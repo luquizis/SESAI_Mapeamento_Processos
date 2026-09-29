@@ -1337,7 +1337,9 @@ const DEFAULT_STEPS = [
     ],
     "alert": null,
     "btnLabel": "Demanda aprovada →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "ed2",
@@ -1358,7 +1360,9 @@ const DEFAULT_STEPS = [
     ],
     "alert": null,
     "btnLabel": "Rota definida →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "ed3a",
@@ -1380,7 +1384,9 @@ const DEFAULT_STEPS = [
     ],
     "alert": "OBS do fluxo: responsável específico pelo controle dos materiais nos DSEIs e verificação de cota de combustível na execução direta.",
     "btnLabel": "Materiais contratados →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "subprocess",
+    "_bnote": "certame de materiais"
   },
   {
     "id": "ed3b",
@@ -1402,7 +1408,9 @@ const DEFAULT_STEPS = [
     "btnLabel": "Mão de obra contratada →",
     "optional": true,
     "optLabel": "Pular — mão de obra própria/voluntária",
-    "attachments": []
+    "attachments": [],
+    "_btype": "subprocess",
+    "_bnote": "contratação de mão de obra"
   },
   {
     "id": "ed3c",
@@ -1425,7 +1433,9 @@ const DEFAULT_STEPS = [
     "btnLabel": "Plano aprovado →",
     "optional": true,
     "optLabel": "Pular — materiais/mão de obra contratados",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "ed4",
@@ -1447,7 +1457,9 @@ const DEFAULT_STEPS = [
     ],
     "alert": "Dificuldade mapeada: falta de padronização nos registros de entrada/saída e de rastreabilidade até o ponto de uso.",
     "btnLabel": "Estoque liberado →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "service_task",
+    "_bnote": "liquidação/registro no SIAFI"
   },
   {
     "id": "ed5",
@@ -1467,7 +1479,9 @@ const DEFAULT_STEPS = [
     ],
     "alert": null,
     "btnLabel": "Reunião realizada →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "ed6",
@@ -1487,7 +1501,9 @@ const DEFAULT_STEPS = [
     ],
     "alert": null,
     "btnLabel": "OS emitida →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "send_task",
+    "_bnote": "emissão e envio da OS"
   },
   {
     "id": "ed7",
@@ -1508,7 +1524,9 @@ const DEFAULT_STEPS = [
     "btnLabel": "ART inserida →",
     "optional": true,
     "optLabel": "Pular — não exige ART",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "ed8",
@@ -1528,7 +1546,9 @@ const DEFAULT_STEPS = [
     ],
     "alert": null,
     "btnLabel": "Retirada atestada →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "ed9",
@@ -1547,7 +1567,9 @@ const DEFAULT_STEPS = [
     ],
     "alert": "Dificuldade: conectividade limitada pode atrasar o registro digital da entrega em campo.",
     "btnLabel": "Entrega atestada →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "ed10",
@@ -1568,7 +1590,9 @@ const DEFAULT_STEPS = [
     ],
     "alert": "Dificuldade: conectividade limitada exige modo offline; escassez de AISANs em campo.",
     "btnLabel": "Semana registrada →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "ed11",
@@ -1590,7 +1614,9 @@ const DEFAULT_STEPS = [
     ],
     "alert": null,
     "btnLabel": "Relatório validado →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "service_task",
+    "_bnote": "gerado automaticamente do diário de obras"
   },
   {
     "id": "ed12",
@@ -1612,7 +1638,9 @@ const DEFAULT_STEPS = [
     ],
     "alert": null,
     "btnLabel": "Obra entregue! 🏁",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "ed13",
@@ -1633,7 +1661,9 @@ const DEFAULT_STEPS = [
     "alert": null,
     "btnLabel": "Manutenção acionada ↻",
     "isLast": true,
-    "attachments": []
+    "attachments": [],
+    "_btype": "service_task",
+    "_bnote": "registro formal em sistema"
   }
 ];
 
@@ -1656,7 +1686,9 @@ const CD_STEPS = [
     ],
     "alert": null,
     "btnLabel": "Demanda aprovada →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "cd2",
@@ -1677,7 +1709,9 @@ const CD_STEPS = [
     ],
     "alert": null,
     "btnLabel": "Justificativa instruída →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "cd3",
@@ -1696,7 +1730,9 @@ const CD_STEPS = [
     ],
     "alert": "OBS do fluxo: descrever em contrato a obrigatoriedade de treinamento em Segurança no Trabalho e Equipamentos >> Responsabilidades.",
     "btnLabel": "Análise concluída →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "cd4",
@@ -1715,7 +1751,9 @@ const CD_STEPS = [
     ],
     "alert": null,
     "btnLabel": "Empenho emitido →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "service_task",
+    "_bnote": "emissão da NE no SIAFI"
   },
   {
     "id": "cd5",
@@ -1735,7 +1773,9 @@ const CD_STEPS = [
     ],
     "alert": null,
     "btnLabel": "Contrato formalizado →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "send_task",
+    "_bnote": "publicação do extrato"
   },
   {
     "id": "cd6",
@@ -1755,7 +1795,9 @@ const CD_STEPS = [
     ],
     "alert": null,
     "btnLabel": "Execução acompanhada →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "cd7",
@@ -1775,7 +1817,9 @@ const CD_STEPS = [
     ],
     "alert": null,
     "btnLabel": "Entregas parciais pagas →",
-    "attachments": []
+    "attachments": [],
+    "_btype": "service_task",
+    "_bnote": "pagamento por atesto de entrega"
   },
   {
     "id": "cd8",
@@ -1795,7 +1839,9 @@ const CD_STEPS = [
     ],
     "alert": null,
     "btnLabel": "Contrato concluído! 🏁",
-    "attachments": []
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
   },
   {
     "id": "cd9",
@@ -1815,132 +1861,13 @@ const CD_STEPS = [
     "alert": null,
     "btnLabel": "Manutenção acionada ↻",
     "isLast": true,
-    "attachments": []
+    "attachments": [],
+    "_btype": "service_task",
+    "_bnote": "registro/monitoramento em sistema"
   }
 ];
 
-const IC_STEPS = [
-  {
-    "id": "ic1",
-    "num": "1",
-    "phase": "p1",
-    "actor": "dsei",
-    "title": "Aprovação da demanda e análise de alternativas",
-    "desc": "Demanda aprovada e estudo comparativo: construir nova obra versus incorporar imóvel existente.",
-    "items": [
-      "Demanda registrada no SEI",
-      "Estudo comparativo de custo, prazo e adequação",
-      "Decisão fundamentada pela via mais adequada, econômica ou ágil"
-    ],
-    "docs": [
-      "DFD",
-      "Estudo comparativo"
-    ],
-    "alert": null,
-    "btnLabel": "Demanda aprovada →",
-    "attachments": []
-  },
-  {
-    "id": "ic2",
-    "num": "2",
-    "phase": "p1",
-    "actor": "ses",
-    "title": "Avaliações técnicas, patrimoniais, jurídicas e orçamentárias",
-    "desc": "A incorporação só deve ser adotada após avaliações técnicas, patrimoniais, jurídicas e orçamentárias aplicáveis.",
-    "items": [
-      "Vistoria técnica e avaliação do imóvel",
-      "Análise patrimonial e documentação do imóvel",
-      "Análise jurídica (titularidade, ônus, restrições)",
-      "Análise orçamentária e fonte de recursos"
-    ],
-    "docs": [
-      "Laudo de avaliação",
-      "Certidões",
-      "Parecer jurídico"
-    ],
-    "alert": null,
-    "btnLabel": "Avaliações concluídas →",
-    "attachments": []
-  },
-  {
-    "id": "ic3",
-    "num": "3",
-    "phase": "p2",
-    "actor": "selog",
-    "title": "Processo de aquisição do imóvel",
-    "desc": "Instrução do processo de aquisição (dispensa/inexigibilidade ou licitação, conforme o caso) e formalização da compra.",
-    "items": [
-      "Instrução do processo de aquisição",
-      "Justificativa e compatibilidade de preço",
-      "Escritura/contrato de compra e venda"
-    ],
-    "docs": [
-      "Processo SEI",
-      "Escritura"
-    ],
-    "alert": null,
-    "btnLabel": "Imóvel adquirido →",
-    "attachments": []
-  },
-  {
-    "id": "ic4",
-    "num": "4",
-    "phase": "p3",
-    "actor": "sepat",
-    "title": "Regularização e registro no patrimônio da União",
-    "desc": "Registro do imóvel no patrimônio da União (SEPAT) com toda a documentação de incorporação patrimonial.",
-    "items": [
-      "Registro patrimonial do imóvel",
-      "Atualização da documentação de titularidade",
-      "Cadastro nos sistemas de patrimônio"
-    ],
-    "docs": [
-      "Termo de incorporação patrimonial"
-    ],
-    "alert": null,
-    "btnLabel": "Imóvel registrado →",
-    "attachments": []
-  },
-  {
-    "id": "ic5",
-    "num": "5",
-    "phase": "p3",
-    "actor": "dsei",
-    "title": "Destinação à prestação dos serviços da SESAI",
-    "desc": "Imóvel destinado ao uso dos serviços da SESAI, com comunicação à comunidade/ala de atendimento.",
-    "items": [
-      "Destinação formal do imóvel",
-      "Ativação do imóvel para o serviço",
-      "Comunicação à comunidade beneficiária"
-    ],
-    "docs": [
-      "Despacho de destinação"
-    ],
-    "alert": null,
-    "btnLabel": "Imóvel destinado →",
-    "attachments": []
-  },
-  {
-    "id": "ic6",
-    "num": "6",
-    "phase": "p5",
-    "actor": "dsei",
-    "title": "Manutenção e monitoramento",
-    "desc": "Ciclo contínuo de manutenção e monitoramento do imóvel incorporado.",
-    "items": [
-      "Plano de manutenção do imóvel",
-      "Responsável pelo acompanhamento",
-      "Registros periódicos de conservação"
-    ],
-    "docs": [
-      "Plano de manutenção"
-    ],
-    "alert": null,
-    "btnLabel": "Manutenção acionada ↻",
-    "isLast": true,
-    "attachments": []
-  }
-];
+const IC_STEPS = json.loads(JSON.stringify([{"id": "ic1", "num": "1", "phase": "p1", "actor": "dsei", "title": "Aprovação da demanda e análise de alternativas", "desc": "Demanda aprovada e estudo comparativo: construir nova obra versus incorporar imóvel existente.", "items": ["Demanda registrada no SEI", "Estudo comparativo de custo, prazo e adequação", "Decisão fundamentada pela via mais adequada, econômica ou ágil"], "docs": ["DFD", "Estudo comparativo"], "alert": null, "btnLabel": "Demanda aprovada →", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic2", "num": "2", "phase": "p1", "actor": "ses", "title": "Avaliações técnicas, patrimoniais, jurídicas e orçamentárias", "desc": "A incorporação só deve ser adotada após avaliações técnicas, patrimoniais, jurídicas e orçamentárias aplicáveis.", "items": ["Vistoria técnica e avaliação do imóvel", "Análise patrimonial e documentação do imóvel", "Análise jurídica (titularidade, ônus, restrições)", "Análise orçamentária e fonte de recursos"], "docs": ["Laudo de avaliação", "Certidões", "Parecer jurídico"], "alert": null, "btnLabel": "Avaliações concluídas →", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic3", "num": "3", "phase": "p2", "actor": "selog", "title": "Processo de aquisição do imóvel", "desc": "Instrução do processo de aquisição (dispensa/inexigibilidade ou licitação, conforme o caso) e formalização da compra.", "items": ["Instrução do processo de aquisição", "Justificativa e compatibilidade de preço", "Escritura/contrato de compra e venda"], "docs": ["Processo SEI", "Escritura"], "alert": null, "btnLabel": "Imóvel adquirido →", "attachments": [], "_btype": "subprocess", "_bnote": "aquisição e formalização"}, {"id": "ic4", "num": "4", "phase": "p3", "actor": "sepat", "title": "Regularização e registro no patrimônio da União", "desc": "Registro do imóvel no patrimônio da União (SEPAT) com toda a documentação de incorporação patrimonial.", "items": ["Registro patrimonial do imóvel", "Atualização da documentação de titularidade", "Cadastro nos sistemas de patrimônio"], "docs": ["Termo de incorporação patrimonial"], "alert": null, "btnLabel": "Imóvel registrado →", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic5", "num": "5", "phase": "p3", "actor": "dsei", "title": "Destinação à prestação dos serviços da SESAI", "desc": "Imóvel destinado ao uso dos serviços da SESAI, com comunicação à comunidade/ala de atendimento.", "items": ["Destinação formal do imóvel", "Ativação do imóvel para o serviço", "Comunicação à comunidade beneficiária"], "docs": ["Despacho de destinação"], "alert": null, "btnLabel": "Imóvel destinado →", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic6", "num": "6", "phase": "p5", "actor": "dsei", "title": "Manutenção e monitoramento", "desc": "Ciclo contínuo de manutenção e monitoramento do imóvel incorporado.", "items": ["Plano de manutenção do imóvel", "Responsável pelo acompanhamento", "Registros periódicos de conservação"], "docs": ["Plano de manutenção"], "alert": null, "btnLabel": "Manutenção acionada ↻", "isLast": true, "attachments": [], "_btype": "service_task", "_bnote": "monitoramento contínuo em sistema"}]));
 
 /* ====================================================
    JSONBIN BACKEND — shared storage for all users
@@ -2057,7 +1984,7 @@ function _ensureDefaultProcs() {
   const defs = _defaultProcesses().list;
   // Atualiza Execução Direta se ainda estiver na versão antiga (13 etapas, ids s1…)
   const pd = PROCS.list.find(p => p.id === 'p_direta');
-  if (pd && pd.steps && pd.steps.length === 13 && pd.steps[0] && pd.steps[0].id === 's1') {
+  if (pd && pd.steps && ((pd.steps.length === 13 && pd.steps[0] && pd.steps[0].id === 's1') || (pd.steps.length && !pd.steps[0]._btype))) {
     pd.steps = JSON.parse(JSON.stringify(DEFAULT_STEPS));
     pd.name = 'Execução Direta de Obras — Completa';
     pd.desc = 'Licitação de materiais + mão de obra própria/voluntária · 15 etapas';
@@ -2278,6 +2205,43 @@ function buildBPMN(stepsData) {
     prevId = tid;
     prevX  = tx + TASK_W;
     prevY  = cy;
+
+    // Macro gateway (encruzilhada) — decisão com retorno de correção
+    if (s._gw && typeof MACRO_GATEWAYS !== 'undefined' && MACRO_GATEWAYS[s._gw]) {
+      const gwm  = MACRO_GATEWAYS[s._gw];
+      const gwId2= 'GWX_' + s._gw;
+      const gwX2 = prevX + 30;
+      const gwY2 = cy - GW_SIZE / 2;
+      gwDefs   += `    <exclusiveGateway id="${gwId2}" name="${sanitizeXml(gwm.question)}"/>` + '\n';
+      gwShapes += `      <bpmndi:BPMNShape id="sh_${gwId2}" bpmnElement="${gwId2}" isMarkerVisible="true">
+        <dc:Bounds x="${gwX2}" y="${gwY2}" width="${GW_SIZE}" height="${GW_SIZE}"/>
+        <bpmndi:BPMNLabel><dc:Bounds x="${gwX2 - 20}" y="${gwY2 - 22}" width="96" height="14"/></bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>` + '\n';
+      // fluxo principal: tarefa → gateway ("Sim" segue em frente)
+      const sfA = `sf_${tid}_${gwId2}`;
+      seqFlowDefs  += `    <sequenceFlow id="${sfA}" name="Sim" sourceRef="${tid}" targetRef="${gwId2}"/>` + '\n';
+      seqFlowEdges += buildEdge(sfA, prevX, cy, gwX2, cy);
+      // retorno de correção: gateway → atividade alvo ("Não")
+      const loopTarget = (typeof GW_LOOP !== 'undefined') ? GW_LOOP[s._gw] : null;
+      const tIdx = loopTarget ? stepsData.findIndex(x => x.id === loopTarget) : -1;
+      if (tIdx >= 0) {
+        const tgt  = stepsData[tIdx];
+        const ty2  = laneYMap[tgt.actor || 'ses'];
+        const tx2  = stepX[tIdx] - TASK_W / 2;
+        const sfB  = `sf_${gwId2}_loop_${tIdx}`;
+        seqFlowDefs += `    <sequenceFlow id="${sfB}" name="Não — retorna p/ correção" sourceRef="${gwId2}" targetRef="T_${tIdx}"/>` + '\n';
+        const bx = gwX2 + GW_SIZE + 46;
+        seqFlowEdges += `      <bpmndi:BPMNEdge id="ed_${sfB}" bpmnElement="${sfB}">
+        <di:waypoint x="${gwX2 + GW_SIZE}" y="${cy}"/>
+        <di:waypoint x="${bx}" y="${cy}"/>
+        <di:waypoint x="${bx}" y="${ty2}"/>
+        <di:waypoint x="${tx2 + TASK_W}" y="${ty2}"/>
+      </bpmndi:BPMNEdge>` + '\n';
+      }
+      prevId = gwId2;
+      prevX  = gwX2 + GW_SIZE;
+      prevY  = cy;
+    }
 
     // Optional gateway (XOR) after this task if step is optional
     if (s.optional) {
@@ -2523,7 +2487,8 @@ async function bPrint() {
       <th style="width:28%">Atividade</th>
       <th style="width:12%">Ator</th>
       <th style="width:10%">Fase</th>
-      <th style="width:46%">Descrição / Checklist</th>
+      <th style="width:10%">Classificação</th>
+      <th style="width:36%">Descrição / Checklist</th>
     </tr>
   </thead>
   <tbody>
@@ -2535,6 +2500,7 @@ async function bPrint() {
         <td style="font-weight:600">${sanitize(s.title)}</td>
         <td><span class="actor-pill" style="background:${ac.bg};color:${ac.color}">${ac.label}</span></td>
         <td style="color:#555">${ph.label}</td>
+        <td>${s._btype && (typeof MACRO_BPMN_TYPES!=='undefined') && MACRO_BPMN_TYPES[s._btype] ? MACRO_BPMN_TYPES[s._btype].icon+' '+MACRO_BPMN_TYPES[s._btype].label : '👤 Tarefa humana'}</td>
         <td style="color:#444">${s.items.map(it=>`• ${sanitize(it)}`).join('<br>')}</td>
       </tr>`;
     }).join('')}
@@ -2721,6 +2687,7 @@ function renderCards() {
           <div class="step-meta-row">
             <span class="actor-pill" style="background:${ac.bg};color:${ac.color}">● ${ac.label}</span>
             <span class="phase-pill-sm">${ph.label}</span>
+            ${s._btype && (typeof MACRO_BPMN_TYPES!=='undefined') && MACRO_BPMN_TYPES[s._btype] ? `<span class="phase-pill-sm" title="Classificação BPMN da atividade">${MACRO_BPMN_TYPES[s._btype].icon} ${MACRO_BPMN_TYPES[s._btype].label}</span>` : '<span class="phase-pill-sm">👤 Tarefa humana</span>'}
             ${atts.length>0?`<span style="font-size:10.5px;color:var(--gray-400)">📎 ${atts.length}</span>`:''}
             ${(s.comments&&s.comments.length)?`<span style="font-size:10.5px;color:var(--gray-400)">💬 ${s.comments.length}</span>`:''}
           </div>
@@ -3505,6 +3472,17 @@ const MACRO_GATEWAYS = {
   GW_005: { after:'ACT_034', name:'Parecer jurídico favorável?',                     question:'Parecer jurídico foi favorável?',               stage:'STAGE_5' },
   GW_006: { after:'ACT_042', name:'Necessidade de ajustar edital após impugnações?', question:'Houve impugnações que exigem ajuste do edital?',stage:'STAGE_6' },
   GW_007: { after:'ACT_044', name:'Resultado recursal mantido?',                     question:'Resultado da licitação foi mantido após recursos?',stage:'STAGE_6'},
+};
+
+/* Alvo do retorno ("Não") de cada gateway — modela as correções do processo */
+const GW_LOOP = {
+  GW_001:null,        // decisão de rota (projeto próprio vs. apoio técnico) — sem retorno
+  GW_002:'ACT_009',   // DFD inconsistente → reelaborar DFD (SESANI)
+  GW_003:'ACT_016',   // projeto não validado → ajustar projeto básico
+  GW_004:'ACT_028',   // TR não validado → ajustar Termo de Referência
+  GW_005:'ACT_035',   // parecer jurídico desfavorável → saneamento jurídico
+  GW_006:'ACT_030',   // impugnações → ajustar minuta do edital
+  GW_007:'ACT_043',   // recurso reforma resultado → reconduzir certame
 };
 
 const MACRO_ACTIVITIES = [
