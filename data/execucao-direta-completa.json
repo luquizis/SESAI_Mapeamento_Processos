@@ -1,0 +1,323 @@
+{
+  "processName": "Execução Direta de Obras — Completa",
+  "description": "Obra executada pelo DSEI: licitação apenas para materiais e/ou mão de obra especializada, com mão de obra própria ou voluntária. Gatilhos: 1-Aprovação da demanda · 2-Contratação/Plano de execução · 3-Entregas parciais · 4-Entrega definitiva.",
+  "icon": "🏗",
+  "steps": [
+    {
+      "id": "ed1",
+      "num": "1",
+      "phase": "p1",
+      "actor": "dsei",
+      "title": "Aprovação da demanda",
+      "desc": "Gatilho 1 — A demanda é priorizada (PDSI/PCA) e formalmente aprovada pelo DSEI/Gabinete antes de qualquer aquisição.",
+      "items": [
+        "Demanda registrada no SEI e vinculada ao PDSI/PCA",
+        "Aprovação formal pelo DSEI/Gabinete",
+        "Definição do objeto e do valor estimado"
+      ],
+      "docs": [
+        "DFD aprovado",
+        "PCA"
+      ],
+      "alert": null,
+      "btnLabel": "Demanda aprovada →",
+      "attachments": []
+    },
+    {
+      "id": "ed2",
+      "num": "2",
+      "phase": "p1",
+      "actor": "dsei",
+      "title": "Definição da rota de execução direta",
+      "desc": "Gateway — define-se como a obra será executada. São três rotas possíveis (podem se combinar): (a) licitar apenas a compra dos materiais; (b) contratar mão de obra especializada; (c) executar com mão de obra própria do DSEI ou voluntária (comunidade/parceiros).",
+      "items": [
+        "Rota A: licitação para aquisição de materiais",
+        "Rota B: licitação para contratação de mão de obra especializada",
+        "Rota C: mão de obra própria do DSEI ou voluntária (registrar doação de material)",
+        "Registro da decisão e da justificativa no SEI"
+      ],
+      "docs": [
+        "Despacho de decisão",
+        "Registro de doação de material (rota C)"
+      ],
+      "alert": null,
+      "btnLabel": "Rota definida →",
+      "attachments": []
+    },
+    {
+      "id": "ed3a",
+      "num": "3a",
+      "phase": "p2",
+      "actor": "selog",
+      "title": "Processo licitatório para compra de materiais",
+      "desc": "Gatilho 2 (rota A) — SELOG conduz o processo licitatório (pregão/concorrência) para aquisição dos materiais de construção.",
+      "items": [
+        "ETP/TR para aquisição de materiais",
+        "Execução do certame no Compras.gov/PNCP",
+        "Homologação e contratação do fornecedor",
+        "OBS: entrega programada conforme cronograma de execução (evitar vencimento/estoque inadequado)"
+      ],
+      "docs": [
+        "ETP",
+        "TR",
+        "Contrato de aquisição"
+      ],
+      "alert": "OBS do fluxo: responsável específico pelo controle dos materiais nos DSEIs e verificação de cota de combustível na execução direta.",
+      "btnLabel": "Materiais contratados →",
+      "attachments": []
+    },
+    {
+      "id": "ed3b",
+      "num": "3b",
+      "phase": "p2",
+      "actor": "selog",
+      "title": "Processo de fornecimento de mão de obra especializada",
+      "desc": "Gatilho 2 (rota B) — contratação de mão de obra especializada (ex.: serviços de construção) quando o DSEI não executa com equipe própria.",
+      "items": [
+        "Definição do escopo da mão de obra",
+        "Certame e contratação",
+        "Cláusulas de responsabilidade e segurança do trabalho"
+      ],
+      "docs": [
+        "TR mão de obra",
+        "Contrato"
+      ],
+      "alert": null,
+      "btnLabel": "Mão de obra contratada →",
+      "optional": true,
+      "optLabel": "Pular — mão de obra própria/voluntária",
+      "attachments": []
+    },
+    {
+      "id": "ed3c",
+      "num": "3c",
+      "phase": "p2",
+      "actor": "dsei",
+      "title": "Plano de execução com mão de obra própria/voluntária",
+      "desc": "Gatilho 2 (rota C) — DSEI formaliza o plano de execução usando servidores e/ou voluntários da comunidade/parceiros, e registra a doação de material de construção quando houver.",
+      "items": [
+        "Plano de execução aprovado (equipe, cronograma, insumos)",
+        "Registro de doação de material de construção (quando aplicável)",
+        "Responsabilidade técnica e fiscal designadas por portaria"
+      ],
+      "docs": [
+        "Plano de execução",
+        "Registro de doação",
+        "Portaria de designação"
+      ],
+      "alert": null,
+      "btnLabel": "Plano aprovado →",
+      "optional": true,
+      "optLabel": "Pular — materiais/mão de obra contratados",
+      "attachments": []
+    },
+    {
+      "id": "ed4",
+      "num": "4",
+      "phase": "p2",
+      "actor": "seofi",
+      "title": "Cadastro do estoque e liberação de materiais",
+      "desc": "SEOFI cadastra e liquida o material recebido no SIAFI; SELOG vincula os itens à obra; liberação em remessas conforme etapa.",
+      "items": [
+        "Liquidação da NF no SIAFI e registro no almoxarifado",
+        "Vinculação de itens à obra (SELOG)",
+        "Liberação física em remessas",
+        "Realocação: SESANI justifica → DEAMB aprova"
+      ],
+      "docs": [
+        "Nota fiscal",
+        "Liquidação SIAFI",
+        "Requisição de material"
+      ],
+      "alert": "Dificuldade mapeada: falta de padronização nos registros de entrada/saída e de rastreabilidade até o ponto de uso.",
+      "btnLabel": "Estoque liberado →",
+      "attachments": []
+    },
+    {
+      "id": "ed5",
+      "num": "5",
+      "phase": "p3",
+      "actor": "ses",
+      "title": "Reunião com a comunidade",
+      "desc": "SESANI organiza reunião para apresentar a obra, alinhar responsabilidades e validar a data de início com a comunidade.",
+      "items": [
+        "Pauta: obra, etapas, cronograma e impactos",
+        "Validação da data de início",
+        "ATA assinada ou relato fotográfico"
+      ],
+      "docs": [
+        "ATA de reunião",
+        "Lista de presença"
+      ],
+      "alert": null,
+      "btnLabel": "Reunião realizada →",
+      "attachments": []
+    },
+    {
+      "id": "ed6",
+      "num": "6",
+      "phase": "p3",
+      "actor": "ses",
+      "title": "Emissão da Ordem de Serviço",
+      "desc": "A OS deflagra oficialmente o início da obra — o marco formal que substitui o início de um contrato licitado de obra.",
+      "items": [
+        "Data oficial de início",
+        "Escopo detalhado e equipe designada",
+        "Co-assinada por DSEI/Gabinete e SESANI"
+      ],
+      "docs": [
+        "Ordem de Serviço",
+        "Escopo de obra"
+      ],
+      "alert": null,
+      "btnLabel": "OS emitida →",
+      "attachments": []
+    },
+    {
+      "id": "ed7",
+      "num": "7",
+      "phase": "p3",
+      "actor": "deamb",
+      "title": "ART e documentos técnicos",
+      "desc": "Quando exigida, SESANI solicita a ART à COABS. NÃO se aplica a reforma, manutenção e serviços similares.",
+      "items": [
+        "Solicitação e pagamento da ART à COABS",
+        "Anexos dos documentos técnicos da obra"
+      ],
+      "docs": [
+        "ART",
+        "Projeto executivo"
+      ],
+      "alert": null,
+      "btnLabel": "ART inserida →",
+      "optional": true,
+      "optLabel": "Pular — não exige ART",
+      "attachments": []
+    },
+    {
+      "id": "ed8",
+      "num": "8",
+      "phase": "p3",
+      "actor": "sepat",
+      "title": "Atesto de retirada de material (SEPAT)",
+      "desc": "Com a OS, SESANI aciona o SEPAT para retirada do material; ambos assinam o atesto (formulário único 8→9).",
+      "items": [
+        "Liberação do material pelo SEPAT",
+        "Assinatura do atesto de retirada",
+        "Retirada possível em remessas por etapa"
+      ],
+      "docs": [
+        "Atesto de retirada",
+        "Formulário único"
+      ],
+      "alert": null,
+      "btnLabel": "Retirada atestada →",
+      "attachments": []
+    },
+    {
+      "id": "ed9",
+      "num": "9",
+      "phase": "p3",
+      "actor": "ses",
+      "title": "Atesto de entrega do material na aldeia",
+      "desc": "SESANI assina o atesto de entrega no canteiro de obras na aldeia, encerrando o formulário único.",
+      "items": [
+        "Entrega física no canteiro de obras",
+        "Assinatura do atesto de entrega",
+        "Ciclo documental completo: origem → almoxarifado → obra"
+      ],
+      "docs": [
+        "Atesto de entrega"
+      ],
+      "alert": "Dificuldade: conectividade limitada pode atrasar o registro digital da entrega em campo.",
+      "btnLabel": "Entrega atestada →",
+      "attachments": []
+    },
+    {
+      "id": "ed10",
+      "num": "10",
+      "phase": "p4",
+      "actor": "ses",
+      "title": "Execução e acompanhamento da obra",
+      "desc": "Gatilho 3 — execução da obra com diário de obras semanal (fotos georreferenciadas, cronograma, problemas). Pode ser preenchido por AISAN e comunidade.",
+      "items": [
+        "Diário de obras semanal (7 dias)",
+        "Registro fotográfico georreferenciado",
+        "Ajuste de cronograma e registro de problemas",
+        "Preenchimento também por AISAN e comunidade"
+      ],
+      "docs": [
+        "Diário de obras",
+        "Cronograma atualizado"
+      ],
+      "alert": "Dificuldade: conectividade limitada exige modo offline; escassez de AISANs em campo.",
+      "btnLabel": "Semana registrada →",
+      "attachments": []
+    },
+    {
+      "id": "ed11",
+      "num": "11",
+      "phase": "p4",
+      "actor": "deamb",
+      "title": "Relatório situacional mensal",
+      "desc": "Gerado automaticamente a cada 4 semanas a partir do diário; validado pelo SESANI e pelo DEAMB/COABS.",
+      "items": [
+        "% executado no mês e acumulado vs previsto",
+        "Curva previsto × executado",
+        "Riscos, não conformidades e ações",
+        "Validação SESANI → DEAMB/COABS"
+      ],
+      "docs": [
+        "Relatório situacional",
+        "Curva S",
+        "Parecer técnico"
+      ],
+      "alert": null,
+      "btnLabel": "Relatório validado →",
+      "attachments": []
+    },
+    {
+      "id": "ed12",
+      "num": "12",
+      "phase": "p5",
+      "actor": "ses",
+      "title": "Entrega à comunidade e Termo de Conclusão",
+      "desc": "Gatilho 4 — reunião formal de entrega, assinatura da liderança local, Termo de Conclusão e encerramento do processo no SEI.",
+      "items": [
+        "Entrega formal com registro fotográfico",
+        "Assinatura da liderança local",
+        "Termo de Conclusão de Obra (SESANI)",
+        "DEAMB instrui o encerramento do processo SEI"
+      ],
+      "docs": [
+        "Ata de entrega",
+        "Termo de conclusão",
+        "Encerramento SEI"
+      ],
+      "alert": null,
+      "btnLabel": "Obra entregue! 🏁",
+      "attachments": []
+    },
+    {
+      "id": "ed13",
+      "num": "13",
+      "phase": "p5",
+      "actor": "dsei",
+      "title": "Registro de entrega e acionamento da manutenção",
+      "desc": "Registro formal de entrega da obra e início do ciclo contínuo de manutenção/monitoramento do patrimônio.",
+      "items": [
+        "Registro de entrega da obra no sistema",
+        "Plano de manutenção/monitoramento",
+        "Responsável DSEI pelo acompanhamento pós-obra"
+      ],
+      "docs": [
+        "Registro de entrega",
+        "Plano de manutenção"
+      ],
+      "alert": null,
+      "btnLabel": "Manutenção acionada ↻",
+      "isLast": true,
+      "attachments": []
+    }
+  ]
+}

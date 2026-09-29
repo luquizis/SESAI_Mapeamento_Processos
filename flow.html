@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fluxo Interativo</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+:root{
+  --verde-escuro:#1b4332; --verde-medio:#2d6a4f; --verde-claro:#40916c; --verde-bg:#d8f3dc;
+  --vermelho:#8b2e16; --vermelho-med:#b5451b; --vermelho-light:#fdf0ec;
+  --ouro:#c9a84c; --ouro-light:#fef9ee;
+  --branco:#ffffff; --cinza-100:#f7f8f9; --cinza-200:#e8e8e8; --cinza-300:#d0d0d0;
+  --cinza-500:#888; --cinza-700:#444; --cinza-900:#1a1a1a;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.08); --shadow-md:0 4px 16px rgba(0,0,0,.1);
+  --font:'Source Sans 3',sans-serif; --font-head:'Raleway',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:var(--font);background:var(--cinza-100);color:var(--cinza-900);overflow-x:hidden;}
+
+.page{display:grid;grid-template-rows:auto auto 1fr auto;min-height:100vh;max-width:1160px;margin:0 auto;padding:0 20px;}
+
+/* progress bar */
+.prog-bar-wrap{background:var(--branco);border-bottom:1px solid var(--cinza-200);padding:10px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.prog-label{font-size:12px;color:var(--cinza-500);white-space:nowrap;}
+.prog-track{flex:1;min-width:120px;height:6px;background:var(--cinza-200);border-radius:4px;overflow:hidden;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--verde-claro),var(--verde-medio));border-radius:4px;transition:width .5s ease;}
+.prog-count{font-size:12px;font-weight:600;color:var(--verde-escuro);white-space:nowrap;}
+.prog-reset{padding:5px 12px;border-radius:5px;border:1px solid var(--cinza-300);background:none;font-size:11px;color:var(--cinza-500);cursor:pointer;font-family:var(--font);transition:all .2s;}
+.prog-reset:hover{border-color:var(--cinza-700);color:var(--cinza-900);}
+
+/* phase pills */
+.phases-strip{padding:12px 0 8px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;}
+.phases-strip::-webkit-scrollbar{display:none;}
+.phase-pill{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:20px;border:1.5px solid var(--cinza-200);background:var(--branco);cursor:pointer;font-size:11.5px;font-weight:500;color:var(--cinza-500);white-space:nowrap;transition:all .2s;font-family:var(--font);}
+.phase-pill:hover{border-color:var(--verde-claro);color:var(--verde-escuro);}
+.phase-pill.active{color:var(--branco);border-color:transparent;font-weight:600;}
+.phase-pill.done{opacity:.6;}
+.pill-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.pill-count{font-size:10px;opacity:.7;}
+
+/* main grid */
+main{display:grid;grid-template-columns:1fr 310px;gap:18px;padding:6px 0 32px;align-items:start;}
+
+/* step cards */
+.flow-col{display:flex;flex-direction:column;gap:10px;}
+.step-card{background:var(--branco);border:1px solid var(--cinza-200);border-radius:10px;overflow:hidden;transition:all .3s ease;opacity:.35;box-shadow:none;}
+.step-card.unlocked,.step-card.done{opacity:1;}
+.step-card.active{opacity:1;box-shadow:var(--shadow-md);border-color:var(--cinza-300);}
+.step-card.done{opacity:.6;}
+
+.card-hdr{display:flex;align-items:stretch;cursor:pointer;user-select:none;}
+.card-accent{width:5px;flex-shrink:0;transition:background .3s;}
+.card-hdr-inner{flex:1;display:flex;align-items:center;gap:12px;padding:13px 16px;}
+.step-num{width:34px;height:34px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--font-head);background:var(--cinza-100);border:1.5px solid var(--cinza-200);color:var(--cinza-500);transition:all .3s;}
+.step-card.active .step-num,.step-card.unlocked:not(.done) .step-num{background:var(--verde-bg);border-color:var(--verde-claro);color:var(--verde-escuro);}
+.step-card.done .step-num{background:var(--verde-bg);border-color:var(--verde-claro);color:var(--verde-claro);}
+.step-meta{flex:1;min-width:0;}
+.step-title{font-size:13.5px;font-weight:600;color:var(--cinza-900);line-height:1.3;margin-bottom:3px;}
+.step-actor-row{display:flex;align-items:center;gap:6px;}
+.actor-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;}
+.step-right-meta{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.phase-tag{font-size:10.5px;padding:3px 9px;border-radius:10px;font-weight:600;white-space:nowrap;}
+.chevron-icon{font-size:12px;color:var(--cinza-300);transition:transform .3s;}
+.step-card.open .chevron-icon{transform:rotate(180deg);}
+
+/* card body */
+.card-body{display:none;border-top:1px solid var(--cinza-100);padding:0;}
+.step-card.open .card-body{display:block;}
+.card-body-inner{padding:16px 20px 18px 66px;}
+.body-desc{font-size:13px;color:var(--cinza-700);line-height:1.7;margin-bottom:14px;}
+.body-items{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.body-item{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--cinza-700);line-height:1.5;}
+.body-item-dot{width:5px;height:5px;border-radius:50%;background:var(--verde-claro);flex-shrink:0;margin-top:7px;}
+.alert-block{display:flex;gap:10px;align-items:flex-start;background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #f59e0b;border-radius:6px;padding:10px 13px;margin-bottom:12px;}
+.alert-txt{font-size:12px;color:#92400e;line-height:1.6;}
+.docs-strip{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.doc-tag{display:flex;align-items:center;gap:5px;background:var(--cinza-100);border:1px solid var(--cinza-200);border-radius:5px;padding:4px 10px;font-size:11.5px;color:var(--cinza-700);}
+
+/* edit zone */
+.edit-zone{background:#f0fdf4;border:1px dashed var(--verde-claro);border-radius:8px;padding:14px;margin-top:14px;display:none;}
+.edit-zone.show{display:block;}
+.edit-zone h4{font-size:12px;font-weight:600;color:var(--verde-escuro);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.ez-label{font-size:11px;font-weight:600;color:var(--cinza-700);display:block;margin-bottom:4px;}
+.ez-input,.ez-textarea{width:100%;border:1px solid var(--cinza-300);border-radius:5px;padding:7px 10px;font-size:12px;font-family:var(--font);color:var(--cinza-900);margin-bottom:10px;outline:none;transition:border-color .2s;background:#fff;}
+.ez-input:focus,.ez-textarea:focus{border-color:var(--verde-claro);}
+.ez-textarea{min-height:70px;resize:vertical;}
+.ez-actions{display:flex;gap:8px;}
+.ez-save{padding:7px 16px;border-radius:5px;border:none;background:var(--verde-escuro);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);}
+.ez-cancel{padding:7px 14px;border-radius:5px;border:1px solid var(--cinza-300);background:none;font-size:12px;color:var(--cinza-700);cursor:pointer;font-family:var(--font);}
+
+/* action row */
+.action-row{display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap;}
+.btn-advance{display:flex;align-items:center;gap:6px;padding:9px 20px;border-radius:6px;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:var(--font);transition:all .2s;white-space:nowrap;color:#fff;}
+.btn-advance:hover{filter:brightness(1.07);transform:translateY(-1px);}
+.btn-advance.done-state{background:var(--verde-bg);color:var(--verde-claro);cursor:default;border:1px solid var(--verde-claro);}
+.btn-advance.done-state:hover{transform:none;filter:none;}
+.btn-skip{padding:9px 14px;border-radius:6px;border:1px solid var(--cinza-300);background:none;font-size:12px;color:var(--cinza-500);cursor:pointer;font-family:var(--font);transition:all .2s;}
+.btn-skip:hover{border-color:var(--cinza-700);color:var(--cinza-900);}
+.btn-comment{padding:9px 14px;border-radius:6px;border:1px solid var(--vermelho-med);background:var(--vermelho-light);font-size:12px;color:var(--vermelho);cursor:pointer;font-family:var(--font);transition:all .2s;font-weight:500;}
+.btn-comment:hover{background:var(--vermelho);color:#fff;}
+.btn-edit-step{padding:9px 14px;border-radius:6px;border:1px solid var(--verde-claro);background:var(--verde-bg);font-size:12px;color:var(--verde-escuro);cursor:pointer;font-family:var(--font);transition:all .2s;font-weight:500;}
+.btn-edit-step:hover{background:var(--verde-escuro);color:#fff;}
+
+/* SIDEBAR */
+.sidebar{position:sticky;top:16px;display:flex;flex-direction:column;gap:12px;}
+.side-card{background:var(--branco);border:1px solid var(--cinza-200);border-radius:10px;overflow:hidden;}
+.side-card-head{padding:12px 16px;border-bottom:1px solid var(--cinza-100);display:flex;align-items:center;gap:8px;}
+.side-card-head h3{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--cinza-500);}
+.side-card-head .sch-accent{width:3px;height:14px;border-radius:2px;flex-shrink:0;}
+.side-card-body{padding:10px 12px;}
+
+/* mini steps */
+.mini-steps{display:flex;flex-direction:column;gap:2px;}
+.ms-item{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer;transition:background .15s;}
+.ms-item:hover{background:var(--cinza-100);}
+.ms-item.ms-locked{cursor:default;opacity:.45;}
+.ms-item.ms-active{background:var(--verde-bg);}
+.ms-dot{width:22px;height:22px;border-radius:6px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;font-family:var(--font-head);border:1.5px solid var(--cinza-200);background:var(--cinza-100);color:var(--cinza-500);}
+.ms-item.ms-done .ms-dot{background:var(--verde-bg);border-color:var(--verde-claro);color:var(--verde-escuro);}
+.ms-item.ms-active .ms-dot{border-color:var(--verde-claro);color:var(--verde-escuro);background:var(--branco);}
+.ms-info{flex:1;min-width:0;}
+.ms-title{font-size:10.5px;line-height:1.3;color:var(--cinza-700);}
+.ms-actor{font-size:9.5px;color:var(--cinza-500);}
+
+/* phase bars */
+.ph-bars{display:flex;flex-direction:column;gap:8px;padding:12px 14px;}
+.ph-row{display:flex;align-items:center;gap:8px;}
+.ph-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.ph-name{font-size:11px;color:var(--cinza-700);flex:1;}
+.ph-track{width:70px;height:4px;background:var(--cinza-200);border-radius:3px;overflow:hidden;}
+.ph-fill{height:100%;border-radius:3px;transition:width .5s;}
+.ph-pct{font-size:10px;color:var(--cinza-500);width:28px;text-align:right;}
+
+/* actors */
+.actor-list{display:flex;flex-direction:column;gap:6px;padding:12px 14px;}
+.al-row{display:flex;align-items:center;gap:8px;}
+.al-strip{width:3px;height:24px;border-radius:2px;flex-shrink:0;}
+.al-name{font-size:11.5px;font-weight:600;}
+.al-desc{font-size:10px;color:var(--cinza-500);}
+
+/* celebrate */
+.celebrate{display:none;position:fixed;inset:0;z-index:100;background:rgba(27,67,50,.88);backdrop-filter:blur(8px);flex-direction:column;align-items:center;justify-content:center;gap:18px;text-align:center;padding:32px;}
+.celebrate.show{display:flex;}
+.cel-diamond{font-size:14px;color:rgba(255,255,255,.2);letter-spacing:4px;margin-bottom:8px;}
+.cel-icon{font-size:52px;}
+.cel-title{font-family:var(--font-head);font-size:28px;font-weight:700;color:#fff;}
+.cel-sub{font-size:14px;color:rgba(255,255,255,.65);max-width:420px;}
+.cel-actions{display:flex;gap:10px;margin-top:8px;flex-wrap:wrap;justify-content:center;}
+.cel-btn{padding:11px 28px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:600;font-family:var(--font);}
+.cel-btn.primary{background:var(--ouro);color:var(--cinza-900);}
+.cel-btn.secondary{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);}
+
+footer{border-top:1px solid var(--cinza-200);padding:12px 0;font-size:11px;color:var(--cinza-500);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;background:var(--branco);margin:0 -20px;padding-left:20px;padding-right:20px;}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.just-in{animation:fadeUp .35s ease forwards;}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--cinza-100)}::-webkit-scrollbar-thumb{background:var(--cinza-300);border-radius:3px}
+@media(max-width:780px){main{grid-template-columns:1fr}.sidebar{position:static}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<!-- PROGRESS BAR -->
+<div class="prog-bar-wrap">
+  <span class="prog-label">Progresso geral</span>
+  <div class="prog-track"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+  <span class="prog-count" id="progCount">0 de 15 etapas</span>
+  <button class="prog-reset" onclick="resetAll()">↺ Reiniciar</button>
+</div>
+
+<!-- PHASE PILLS -->
+<div class="phases-strip" id="phaseStrip"></div>
+
+<!-- MAIN -->
+<main>
+  <div class="flow-col" id="flowCol"></div>
+  <div class="sidebar">
+    <div class="side-card">
+      <div class="side-card-head"><div class="sch-accent" style="background:var(--verde-escuro)"></div><h3>Mapa do fluxo</h3></div>
+      <div class="side-card-body"><div class="mini-steps" id="miniSteps"></div></div>
+    </div>
+    <div class="side-card">
+      <div class="side-card-head"><div class="sch-accent" style="background:var(--verde-claro)"></div><h3>Progresso por fase</h3></div>
+      <div class="ph-bars" id="phBars"></div>
+    </div>
+    <div class="side-card">
+      <div class="side-card-head"><div class="sch-accent" style="background:var(--vermelho)"></div><h3>Atores</h3></div>
+      <div class="actor-list">
+        <div class="al-row"><div class="al-strip" style="background:#1b4d8a"></div><div><div class="al-name" style="color:#1b4d8a">DSEI / Gabinete</div><div class="al-desc">aprovação · designação · SEI</div></div></div>
+        <div class="al-row"><div class="al-strip" style="background:#1b4332"></div><div><div class="al-name" style="color:#1b4332">SESANI</div><div class="al-desc">responsável técnico central</div></div></div>
+        <div class="al-row"><div class="al-strip" style="background:#78350f"></div><div><div class="al-name" style="color:#78350f">SEOFI</div><div class="al-desc">financeiro · SIAFI · almoxarifado</div></div></div>
+        <div class="al-row"><div class="al-strip" style="background:#713f12"></div><div><div class="al-name" style="color:#713f12">SELOG</div><div class="al-desc">logística · cadastro de obras</div></div></div>
+        <div class="al-row"><div class="al-strip" style="background:#164e63"></div><div><div class="al-name" style="color:#164e63">SEPAT</div><div class="al-desc">patrimônio · retirada de material</div></div></div>
+        <div class="al-row"><div class="al-strip" style="background:#4c1d95"></div><div><div class="al-name" style="color:#4c1d95">DEAMB / COABS</div><div class="al-desc">validação · ART · conclusão</div></div></div>
+        <div class="al-row"><div class="al-strip" style="background:#7c2d12"></div><div><div class="al-name" style="color:#7c2d12">Comunidade</div><div class="al-desc">participação · recebimento</div></div></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <span>SESAI · Secretaria Especial de Saúde Indígena · Ministério da Saúde</span>
+  <span>Fluxo de Execução Direta · v4.0</span>
+</footer>
+</div>
+
+<div class="celebrate" id="celebrate">
+  <div class="cel-diamond">◇ ◇ ◇ ◇ ◇ ◇ ◇</div>
+  <div class="cel-icon">🏁</div>
+  <div class="cel-title">Fluxo concluído!</div>
+  <div class="cel-sub">Todas as 15 etapas foram percorridas. Não se esqueça de registrar sua contribuição sobre o processo.</div>
+  <div class="cel-actions">
+    <button class="cel-btn primary" onclick="window.parent.postMessage({type:'openFeedback',step:'geral'},'*')">💬 Registrar contribuição</button>
+    <button class="cel-btn secondary" onclick="resetAll()">↺ Reiniciar</button>
+  </div>
+</div>
+
+<script>
+const PHASES=[
+  {id:'p1',label:'① Pré-obra',color:'#1b4332',bg:'#d8f3dc',steps:[0,1,2,3]},
+  {id:'p2',label:'② Distribuição',color:'#1b4d8a',bg:'#dbeafe',steps:[4]},
+  {id:'p3',label:'③ Início da Obra',color:'#78350f',bg:'#fef3c7',steps:[5,6,7,8,9]},
+  {id:'p4',label:'④ Acompanhamento',color:'#4c1d95',bg:'#ede9fe',steps:[10,11]},
+  {id:'p5',label:'⑤ Conclusão',color:'#8b2e16',bg:'#fdf0ec',steps:[12]},
+];
+const ACTORS={
+  dsei: {label:'DSEI / Gabinete',color:'#1b4d8a',bg:'#dbeafe'},
+  ses:  {label:'SESANI',color:'#1b4332',bg:'#d8f3dc'},
+  seofi:{label:'SEOFI',color:'#78350f',bg:'#ffedd5'},
+  selog:{label:'SELOG',color:'#713f12',bg:'#fef3c7'},
+  sepat:{label:'SEPAT',color:'#164e63',bg:'#cffafe'},
+  deamb:{label:'DEAMB / COABS',color:'#4c1d95',bg:'#ede9fe'},
+  com:  {label:'Comunidade',color:'#7c2d12',bg:'#fef2f2'},
+};
+
+// editable step data (loaded from localStorage if exists)
+let STEPS_DATA = JSON.parse(localStorage.getItem('sesai_steps_v3') || 'null') || [
+  {
+    "id": "ed1",
+    "num": "1",
+    "phase": "p1",
+    "actor": "dsei",
+    "title": "Aprovação da demanda",
+    "desc": "Gatilho 1 — A demanda é priorizada (PDSI/PCA) e formalmente aprovada pelo DSEI/Gabinete antes de qualquer aquisição.",
+    "items": [
+      "Demanda registrada no SEI e vinculada ao PDSI/PCA",
+      "Aprovação formal pelo DSEI/Gabinete",
+      "Definição do objeto e do valor estimado"
+    ],
+    "docs": [
+      "DFD aprovado",
+      "PCA"
+    ],
+    "alert": null,
+    "btnLabel": "Demanda aprovada →",
+    "attachments": []
+  },
+  {
+    "id": "ed2",
+    "num": "2",
+    "phase": "p1",
+    "actor": "dsei",
+    "title": "Definição da rota de execução direta",
+    "desc": "Gateway — define-se como a obra será executada. São três rotas possíveis (podem se combinar): (a) licitar apenas a compra dos materiais; (b) contratar mão de obra especializada; (c) executar com mão de obra própria do DSEI ou voluntária (comunidade/parceiros).",
+    "items": [
+      "Rota A: licitação para aquisição de materiais",
+      "Rota B: licitação para contratação de mão de obra especializada",
+      "Rota C: mão de obra própria do DSEI ou voluntária (registrar doação de material)",
+      "Registro da decisão e da justificativa no SEI"
+    ],
+    "docs": [
+      "Despacho de decisão",
+      "Registro de doação de material (rota C)"
+    ],
+    "alert": null,
+    "btnLabel": "Rota definida →",
+    "attachments": []
+  },
+  {
+    "id": "ed3a",
+    "num": "3a",
+    "phase": "p2",
+    "actor": "selog",
+    "title": "Processo licitatório para compra de materiais",
+    "desc": "Gatilho 2 (rota A) — SELOG conduz o processo licitatório (pregão/concorrência) para aquisição dos materiais de construção.",
+    "items": [
+      "ETP/TR para aquisição de materiais",
+      "Execução do certame no Compras.gov/PNCP",
+      "Homologação e contratação do fornecedor",
+      "OBS: entrega programada conforme cronograma de execução (evitar vencimento/estoque inadequado)"
+    ],
+    "docs": [
+      "ETP",
+      "TR",
+      "Contrato de aquisição"
+    ],
+    "alert": "OBS do fluxo: responsável específico pelo controle dos materiais nos DSEIs e verificação de cota de combustível na execução direta.",
+    "btnLabel": "Materiais contratados →",
+    "attachments": []
+  },
+  {
+    "id": "ed3b",
+    "num": "3b",
+    "phase": "p2",
+    "actor": "selog",
+    "title": "Processo de fornecimento de mão de obra especializada",
+    "desc": "Gatilho 2 (rota B) — contratação de mão de obra especializada (ex.: serviços de construção) quando o DSEI não executa com equipe própria.",
+    "items": [
+      "Definição do escopo da mão de obra",
+      "Certame e contratação",
+      "Cláusulas de responsabilidade e segurança do trabalho"
+    ],
+    "docs": [
+      "TR mão de obra",
+      "Contrato"
+    ],
+    "alert": null,
+    "btnLabel": "Mão de obra contratada →",
+    "optional": true,
+    "optLabel": "Pular — mão de obra própria/voluntária",
+    "attachments": []
+  },
+  {
+    "id": "ed3c",
+    "num": "3c",
+    "phase": "p2",
+    "actor": "dsei",
+    "title": "Plano de execução com mão de obra própria/voluntária",
+    "desc": "Gatilho 2 (rota C) — DSEI formaliza o plano de execução usando servidores e/ou voluntários da comunidade/parceiros, e registra a doação de material de construção quando houver.",
+    "items": [
+      "Plano de execução aprovado (equipe, cronograma, insumos)",
+      "Registro de doação de material de construção (quando aplicável)",
+      "Responsabilidade técnica e fiscal designadas por portaria"
+    ],
+    "docs": [
+      "Plano de execução",
+      "Registro de doação",
+      "Portaria de designação"
+    ],
+    "alert": null,
+    "btnLabel": "Plano aprovado →",
+    "optional": true,
+    "optLabel": "Pular — materiais/mão de obra contratados",
+    "attachments": []
+  },
+  {
+    "id": "ed4",
+    "num": "4",
+    "phase": "p2",
+    "actor": "seofi",
+    "title": "Cadastro do estoque e liberação de materiais",
+    "desc": "SEOFI cadastra e liquida o material recebido no SIAFI; SELOG vincula os itens à obra; liberação em remessas conforme etapa.",
+    "items": [
+      "Liquidação da NF no SIAFI e registro no almoxarifado",
+      "Vinculação de itens à obra (SELOG)",
+      "Liberação física em remessas",
+      "Realocação: SESANI justifica → DEAMB aprova"
+    ],
+    "docs": [
+      "Nota fiscal",
+      "Liquidação SIAFI",
+      "Requisição de material"
+    ],
+    "alert": "Dificuldade mapeada: falta de padronização nos registros de entrada/saída e de rastreabilidade até o ponto de uso.",
+    "btnLabel": "Estoque liberado →",
+    "attachments": []
+  },
+  {
+    "id": "ed5",
+    "num": "5",
+    "phase": "p3",
+    "actor": "ses",
+    "title": "Reunião com a comunidade",
+    "desc": "SESANI organiza reunião para apresentar a obra, alinhar responsabilidades e validar a data de início com a comunidade.",
+    "items": [
+      "Pauta: obra, etapas, cronograma e impactos",
+      "Validação da data de início",
+      "ATA assinada ou relato fotográfico"
+    ],
+    "docs": [
+      "ATA de reunião",
+      "Lista de presença"
+    ],
+    "alert": null,
+    "btnLabel": "Reunião realizada →",
+    "attachments": []
+  },
+  {
+    "id": "ed6",
+    "num": "6",
+    "phase": "p3",
+    "actor": "ses",
+    "title": "Emissão da Ordem de Serviço",
+    "desc": "A OS deflagra oficialmente o início da obra — o marco formal que substitui o início de um contrato licitado de obra.",
+    "items": [
+      "Data oficial de início",
+      "Escopo detalhado e equipe designada",
+      "Co-assinada por DSEI/Gabinete e SESANI"
+    ],
+    "docs": [
+      "Ordem de Serviço",
+      "Escopo de obra"
+    ],
+    "alert": null,
+    "btnLabel": "OS emitida →",
+    "attachments": []
+  },
+  {
+    "id": "ed7",
+    "num": "7",
+    "phase": "p3",
+    "actor": "deamb",
+    "title": "ART e documentos técnicos",
+    "desc": "Quando exigida, SESANI solicita a ART à COABS. NÃO se aplica a reforma, manutenção e serviços similares.",
+    "items": [
+      "Solicitação e pagamento da ART à COABS",
+      "Anexos dos documentos técnicos da obra"
+    ],
+    "docs": [
+      "ART",
+      "Projeto executivo"
+    ],
+    "alert": null,
+    "btnLabel": "ART inserida →",
+    "optional": true,
+    "optLabel": "Pular — não exige ART",
+    "attachments": []
+  },
+  {
+    "id": "ed8",
+    "num": "8",
+    "phase": "p3",
+    "actor": "sepat",
+    "title": "Atesto de retirada de material (SEPAT)",
+    "desc": "Com a OS, SESANI aciona o SEPAT para retirada do material; ambos assinam o atesto (formulário único 8→9).",
+    "items": [
+      "Liberação do material pelo SEPAT",
+      "Assinatura do atesto de retirada",
+      "Retirada possível em remessas por etapa"
+    ],
+    "docs": [
+      "Atesto de retirada",
+      "Formulário único"
+    ],
+    "alert": null,
+    "btnLabel": "Retirada atestada →",
+    "attachments": []
+  },
+  {
+    "id": "ed9",
+    "num": "9",
+    "phase": "p3",
+    "actor": "ses",
+    "title": "Atesto de entrega do material na aldeia",
+    "desc": "SESANI assina o atesto de entrega no canteiro de obras na aldeia, encerrando o formulário único.",
+    "items": [
+      "Entrega física no canteiro de obras",
+      "Assinatura do atesto de entrega",
+      "Ciclo documental completo: origem → almoxarifado → obra"
+    ],
+    "docs": [
+      "Atesto de entrega"
+    ],
+    "alert": "Dificuldade: conectividade limitada pode atrasar o registro digital da entrega em campo.",
+    "btnLabel": "Entrega atestada →",
+    "attachments": []
+  },
+  {
+    "id": "ed10",
+    "num": "10",
+    "phase": "p4",
+    "actor": "ses",
+    "title": "Execução e acompanhamento da obra",
+    "desc": "Gatilho 3 — execução da obra com diário de obras semanal (fotos georreferenciadas, cronograma, problemas). Pode ser preenchido por AISAN e comunidade.",
+    "items": [
+      "Diário de obras semanal (7 dias)",
+      "Registro fotográfico georreferenciado",
+      "Ajuste de cronograma e registro de problemas",
+      "Preenchimento também por AISAN e comunidade"
+    ],
+    "docs": [
+      "Diário de obras",
+      "Cronograma atualizado"
+    ],
+    "alert": "Dificuldade: conectividade limitada exige modo offline; escassez de AISANs em campo.",
+    "btnLabel": "Semana registrada →",
+    "attachments": []
+  },
+  {
+    "id": "ed11",
+    "num": "11",
+    "phase": "p4",
+    "actor": "deamb",
+    "title": "Relatório situacional mensal",
+    "desc": "Gerado automaticamente a cada 4 semanas a partir do diário; validado pelo SESANI e pelo DEAMB/COABS.",
+    "items": [
+      "% executado no mês e acumulado vs previsto",
+      "Curva previsto × executado",
+      "Riscos, não conformidades e ações",
+      "Validação SESANI → DEAMB/COABS"
+    ],
+    "docs": [
+      "Relatório situacional",
+      "Curva S",
+      "Parecer técnico"
+    ],
+    "alert": null,
+    "btnLabel": "Relatório validado →",
+    "attachments": []
+  },
+  {
+    "id": "ed12",
+    "num": "12",
+    "phase": "p5",
+    "actor": "ses",
+    "title": "Entrega à comunidade e Termo de Conclusão",
+    "desc": "Gatilho 4 — reunião formal de entrega, assinatura da liderança local, Termo de Conclusão e encerramento do processo no SEI.",
+    "items": [
+      "Entrega formal com registro fotográfico",
+      "Assinatura da liderança local",
+      "Termo de Conclusão de Obra (SESANI)",
+      "DEAMB instrui o encerramento do processo SEI"
+    ],
+    "docs": [
+      "Ata de entrega",
+      "Termo de conclusão",
+      "Encerramento SEI"
+    ],
+    "alert": null,
+    "btnLabel": "Obra entregue! 🏁",
+    "attachments": []
+  },
+  {
+    "id": "ed13",
+    "num": "13",
+    "phase": "p5",
+    "actor": "dsei",
+    "title": "Registro de entrega e acionamento da manutenção",
+    "desc": "Registro formal de entrega da obra e início do ciclo contínuo de manutenção/monitoramento do patrimônio.",
+    "items": [
+      "Registro de entrega da obra no sistema",
+      "Plano de manutenção/monitoramento",
+      "Responsável DSEI pelo acompanhamento pós-obra"
+    ],
+    "docs": [
+      "Registro de entrega",
+      "Plano de manutenção"
+    ],
+    "alert": null,
+    "btnLabel": "Manutenção acionada ↻",
+    "isLast": true,
+    "attachments": []
+  }
+]
+];
+
+let currentStep=0, completedSteps=new Set(), openCard=-1, isEditMode=false, editingCard=-1;
+
+function renderPhases(){
+  document.getElementById('phaseStrip').innerHTML = PHASES.map(ph=>{
+    const total=ph.steps.length, done=ph.steps.filter(i=>completedSteps.has(i)).length;
+    const isActive=ph.steps.includes(currentStep);
+    return `<button class="phase-pill ${isActive?'active':done===total&&total>0?'done':''}"
+      style="${isActive?`background:${ph.color};border-color:${ph.color};`:''}"
+      onclick="jumpTo(${ph.steps[0]})">
+      <div class="pill-dot" style="background:${isActive?'rgba(255,255,255,.6)':ph.color};opacity:${done===total&&total>0?1:.5}"></div>
+      ${ph.label}
+      <span class="pill-count">${done}/${total}</span>
+    </button>`;
+  }).join('');
+}
+
+function renderCards(){
+  document.getElementById('flowCol').innerHTML = STEPS_DATA.map((s,i)=>{
+    const ph=PHASES.find(p=>p.id===s.phase), ac=ACTORS[s.actor];
+    const isDone=completedSteps.has(i), isActive=i===currentStep, isOpen=i===openCard, isLocked=i>currentStep;
+    let cls='step-card';
+    if(isDone)cls+=' done'; else if(isActive)cls+=' active unlocked'; else if(!isLocked)cls+=' unlocked';
+    if(isOpen)cls+=' open';
+
+    const docsHtml=s.docs.map(d=>`<div class="doc-tag">📄 ${d}</div>`).join('');
+    const alertHtml=s.alert?`<div class="alert-block"><span style="font-size:16px;flex-shrink:0">⚠️</span><div class="alert-txt">${s.alert}</div></div>`:'';
+    const itemsHtml=s.items.map(it=>`<div class="body-item"><div class="body-item-dot"></div><span>${it}</span></div>`).join('');
+
+    const editZoneHtml = `
+    <div class="edit-zone ${editingCard===i&&isEditMode?'show':''}" id="ez-${i}">
+      <h4>✏️ Editar etapa</h4>
+      <label class="ez-label">Título</label>
+      <input class="ez-input" id="ez-title-${i}" value="${s.title.replace(/"/g,'&quot;')}">
+      <label class="ez-label">Descrição</label>
+      <textarea class="ez-textarea" id="ez-desc-${i}">${s.desc}</textarea>
+      <div class="ez-actions">
+        <button class="ez-save" onclick="saveStepEdit(${i})">Salvar alterações</button>
+        <button class="ez-cancel" onclick="cancelEdit(${i})">Cancelar</button>
+      </div>
+    </div>`;
+
+    let actionHtml='';
+    if(!isLocked){
+      if(isDone){
+        actionHtml=`<button class="btn-advance done-state">✓ Concluído</button>`;
+      } else {
+        actionHtml=`<button class="btn-advance" style="background:${ph.color}" onclick="advance(${i})">${s.btnLabel}</button>`;
+        if(s.optional) actionHtml+=`<button class="btn-skip" onclick="advance(${i})">${s.optLabel||'Pular'}</button>`;
+      }
+      actionHtml+=`<button class="btn-comment" onclick="window.parent.postMessage({type:'openFeedback',step:'${s.num}'},'*')">💬 Comentar</button>`;
+      if(isEditMode && !isDone){
+        actionHtml+=`<button class="btn-edit-step" onclick="toggleEdit(${i})">✏️ Editar</button>`;
+      }
+    }
+
+    return `<div class="step-card ${cls}" id="card-${i}">
+      <div class="card-hdr" onclick="toggleCard(${i})">
+        <div class="card-accent" style="background:${ph.color}"></div>
+        <div class="card-hdr-inner">
+          <div class="step-num">${isDone?'✓':s.num}</div>
+          <div class="step-meta">
+            <div class="step-title">${s.title}</div>
+            <div class="step-actor-row">
+              <span class="actor-chip" style="background:${ac.bg};color:${ac.color}">● ${ac.label}</span>
+            </div>
+          </div>
+          <div class="step-right-meta">
+            <span class="phase-tag" style="background:${ph.bg};color:${ph.color}">${ph.label}</span>
+            ${!isLocked?`<span class="chevron-icon">▾</span>`:''}
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-body-inner">
+          <p class="body-desc" id="bd-desc-${i}">${s.desc}</p>
+          ${alertHtml}
+          <div class="body-items">${itemsHtml}</div>
+          <div class="docs-strip">${docsHtml}</div>
+          ${editZoneHtml}
+          <div class="action-row">${actionHtml}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderMiniSteps(){
+  document.getElementById('miniSteps').innerHTML = STEPS_DATA.map((s,i)=>{
+    const ac=ACTORS[s.actor], isDone=completedSteps.has(i), isActive=i===currentStep, isLocked=i>currentStep;
+    const ph=PHASES.find(p=>p.id===s.phase);
+    let cls=isLocked?'ms-locked':isDone?'ms-done':isActive?'ms-active':'';
+    return `<div class="ms-item ${cls}" onclick="if(${!isLocked})toggleCard(${i})">
+      <div class="ms-dot" style="${isActive?`border-color:${ph.color};color:${ph.color}`:''}">${isDone?'✓':s.num}</div>
+      <div class="ms-info">
+        <div class="ms-title">${s.title.substring(0,40)}${s.title.length>40?'…':''}</div>
+        <div class="ms-actor">${ac.label}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderPhBars(){
+  document.getElementById('phBars').innerHTML = PHASES.map(ph=>{
+    const total=ph.steps.length, done=ph.steps.filter(i=>completedSteps.has(i)).length;
+    const pct=total?Math.round((done/total)*100):0;
+    return `<div class="ph-row">
+      <div class="ph-dot" style="background:${ph.color}"></div>
+      <div class="ph-name">${ph.label}</div>
+      <div class="ph-track"><div class="ph-fill" style="width:${pct}%;background:${ph.color}"></div></div>
+      <div class="ph-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+}
+
+function renderProgress(){
+  const n=completedSteps.size, total=STEPS_DATA.length;
+  document.getElementById('progFill').style.width=`${(n/total)*100}%`;
+  document.getElementById('progCount').textContent=`${n} de ${total} etapas`;
+}
+
+function toggleCard(i){
+  if(i>currentStep)return;
+  openCard=(openCard===i)?-1:i;
+  renderAll();
+  if(openCard!==-1) setTimeout(()=>document.getElementById(`card-${i}`)?.scrollIntoView({behavior:'smooth',block:'nearest'}),80);
+}
+
+function advance(i){
+  completedSteps.add(i); currentStep=i+1; openCard=currentStep<STEPS_DATA.length?currentStep:-1; editingCard=-1;
+  renderAll();
+  setTimeout(()=>{
+    const el=document.getElementById(`card-${currentStep}`);
+    if(el){el.classList.add('just-in');el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el.classList.remove('just-in'),500);}
+  },100);
+  if(currentStep>=STEPS_DATA.length) setTimeout(()=>document.getElementById('celebrate').classList.add('show'),600);
+}
+
+function jumpTo(idx){ if(idx>currentStep)return; openCard=idx; renderAll(); setTimeout(()=>document.getElementById(`card-${idx}`)?.scrollIntoView({behavior:'smooth',block:'center'}),80); }
+
+function resetAll(){ currentStep=0; completedSteps.clear(); openCard=0; editingCard=-1; document.getElementById('celebrate').classList.remove('show'); renderAll(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+// EDIT
+function toggleEdit(i){
+  if(!isEditMode){ window.parent.postMessage({type:'loginNeeded'},'*'); return; }
+  editingCard=(editingCard===i)?-1:i;
+  openCard=i;
+  renderAll();
+  setTimeout(()=>document.getElementById(`ez-${i}`)?.scrollIntoView({behavior:'smooth',block:'nearest'}),80);
+}
+function cancelEdit(i){ editingCard=-1; renderAll(); }
+function saveStepEdit(i){
+  const title=document.getElementById(`ez-title-${i}`)?.value.trim();
+  const desc=document.getElementById(`ez-desc-${i}`)?.value.trim();
+  if(title) STEPS_DATA[i].title=title;
+  if(desc)  STEPS_DATA[i].desc=desc;
+  localStorage.setItem('sesai_steps_v3',JSON.stringify(STEPS_DATA));
+  editingCard=-1; renderAll();
+  window.parent.postMessage({type:'toast',msg:'✅ Etapa atualizada com sucesso!'},'*');
+}
+
+function renderAll(){ renderPhases(); renderCards(); renderMiniSteps(); renderPhBars(); renderProgress(); }
+
+// Listen for editMode from parent
+window.addEventListener('message',e=>{
+  if(e.data?.type==='editMode'){
+    isEditMode=e.data.value;
+    renderAll();
+  }
+});
+// ask parent for current edit mode on load
+window.parent.postMessage({type:'requestEditMode'},'*');
+
+openCard=0; renderAll();
+</script>
+</body>
+</html>

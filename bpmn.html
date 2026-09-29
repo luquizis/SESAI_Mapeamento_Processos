@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagrama BPMN</title>
+<link rel="stylesheet" href="https://unpkg.com/bpmn-js@17/dist/assets/bpmn-js.css">
+<link rel="stylesheet" href="https://unpkg.com/bpmn-js@17/dist/assets/diagram-js.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700&family=Source+Sans+3:wght@400;500;600&display=swap');
+:root{
+  --verde-escuro:#1b4332; --verde-medio:#2d6a4f; --verde-claro:#40916c; --verde-bg:#d8f3dc;
+  --vermelho:#8b2e16; --cinza-100:#f7f8f9; --cinza-200:#e8e8e8; --cinza-300:#d0d0d0;
+  --cinza-500:#888; --cinza-700:#444; --cinza-900:#1a1a1a; --branco:#fff;
+  --shadow-md:0 4px 16px rgba(0,0,0,.1);
+  --font:'Source Sans 3',sans-serif; --font-head:'Raleway',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:var(--font);background:var(--cinza-100);color:var(--cinza-900);overflow:hidden;}
+.shell{display:flex;flex-direction:column;height:100vh;}
+
+/* toolbar */
+.toolbar{
+  background:var(--branco);border-bottom:1px solid var(--cinza-200);
+  padding:8px 16px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex-shrink:0;
+}
+.tb-group{display:flex;align-items:center;gap:5px;}
+.tb-sep{width:1px;height:26px;background:var(--cinza-200);margin:0 5px;flex-shrink:0;}
+.tb-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--cinza-300);white-space:nowrap;}
+.tb-btn{
+  display:flex;align-items:center;gap:5px;padding:6px 13px;border-radius:6px;
+  border:1px solid var(--cinza-200);background:var(--cinza-100);
+  color:var(--cinza-700);font-size:12px;font-family:var(--font);cursor:pointer;
+  transition:all .18s;white-space:nowrap;
+}
+.tb-btn:hover{border-color:var(--cinza-300);background:var(--branco);color:var(--cinza-900);}
+.tb-btn.green{background:var(--verde-bg);border-color:var(--verde-claro);color:var(--verde-escuro);font-weight:600;}
+.tb-btn.green:hover{background:var(--verde-escuro);color:#fff;border-color:var(--verde-escuro);}
+.tb-btn.locked{opacity:.4;cursor:not-allowed !important;}
+.tb-btn.locked:hover{background:var(--cinza-100);border-color:var(--cinza-200);color:var(--cinza-700);transform:none;}
+.edit-mode-indicator{
+  margin-left:auto;display:flex;align-items:center;gap:7px;
+  background:var(--verde-bg);border:1px solid var(--verde-claro);
+  border-radius:16px;padding:4px 12px;font-size:11px;color:var(--verde-escuro);font-weight:600;
+}
+.lock-indicator{
+  margin-left:auto;display:flex;align-items:center;gap:7px;
+  background:var(--cinza-100);border:1px solid var(--cinza-200);
+  border-radius:16px;padding:4px 12px;font-size:11px;color:var(--cinza-500);
+  cursor:pointer;transition:all .2s;
+}
+.lock-indicator:hover{background:var(--verde-bg);border-color:var(--verde-claro);color:var(--verde-escuro);}
+
+/* canvas */
+.canvas-wrap{flex:1;position:relative;overflow:hidden;}
+#canvas{width:100%;height:100%;}
+
+/* props panel */
+.props-panel{
+  position:absolute;top:12px;right:12px;width:270px;
+  background:var(--branco);border:1px solid var(--cinza-200);border-radius:10px;
+  box-shadow:var(--shadow-md);overflow:hidden;z-index:10;
+}
+.pp-head{
+  background:var(--verde-escuro);padding:12px 16px;
+  position:relative;overflow:hidden;
+}
+.pp-head::before{
+  content:'◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇◇';
+  position:absolute;inset:0;font-size:8px;color:rgba(255,255,255,.08);line-height:1.3;
+  word-break:break-all;overflow:hidden;letter-spacing:2px;pointer-events:none;
+}
+.pp-head h3{font-family:var(--font-head);font-size:13px;font-weight:700;color:#fff;position:relative;}
+.pp-head p{font-size:10.5px;color:rgba(255,255,255,.55);margin-top:2px;position:relative;}
+.pp-body{padding:14px 16px;}
+.pp-label{font-size:11px;font-weight:600;color:var(--cinza-700);display:block;margin-bottom:4px;}
+.pp-input,.pp-textarea{
+  width:100%;border:1px solid var(--cinza-300);border-radius:5px;
+  padding:7px 10px;font-size:12px;font-family:var(--font);
+  color:var(--cinza-900);margin-bottom:10px;outline:none;transition:border-color .2s;
+}
+.pp-input:focus,.pp-textarea:focus{border-color:var(--verde-claro);}
+.pp-textarea{min-height:70px;resize:vertical;}
+.pp-save{
+  width:100%;padding:9px;border-radius:6px;border:none;cursor:pointer;
+  background:var(--verde-escuro);color:#fff;font-size:12px;font-weight:600;
+  font-family:var(--font);transition:all .2s;
+}
+.pp-save:hover{background:var(--verde-medio);}
+.pp-empty{font-size:12px;color:var(--cinza-500);text-align:center;padding:16px 0;line-height:1.5;}
+.pp-locked{font-size:11px;color:var(--cinza-500);text-align:center;padding:12px;line-height:1.5;border-top:1px solid var(--cinza-100);}
+
+/* legend */
+.legend{
+  position:absolute;bottom:12px;left:12px;
+  background:var(--branco);border:1px solid var(--cinza-200);
+  border-radius:8px;padding:10px 14px;font-size:10.5px;z-index:10;
+  box-shadow:var(--shadow-md);
+}
+.lg-title{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--cinza-500);margin-bottom:7px;}
+.lg-item{display:flex;align-items:center;gap:7px;margin-bottom:4px;color:var(--cinza-700);}
+.lg-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+
+/* toast */
+.toast{position:fixed;bottom:18px;right:18px;background:var(--branco);border-left:4px solid var(--verde-claro);box-shadow:var(--shadow-md);border-radius:6px;padding:11px 16px;font-size:12.5px;color:var(--cinza-700);z-index:999;animation:slideIn .3s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- TOOLBAR -->
+<div class="toolbar">
+  <div class="tb-group">
+    <span class="tb-label">Ver</span>
+    <button class="tb-btn" onclick="fitView()">⤢ Ajustar</button>
+    <button class="tb-btn" onclick="zoomIn()">+ Zoom</button>
+    <button class="tb-btn" onclick="zoomOut()">− Zoom</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group">
+    <span class="tb-label">Editar</span>
+    <button class="tb-btn" id="btn-undo" onclick="doUndo()">↩ Desfazer</button>
+    <button class="tb-btn" id="btn-redo" onclick="doRedo()">↪ Refazer</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group">
+    <span class="tb-label">Exportar</span>
+    <button class="tb-btn green" onclick="exportBPMN()">⬇ Salvar .bpmn</button>
+    <button class="tb-btn green" onclick="exportSVG()">🖼 Exportar SVG</button>
+  </div>
+  <div class="tb-sep"></div>
+  <div class="tb-group">
+    <span class="tb-label">Importar</span>
+    <button class="tb-btn" onclick="document.getElementById('importFile').click()">⬆ Carregar .bpmn</button>
+    <input type="file" id="importFile" accept=".bpmn,.xml" style="display:none" onchange="importBPMN(this)">
+  </div>
+  <div class="tb-sep"></div>
+  <button class="tb-btn" onclick="resetDiagram()">↺ Restaurar original</button>
+
+  <div class="edit-mode-indicator" id="editIndicator" style="display:none;">✏️ Modo de edição ativo</div>
+  <div class="lock-indicator" id="lockIndicator" onclick="requestLogin()" title="Faça login para editar">🔒 Somente leitura — Entrar para editar</div>
+</div>
+
+<!-- CANVAS -->
+<div class="canvas-wrap">
+  <div id="canvas"></div>
+
+  <!-- PROPS PANEL -->
+  <div class="props-panel" id="propsPanel">
+    <div class="pp-head">
+      <h3>Propriedades</h3>
+      <p id="ppSubtitle">Nenhum elemento selecionado</p>
+    </div>
+    <div class="pp-body">
+      <div class="pp-empty" id="ppEmpty">Clique em qualquer tarefa, gateway ou evento para ver e editar suas propriedades.</div>
+      <div id="ppForm" style="display:none;">
+        <label class="pp-label">Nome do elemento</label>
+        <input class="pp-input" id="ppName" type="text" placeholder="Nome da tarefa ou evento">
+        <label class="pp-label">Descrição / notas</label>
+        <textarea class="pp-textarea" id="ppDoc" placeholder="Descreva esta etapa do processo..."></textarea>
+        <button class="pp-save" id="ppSave" onclick="saveProps()">Salvar alterações</button>
+        <div class="pp-locked" id="ppLocked" style="display:none;">🔒 Faça login para editar propriedades.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <div class="lg-title">Raias do processo</div>
+    <div class="lg-item"><div class="lg-dot" style="background:#1b4d8a"></div>DSEI / Gabinete</div>
+    <div class="lg-item"><div class="lg-dot" style="background:#1b4332"></div>SESANI</div>
+    <div class="lg-item"><div class="lg-dot" style="background:#78350f"></div>SEOFI</div>
+    <div class="lg-item"><div class="lg-dot" style="background:#713f12"></div>SELOG</div>
+    <div class="lg-item"><div class="lg-dot" style="background:#164e63"></div>SEPAT</div>
+    <div class="lg-item"><div class="lg-dot" style="background:#4c1d95"></div>DEAMB / COABS</div>
+    <div class="lg-item"><div class="lg-dot" style="background:#7c2d12"></div>Comunidade</div>
+    <div class="lg-title" style="margin-top:8px">Pós-obra</div>
+    <div class="lg-item"><div class="lg-dot" style="background:#1b4332;border-radius:50%"></div>Manutenção/monitoramento (ciclo contínuo)</div>
+  </div>
+</div>
+</div>
+
+<script src="https://unpkg.com/bpmn-js@17/dist/bpmn-modeler.development.js"></script>
+<script>
+let isEditMode = false;
+let selectedElement = null;
+
+const BPMN_XML = `<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+  targetNamespace="http://sesai.bpmn" id="sesai-ed">
+  <collaboration id="Collab1">
+    <participant id="P_DSEI"  name="DSEI / Gabinete"     processRef="Proc_DSEI"/>
+    <participant id="P_SEOFI" name="SEOFI (Financeiro)"  processRef="Proc_SEOFI"/>
+    <participant id="P_SELOG" name="SELOG (Logística)"   processRef="Proc_SELOG"/>
+    <participant id="P_SES"   name="SESANI"              processRef="Proc_SES"/>
+    <participant id="P_SEPAT" name="SEPAT (Patrimônio)"  processRef="Proc_SEPAT"/>
+    <participant id="P_DEAMB" name="DEAMB / COABS"       processRef="Proc_DEAMB"/>
+    <participant id="P_COM"   name="Comunidade"           processRef="Proc_COM"/>
+    <messageFlow id="mf1" sourceRef="T_D2"   targetRef="T_O1"/>
+    <messageFlow id="mf2" sourceRef="T_O1"   targetRef="T_L1"/>
+    <messageFlow id="mf3" sourceRef="T_D3"   targetRef="T_PA1"/>
+    <messageFlow id="mf4" sourceRef="T_S5"   targetRef="T_M2"/>
+  </collaboration>
+  <process id="Proc_DSEI" isExecutable="false">
+    <startEvent id="Start1" name="Recebe&#10;material"/>
+    <task id="T_D1" name="1. Identifica&#10;processos SEI"/>
+    <task id="T_D2" name="2. Designa&#10;responsáveis"/>
+    <task id="T_D3" name="7b. Co-assina&#10;Ordem de Serviço"/>
+    <endEvent id="End1" name="Encerra&#10;processo SEI"/>
+    <sequenceFlow id="sf_d1" sourceRef="Start1" targetRef="T_D1"/>
+    <sequenceFlow id="sf_d2" sourceRef="T_D1"   targetRef="T_D2"/>
+    <sequenceFlow id="sf_d3" sourceRef="T_D2"   targetRef="T_D3"/>
+  </process>
+  <process id="Proc_SEOFI" isExecutable="false">
+    <task id="T_O1" name="3. Cadastra&#10;estoque no SIAFI"/>
+    <task id="T_O2" name="5c. Libera material&#10;do almoxarifado"/>
+    <sequenceFlow id="sf_o1" sourceRef="T_O1" targetRef="T_O2"/>
+  </process>
+  <process id="Proc_SELOG" isExecutable="false">
+    <task id="T_L1" name="4. Cadastro de&#10;obra + macro-etapas"/>
+    <exclusiveGateway id="GW_L1" name="Obra pode&#10;iniciar?"/>
+    <task id="T_L2" name="5a. Vincula material&#10;à obra"/>
+    <exclusiveGateway id="GW_L2" name="Realoca&#10;material?"/>
+    <task id="T_L3" name="5b. Atualiza remessa&#10;no sistema"/>
+    <sequenceFlow id="sf_l1" sourceRef="T_L1"  targetRef="GW_L1"/>
+    <sequenceFlow id="sf_l2" name="Sim" sourceRef="GW_L1" targetRef="T_L2"/>
+    <sequenceFlow id="sf_l3" sourceRef="T_L2"  targetRef="GW_L2"/>
+    <sequenceFlow id="sf_l4" name="Não" sourceRef="GW_L2" targetRef="T_L3"/>
+  </process>
+  <process id="Proc_SES" isExecutable="false">
+    <task id="T_S1" name="6. Organiza reunião&#10;com a comunidade"/>
+    <task id="T_S2" name="7. Emite Ordem&#10;de Serviço"/>
+    <task id="T_S3" name="8. ART e docs&#10;técnicos"/>
+    <task id="T_S4" name="9b. Atesto de&#10;entrega na aldeia"/>
+    <task id="T_S5" name="10–11. Diário semanal&#10;→ Relatório mensal"/>
+    <task id="T_S6" name="12. Entrega obra&#10;à comunidade"/>
+    <task id="T_S7" name="13. Termo de&#10;conclusão"/>
+    <task id="T_MAN" name="14. Registro de entrega +&#10;manutenção/monitoramento ↻"/>
+    <endEvent id="End2" name="Ciclo de&#10;manutenção"/>
+    <sequenceFlow id="sf_s1" sourceRef="T_S1" targetRef="T_S2"/>
+    <sequenceFlow id="sf_s2" sourceRef="T_S2" targetRef="T_S3"/>
+    <sequenceFlow id="sf_s3" sourceRef="T_S3" targetRef="T_S4"/>
+    <sequenceFlow id="sf_s4" sourceRef="T_S4" targetRef="T_S5"/>
+    <sequenceFlow id="sf_s5" sourceRef="T_S5" targetRef="T_S6"/>
+    <sequenceFlow id="sf_s6" sourceRef="T_S6" targetRef="T_S7"/>
+    <sequenceFlow id="sf_man1" sourceRef="T_S7" targetRef="T_MAN"/>
+    <sequenceFlow id="sf_man2" sourceRef="T_MAN" targetRef="End2"/>
+  </process>
+  <process id="Proc_SEPAT" isExecutable="false">
+    <task id="T_PA1" name="9a. Atesto de retirada&#10;(SESANI + SEPAT)"/>
+  </process>
+  <process id="Proc_DEAMB" isExecutable="false">
+    <task id="T_M1" name="Aprova justificativa&#10;de realocação"/>
+    <task id="T_M2" name="11c. Valida&#10;relatório mensal"/>
+    <exclusiveGateway id="GW_M1" name="Há não&#10;conformidade?"/>
+    <sequenceFlow id="sf_m1" sourceRef="T_M2" targetRef="GW_M1"/>
+  </process>
+  <process id="Proc_COM" isExecutable="false">
+    <task id="T_C1" name="C1. Participa da&#10;reunião de início"/>
+    <task id="T_C2" name="C2. Contribui no&#10;diário de obras"/>
+    <task id="T_C3" name="C3. Recebe e assina&#10;entrega da obra"/>
+    <sequenceFlow id="sf_c1" sourceRef="T_C1" targetRef="T_C2"/>
+    <sequenceFlow id="sf_c2" sourceRef="T_C2" targetRef="T_C3"/>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiag1">
+    <bpmndi:BPMNPlane id="Plane1" bpmnElement="Collab1">
+      <bpmndi:BPMNShape id="sh_P_DSEI"  bpmnElement="P_DSEI"  isHorizontal="true"><dc:Bounds x="100" y="40"  width="1560" height="100"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_P_SEOFI" bpmnElement="P_SEOFI" isHorizontal="true"><dc:Bounds x="100" y="150" width="1560" height="100"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_P_SELOG" bpmnElement="P_SELOG" isHorizontal="true"><dc:Bounds x="100" y="260" width="1560" height="110"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_P_SES"   bpmnElement="P_SES"   isHorizontal="true"><dc:Bounds x="100" y="380" width="1560" height="110"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_P_SEPAT" bpmnElement="P_SEPAT" isHorizontal="true"><dc:Bounds x="100" y="500" width="1560" height="90"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_P_DEAMB" bpmnElement="P_DEAMB" isHorizontal="true"><dc:Bounds x="100" y="600" width="1560" height="110"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_P_COM"   bpmnElement="P_COM"   isHorizontal="true"><dc:Bounds x="100" y="720" width="1560" height="100"/></bpmndi:BPMNShape>
+      <!-- DSEI -->
+      <bpmndi:BPMNShape id="sh_Start1" bpmnElement="Start1"><dc:Bounds x="160" y="72"  width="36" height="36"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_D1"   bpmnElement="T_D1">  <dc:Bounds x="240" y="60"  width="140" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_D2"   bpmnElement="T_D2">  <dc:Bounds x="430" y="60"  width="140" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_D3"   bpmnElement="T_D3">  <dc:Bounds x="870" y="60"  width="140" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_End1"   bpmnElement="End1">  <dc:Bounds x="1604" y="72" width="36" height="36"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ed_d1" bpmnElement="sf_d1"><di:waypoint x="196" y="90"/><di:waypoint x="240" y="90"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ed_d2" bpmnElement="sf_d2"><di:waypoint x="380" y="90"/><di:waypoint x="430" y="90"/></bpmndi:BPMNEdge>
+      <!-- SEOFI -->
+      <bpmndi:BPMNShape id="sh_T_O1" bpmnElement="T_O1"><dc:Bounds x="430" y="170" width="140" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_O2" bpmnElement="T_O2"><dc:Bounds x="630" y="170" width="140" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ed_o1" bpmnElement="sf_o1"><di:waypoint x="570" y="200"/><di:waypoint x="630" y="200"/></bpmndi:BPMNEdge>
+      <!-- SELOG -->
+      <bpmndi:BPMNShape id="sh_T_L1"  bpmnElement="T_L1"> <dc:Bounds x="430" y="280" width="140" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_GW_L1" bpmnElement="GW_L1"><dc:Bounds x="620" y="290" width="50"  height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_L2"  bpmnElement="T_L2"> <dc:Bounds x="720" y="280" width="140" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_GW_L2" bpmnElement="GW_L2"><dc:Bounds x="910" y="290" width="50"  height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_L3"  bpmnElement="T_L3"> <dc:Bounds x="1010" y="280" width="140" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ed_l1" bpmnElement="sf_l1"><di:waypoint x="570" y="310"/><di:waypoint x="620" y="315"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ed_l2" bpmnElement="sf_l2"><di:waypoint x="670" y="315"/><di:waypoint x="720" y="310"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ed_l3" bpmnElement="sf_l3"><di:waypoint x="860" y="310"/><di:waypoint x="910" y="315"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ed_l4" bpmnElement="sf_l4"><di:waypoint x="960" y="315"/><di:waypoint x="1010" y="310"/></bpmndi:BPMNEdge>
+      <!-- SESANI -->
+      <bpmndi:BPMNShape id="sh_T_S1" bpmnElement="T_S1"><dc:Bounds x="840"  y="400" width="130" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_S2" bpmnElement="T_S2"><dc:Bounds x="990"  y="400" width="130" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_S3" bpmnElement="T_S3"><dc:Bounds x="1140" y="400" width="130" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_S4" bpmnElement="T_S4"><dc:Bounds x="1290" y="400" width="130" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_S5" bpmnElement="T_S5"><dc:Bounds x="1290" y="400" width="130" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_S6" bpmnElement="T_S6"><dc:Bounds x="1400" y="400" width="130" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_S7" bpmnElement="T_S7"><dc:Bounds x="1460" y="400" width="130" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_MAN" bpmnElement="T_MAN"><dc:Bounds x="1620" y="400" width="150" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_End2" bpmnElement="End2"><dc:Bounds x="1810" y="412" width="36" height="36"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ed_s1" bpmnElement="sf_s1"><di:waypoint x="970" y="430"/><di:waypoint x="990" y="430"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ed_s2" bpmnElement="sf_s2"><di:waypoint x="1120" y="430"/><di:waypoint x="1140" y="430"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ed_s3" bpmnElement="sf_s3"><di:waypoint x="1270" y="430"/><di:waypoint x="1290" y="430"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ed_s4" bpmnElement="sf_s4"><di:waypoint x="1420" y="430"/><di:waypoint x="1460" y="430"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ed_man1" bpmnElement="sf_man1"><di:waypoint x="1590" y="430"/><di:waypoint x="1620" y="430"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ed_man2" bpmnElement="sf_man2"><di:waypoint x="1770" y="430"/><di:waypoint x="1810" y="430"/></bpmndi:BPMNEdge>
+
+      <!-- SEPAT -->
+      <bpmndi:BPMNShape id="sh_T_PA1" bpmnElement="T_PA1"><dc:Bounds x="990" y="520" width="150" height="55"/></bpmndi:BPMNShape>
+      <!-- DEAMB -->
+      <bpmndi:BPMNShape id="sh_T_M1"  bpmnElement="T_M1"> <dc:Bounds x="840"  y="620" width="140" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_M2"  bpmnElement="T_M2"> <dc:Bounds x="1140" y="620" width="140" height="60"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_GW_M1" bpmnElement="GW_M1"><dc:Bounds x="1340" y="630" width="50"  height="50"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ed_m1" bpmnElement="sf_m1"><di:waypoint x="1280" y="650"/><di:waypoint x="1340" y="655"/></bpmndi:BPMNEdge>
+      <!-- COMUNIDADE -->
+      <bpmndi:BPMNShape id="sh_T_C1" bpmnElement="T_C1"><dc:Bounds x="840"  y="740" width="140" height="55"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_C2" bpmnElement="T_C2"><dc:Bounds x="1140" y="740" width="140" height="55"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sh_T_C3" bpmnElement="T_C3"><dc:Bounds x="1400" y="740" width="140" height="55"/></bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="ed_c1" bpmnElement="sf_c1"><di:waypoint x="980"  y="767"/><di:waypoint x="1140" y="767"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ed_c2" bpmnElement="sf_c2"><di:waypoint x="1280" y="767"/><di:waypoint x="1400" y="767"/></bpmndi:BPMNEdge>
+      <!-- Message flows -->
+      <bpmndi:BPMNEdge id="ed_mf1" bpmnElement="mf1"><di:waypoint x="500" y="120"/><di:waypoint x="500" y="170"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ed_mf2" bpmnElement="mf2"><di:waypoint x="500" y="230"/><di:waypoint x="500" y="280"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ed_mf3" bpmnElement="mf3"><di:waypoint x="940" y="120"/><di:waypoint x="1065" y="520"/></bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="ed_mf4" bpmnElement="mf4"><di:waypoint x="1355" y="460"/><di:waypoint x="1210" y="620"/></bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>`;
+
+const modeler = new BpmnJS({container:'#canvas'});
+modeler.importXML(BPMN_XML).then(()=>{ modeler.get('canvas').zoom('fit-viewport'); }).catch(console.error);
+
+// selection
+modeler.on('selection.changed',({newSelection})=>{
+  if(!newSelection.length){
+    document.getElementById('ppEmpty').style.display='block';
+    document.getElementById('ppForm').style.display='none';
+    document.getElementById('ppSubtitle').textContent='Nenhum elemento selecionado';
+    selectedElement=null; return;
+  }
+  selectedElement=newSelection[0];
+  const bo=selectedElement.businessObject;
+  document.getElementById('ppSubtitle').textContent=bo.$type?.replace('bpmn:','')||'Elemento';
+  document.getElementById('ppEmpty').style.display='none';
+  document.getElementById('ppForm').style.display='block';
+  document.getElementById('ppName').value=(bo.name||'').replace(/\n/g,' ');
+  document.getElementById('ppDoc').value=(bo.documentation?.[0]?.text)||'';
+  document.getElementById('ppName').disabled=!isEditMode;
+  document.getElementById('ppDoc').disabled=!isEditMode;
+  document.getElementById('ppSave').style.display=isEditMode?'block':'none';
+  document.getElementById('ppLocked').style.display=isEditMode?'none':'block';
+});
+
+function saveProps(){
+  if(!isEditMode||!selectedElement)return;
+  const modeling=modeler.get('modeling'), moddle=modeler.get('moddle');
+  modeling.updateProperties(selectedElement,{name:document.getElementById('ppName').value});
+  const doc=moddle.create('bpmn:Documentation',{text:document.getElementById('ppDoc').value});
+  modeling.updateProperties(selectedElement,{documentation:[doc]});
+  showToast('✅ Propriedades salvas com sucesso!');
+}
+
+function fitView()  { modeler.get('canvas').zoom('fit-viewport'); }
+function zoomIn()   { const c=modeler.get('canvas'); c.zoom(c.zoom()*1.2); }
+function zoomOut()  { const c=modeler.get('canvas'); c.zoom(c.zoom()*.82); }
+function doUndo()   { if(!isEditMode){requestLogin();return;} modeler.get('commandStack').undo(); }
+function doRedo()   { if(!isEditMode){requestLogin();return;} modeler.get('commandStack').redo(); }
+
+function requestLogin(){ window.parent.postMessage({type:'loginNeeded'},'*'); }
+
+async function exportBPMN(){
+  const{xml}=await modeler.saveXML({format:true});
+  dl(xml,'sesai-execucao-direta.bpmn','application/xml');
+  showToast('⬇ Arquivo .bpmn exportado!');
+}
+async function exportSVG(){
+  const{svg}=await modeler.saveSVG();
+  dl(svg,'sesai-execucao-direta.svg','image/svg+xml');
+  showToast('🖼 SVG exportado!');
+}
+function importBPMN(input){
+  const f=input.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=async e=>{
+    try{await modeler.importXML(e.target.result);modeler.get('canvas').zoom('fit-viewport');showToast('⬆ Diagrama importado!');}
+    catch(err){alert('Erro ao importar: '+err.message);}
+  };
+  r.readAsText(f);
+}
+function resetDiagram(){
+  if(!confirm('Restaurar o diagrama original? Alterações serão perdidas.'))return;
+  modeler.importXML(BPMN_XML).then(()=>{modeler.get('canvas').zoom('fit-viewport');showToast('↺ Diagrama restaurado.');});
+}
+function dl(c,name,type){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([c],{type}));
+  a.download=name; a.click();
+}
+function showToast(msg){
+  const t=document.createElement('div');
+  t.className='toast'; t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3000);
+}
+
+function applyEditMode(val){
+  isEditMode=val;
+  document.getElementById('editIndicator').style.display=val?'flex':'none';
+  document.getElementById('lockIndicator').style.display=val?'none':'flex';
+  // refresh props panel if element selected
+  if(selectedElement){
+    document.getElementById('ppName').disabled=!val;
+    document.getElementById('ppDoc').disabled=!val;
+    document.getElementById('ppSave').style.display=val?'block':'none';
+    document.getElementById('ppLocked').style.display=val?'none':'block';
+  }
+  // enable/disable modeler interactions
+  modeler.get('eventBus').fire('editable.changed',{editable:val});
+}
+
+// listen from parent
+window.addEventListener('message',e=>{
+  if(e.data?.type==='editMode') applyEditMode(e.data.value);
+  if(e.data?.type==='requestEditMode') window.parent.postMessage({type:'requestEditMode'},'*');
+});
+window.parent.postMessage({type:'requestEditMode'},'*');
+</script>
+</body>
+</html>
