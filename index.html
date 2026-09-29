@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SESAI — Fluxo de Execução Direta</title>
+<title>SESAI — Modelagem de Processos</title>
 <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17/dist/assets/bpmn-js.css">
 <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17/dist/assets/diagram-js.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -608,6 +608,7 @@ body.theme-black .mm-title       { color:#cbd5e1 }
 body.theme-black .mm-actor       { color:#64748b }
 body.theme-black .step-card.locked { background:#161f2e }
 </style>
+<base target="_blank">
 </head>
 <body>
 <div class="app">
@@ -1295,7 +1296,6 @@ const USERS = {
   milton:  { pass:'sesai20242026',name:'Milton',         role:'Editor',        initials:'MI', canEdit:true },
   vanessa: { pass:'sesai20242026',name:'Vanessa',        role:'Editor',        initials:'VA', canEdit:true },
   junior:  { pass:'sesai20242026',name:'Junior',         role:'Editor',        initials:'JU', canEdit:true },
-  lucas:   { pass:'sesai20242026',name:'Lucas',         role:'Editor',        initials:'LU', canEdit:true },
   leticia: { pass:'sesai20242026',name:'Leticia',        role:'Editor',        initials:'LE', canEdit:true },
   luiz:    { pass:'sesai20242026',name:'Luiz',           role:'Editor',        initials:'LZ', canEdit:true },
 };
@@ -2457,7 +2457,7 @@ async function bPrint() {
   const win = window.open('', '_blank');
   win.document.write(`<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8">
-<title>SESAI — Fluxo de Execução Direta</title>
+<title>SESAI — Modelagem de Processos</title>
 <style>
   @page { size: A3 landscape; margin: 15mm; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2489,8 +2489,8 @@ async function bPrint() {
 </head><body>
 <div class="print-header">
   <div>
-    <div class="print-title">SESAI — Fluxo de Execução Direta</div>
-    <div class="print-sub">Ministério da Saúde · Secretaria Especial de Saúde Indígena</div>
+    <div class="print-title">SESAI — ${sanitize(_activeProc()?.name||'Fluxo')}</div>
+    <div class="print-sub">${sanitize(_activeProc()?.desc||'Ministério da Saúde · Secretaria Especial de Saúde Indígena')}</div>
   </div>
   <div class="print-meta">
     <div><strong>Gerado em:</strong> ${date}</div>
