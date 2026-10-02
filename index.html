@@ -6,7 +6,6 @@
 <title>SESAI — Modelagem de Processos</title>
 <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17/dist/assets/bpmn-js.css">
 <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17/dist/assets/diagram-js.css">
-<link rel="stylesheet" href="https://unpkg.com/diagram-js-minimap@4/dist/diagram-js-minimap.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap">
 <style>
@@ -635,7 +634,17 @@ body.theme-black .step-card.locked { background:#161f2e }
 #bpmnSearchInput{height:30px;padding:0 9px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:11.5px;font-family:var(--font);outline:none;width:150px}
 #bpmnSearchInput:focus{border-color:var(--green-l);box-shadow:0 0 0 3px var(--green-ring)}
 .bpmn-legend.hidden{display:none}
-.djs-minimap{z-index:9!important}
+.custom-minimap{position:absolute;right:12px;bottom:12px;z-index:11;background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:none}
+.custom-minimap.show{display:block}
+.cm-head{display:flex;justify-content:space-between;padding:6px 10px;font-size:11px;font-weight:600;color:var(--gray-500);border-bottom:1px solid var(--gray-100)}
+.cm-head span:last-child{cursor:pointer;color:var(--gray-300)}
+.cm-body{position:relative;width:220px;height:150px;cursor:crosshair;background:var(--gray-50)}
+#cmContent{position:absolute;left:0;top:0}
+#cmContent svg{display:block}
+.cm-viewport{position:absolute;border:2px solid var(--green);background:rgba(0,90,48,.07);pointer-events:none;border-radius:2px}
+body.theme-black .custom-minimap{background:#1e293b;border-color:#334155}
+body.theme-black .cm-head{color:#94a3b8;border-color:#334155}
+body.theme-black .cm-body{background:#0f172a}
 @media(max-width:900px){.props-panel{position:absolute;top:auto;bottom:0;left:0;right:0;width:100%;max-height:45vh;overflow-y:auto;border-radius:16px 16px 0 0}}
 /* dark mode tokens */
 body.theme-black #bpmnCanvas .djs-container{background:#0f172a}
@@ -710,7 +719,7 @@ body.theme-green #bpmnCanvas .djs-container{background:#f0faf4}
       </div>
     </div>
     <!-- CLOUD INDICATOR -->
-    <button onclick="openSbConfig()" id="sbIndicator" title="Configurar nuvem (JSONBin)"
+    <button onclick="sbIndicatorClick()" id="sbIndicator" title="Nuvem (Supabase) — clique para configurar/sincronizar"
       style="height:26px;padding:0 9px;border-radius:var(--radius-sm);border:1px solid var(--gray-200);background:none;font-size:11px;cursor:pointer;font-family:var(--font);flex-shrink:0">⚫ local</button>
     <!-- THEME TOGGLE -->
     <div style="display:flex;gap:3px;padding:3px;background:var(--gray-100);border-radius:var(--radius-sm);margin-right:4px">
@@ -898,6 +907,10 @@ body.theme-green #bpmnCanvas .djs-container{background:#f0faf4}
     <div class="bpmn-wrap">
       <div class="bpmn-breadcrumb" id="bpmnBreadcrumb" onclick="if(window.modeler&&bpmnReady)modeler.get('selection').select(null)"></div>
       <div id="bpmnCanvas"></div>
+      <div class="custom-minimap" id="customMinimap">
+        <div class="cm-head"><span>Minimap</span><span onclick="bToggleMinimap()" title="Fechar (M)">✕</span></div>
+        <div class="cm-body" id="cmBody"><div id="cmContent"></div><div class="cm-viewport" id="cmViewport"></div></div>
+      </div>
       <div class="sync-overlay" id="syncOverlay"><div class="sync-spinner"></div><div class="sync-text">Sincronizando com BPMN…</div></div>
       <div class="props-panel" id="propsPanel">
         <div class="pp-head"><div class="pp-head-bar"></div><span class="pp-head-title">Propriedades</span><span class="pp-head-type" id="ppType">–</span></div>
@@ -1049,30 +1062,28 @@ body.theme-green #bpmnCanvas .djs-container{background:#f0faf4}
   </div>
 </div>
 
-<!-- MODAL: JSONBIN CONFIG -->
+<!-- MODAL: SUPABASE CONFIG -->
 <div class="overlay" id="sbConfigOverlay">
-  <div class="modal" style="width:500px">
+  <div class="modal" style="width:540px">
     <div class="modal-head">
-      <h3>☁️ Configurar nuvem (JSONBin)</h3>
-      <p>Sincronize os dados entre todos os usuários da equipe</p>
+      <h3>☁️ Configurar nuvem (Supabase)</h3>
+      <p>Sincronize os dados entre todos os usuários da equipe — plano gratuito</p>
     </div>
     <div class="modal-body">
-      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;font-size:12.5px;color:#1e40af;line-height:1.7">
-        <strong>Como configurar (gratuito, 5 minutos):</strong><br>
-        1. Acesse <a href="https://jsonbin.io" target="_blank" style="color:#1d4ed8;font-weight:700">jsonbin.io ↗</a> e crie uma conta<br>
-        2. Vá em <strong>API Keys</strong> → copie sua <em>Master Key</em><br>
-        3. Clique em <strong>Create Bin</strong>, cole <code>{}</code> e salve<br>
-        4. Copie o <strong>Bin ID</strong> da URL (ex: <code>64a1b2c3d4e5f6...</code>)<br>
-        5. Cole abaixo e compartilhe Master Key + Bin ID com a equipe
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:var(--radius);padding:12px 14px;margin-bottom:14px;font-size:12px;color:#1e40af;line-height:1.7">
+        <strong>Como configurar (5 minutos):</strong><br>
+        1. Acesse <a href="https://supabase.com/dashboard" target="_blank" style="color:#1d4ed8;font-weight:700">supabase.com/dashboard ↗</a> e crie um projeto<br>
+        2. Abra o <strong>SQL Editor</strong> e execute:<br>
+        <code style="display:block;background:#1e293b;color:#e2e8f0;padding:8px 10px;border-radius:6px;margin:6px 0;font-size:10.5px;white-space:pre-wrap">create table proc_sync (id text primary key, payload jsonb, updated_at timestamptz default now());
+alter table proc_sync enable row level security;
+create policy "rw" on proc_sync for all using (true) with check (true);</code>
+        3. Em <strong>Project Settings → API</strong>, copie a <em>Project URL</em> e a chave <em>anon public</em><br>
+        4. Cole abaixo — todos da equipe usam os mesmos dados
       </div>
-      <label class="m-label">Master Key (começa com $2b$10$...)</label>
-      <input class="m-input" id="sb-url-input" placeholder="$2b$10$xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx" style="font-family:var(--mono);font-size:12px">
-      <label class="m-label">Bin ID</label>
-      <input class="m-input" id="sb-key-input" placeholder="64a1b2c3d4e5f6a7b8c9d0e1" style="font-family:var(--mono);font-size:12px">
-      <div style="background:var(--green-bg);border:1px solid #a7f3d0;border-radius:var(--radius-sm);padding:10px 12px;font-size:12px;color:var(--gray-600);line-height:1.7;margin-top:4px">
-        <strong style="color:var(--green)">Gratuito e suficiente:</strong> plano free = 10.000 req/mês — mais que suficiente para 6 usuários.<br>
-        Cada usuário configura uma vez neste dispositivo. Login permanece <strong>editor / sesai2024</strong>.
-      </div>
+      <label class="m-label">Project URL</label>
+      <input class="m-input" id="sb-url-input" placeholder="https://abcdefghij.supabase.co">
+      <label class="m-label">Chave API (anon public)</label>
+      <input class="m-input" id="sb-key-input" placeholder="eyJhbGciOiJI...">
     </div>
     <div class="modal-foot">
       <button class="btn-cancel" onclick="document.getElementById('sbConfigOverlay').classList.remove('show')">Cancelar</button>
@@ -1347,7 +1358,6 @@ body.theme-green #bpmnCanvas .djs-container{background:#f0faf4}
 <div class="toast-stack" id="toastStack"></div>
 
 <script src="https://unpkg.com/bpmn-js@17/dist/bpmn-modeler.development.js"></script>
-<script src="https://unpkg.com/diagram-js-minimap@4/dist/diagram-minimap.umd.js"></script>
 <script>
 /* ===================================================
    DATA
@@ -2427,17 +2437,23 @@ const IND_POS_STEPS = [
 
 
 /* ====================================================
-   JSONBIN BACKEND — shared storage for all users
+   SUPABASE BACKEND — shared storage for all users
    localStorage kept as offline cache / fallback
 
-   SETUP: Click the cloud indicator (top right) and
-   enter your JSONBin.io Master Key and Bin ID.
-   Free account at jsonbin.io — no server needed.
+   SETUP: Click the cloud indicator (top right), enter
+   Project URL + anon key, and create table proc_sync:
+   create table proc_sync (id text primary key, payload jsonb, updated_at timestamptz default now());
+   alter table proc_sync enable row level security;
+   create policy "rw" on proc_sync for all using (true) with check (true);
    ==================================================== */
-let JBIN_KEY        = localStorage.getItem('jbin_key') || '';
-let JBIN_BIN        = localStorage.getItem('jbin_bin') || '';
-let JBIN_CONFIGURED = !!(JBIN_KEY && JBIN_BIN);
-const JBIN_URL      = 'https://api.jsonbin.io/v3/b';
+let JBIN_URL        = (localStorage.getItem('sb_url') || 'https://xfvoyerihexsnyktrrqq.supabase.co').replace(/\/+$/,'');
+let JBIN_BIN        = localStorage.getItem('sb_key') || 'sb_publishable_Rrgw_SJllD902NdU4EFcxg_wIHYxbFZ'; // chave publishable/anon do Supabase
+let JBIN_CONFIGURED = !!(JBIN_URL && JBIN_BIN);
+const SB_TABLE      = 'proc_sync';
+
+function sbHeaders(){
+  return { 'apikey': JBIN_BIN, 'Authorization': `Bearer ${JBIN_BIN}`, 'Content-Type': 'application/json' };
+}
 
 // Build save payload: exclude base64 >200KB and p_indireta steps
 function buildSavePayload() {
@@ -2459,24 +2475,48 @@ function buildSavePayload() {
 async function jbinLoad() {
   if (!JBIN_CONFIGURED) return null;
   try {
-    const res = await fetch(`${JBIN_URL}/${JBIN_BIN}/latest`, {
-      headers: { 'X-Master-Key': JBIN_KEY, 'X-Bin-Meta': 'false' }
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.record || null;
-  } catch(e) { console.warn('JSONBin load failed:', e); return null; }
+    const res = await fetch(`${JBIN_URL}/rest/v1/${SB_TABLE}?id=eq.main&select=payload,updated_at`, { headers: sbHeaders() });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const rows = await res.json();
+    if (rows && rows.length) {
+      window._sbLastSync = rows[0].updated_at || null;
+      window._sbLastError = null;
+      return rows[0].payload || null;
+    }
+    return null;
+  } catch(e) { console.warn('Supabase load failed:', e); window._sbLastError = e.message; return null; }
 }
 
 async function jbinSave(payload) {
-  if (!JBIN_CONFIGURED) return;
+  if (!JBIN_CONFIGURED) return { ok:false, error:'not-configured' };
   try {
-    await fetch(`${JBIN_URL}/${JBIN_BIN}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JBIN_KEY },
-      body: JSON.stringify(payload),
+    const body = { id:'main', payload, updated_at:new Date().toISOString() };
+    const res = await fetch(`${JBIN_URL}/rest/v1/${SB_TABLE}?on_conflict=id`, {
+      method:'POST',
+      headers:{ ...sbHeaders(), 'Prefer':'resolution=merge-duplicates' },
+      body: JSON.stringify(body),
     });
-  } catch(e) { console.warn('JSONBin save failed:', e); }
+    if (!res.ok) {
+      const t = await res.text().catch(() => '');
+      throw new Error('HTTP ' + res.status + (t ? ' — ' + t.slice(0,140) : ''));
+    }
+    window._sbLastSync = body.updated_at;
+    window._sbLastError = null;
+    return { ok:true, updatedAt: body.updated_at };
+  } catch(e) { console.warn('Supabase save failed:', e); window._sbLastError = e.message; return { ok:false, error:e.message }; }
+}
+
+async function sbSyncNow(){
+  if (!JBIN_CONFIGURED) { openSbConfig(); return; }
+  toast('☁️ Sincronizando com a nuvem…', 'success');
+  const r = await jbinSave(buildSavePayload());
+  if (!r.ok) { toast('☁️ Falha ao salvar: ' + r.error, 'error'); updateSbIndicator(); return; }
+  await jbinLoadAndRefresh();
+  updateSbIndicator();
+}
+
+function sbIndicatorClick(){
+  if (JBIN_CONFIGURED) sbSyncNow(); else openSbConfig();
 }
 
 async function jbinLoadAndRefresh() {
@@ -2596,7 +2636,11 @@ function _saveProcesses() {
   } catch(e) { console.warn('localStorage save:', e); }
   // 2. Save to JSONBin cloud (async, non-blocking)
   if (JBIN_CONFIGURED) {
-    jbinSave(buildSavePayload()).catch(() => {});
+    jbinSave(buildSavePayload()).then(r => {
+      if (r.ok) { window._sbLastSync = r.updatedAt; window._sbLastError = null; }
+      else { window._sbLastError = r.error; toast('☁️ Falha na sincronização: ' + r.error, 'error'); }
+      updateSbIndicator();
+    });
   }
 }
 
@@ -3001,27 +3045,28 @@ async function bPrint(){
     const canvas=m.get('canvas'),reg=m.get('elementRegistry');
     const gfx=canvas.getContainer().querySelector('svg');
     if(!gfx){toast('Nada para imprimir.','error');return;}
-    // bounding box de todo o conteúdo
     let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
     reg.forEach(el=>{try{const b=el.businessObject;if(!b)return;const g=reg.getGraphics(el);if(!g)return;const bb2=g.getBBox?g.getBBox():null;if(!bb2)return;minX=Math.min(minX,bb2.x);minY=Math.min(minY,bb2.y);maxX=Math.max(maxX,bb2.x+bb2.width);maxY=Math.max(maxY,bb2.y+bb2.height);}catch(e){}});
     if(!isFinite(minX)){const vb=canvas.viewbox();minX=vb.x;minY=vb.y;maxX=vb.x+vb.width;maxY=vb.y+vb.height;}
     const pad=40;minX-=pad;minY-=pad;maxX+=pad;maxY+=pad;
     const w=maxX-minX,h=maxY-minY;
-    // A4 paisagem, margem 12mm → área útil ~1032x703px a 96dpi
-    const PW=1030,HEADER=30,TH=703-HEADER;
-    let scale=Math.min(PW/w,1.6);scale=Math.max(scale,0.2);
+    // A4 paisagem em mm: 297x210. Margens internas: 12mm laterais, 8mm sup/inf.
+    // Em px @96dpi: pagina 1122x793; area do tile: 1032 x 703 (cabecalho consome 30px no topo)
+    const TW=1032,TH=703;
+    let scale=Math.min(TW/w,1.6);scale=Math.max(scale,0.2);
     const contentW=w*scale,contentH=h*scale;
-    const cols=Math.max(1,Math.ceil(contentW/PW));
+    const cols=Math.max(1,Math.ceil(contentW/TW));
     const rows=Math.max(1,Math.ceil(contentH/TH));
     const total=rows*cols;
     const serializer=new XMLSerializer();
     const title=(_activeProc()?.name||'Fluxo');
     const date=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-    const actors=[...new Set(steps.map(s=>ACTORS[s.actor]?.label||s.actor))].join(', ');
     let pages='';
     for(let r=0;r<rows;r++){
       for(let c=0;c<cols;c++){
         const clone=gfx.cloneNode(true);
+        // remove o transform de pan/zoom da viewport: o viewBox passa a usar coordenadas do diagrama
+        const vp=clone.querySelector('g.viewport');if(vp)vp.removeAttribute('transform');
         clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
         clone.setAttribute('viewBox',`${minX} ${minY} ${w} ${h}`);
         clone.setAttribute('width',Math.round(contentW));
@@ -3029,7 +3074,7 @@ async function bPrint(){
         const svgStr=serializer.serializeToString(clone);
         pages+=`<div class="sheet">
           <div class="phead"><span class="pt">${sanitize(title)}</span><span>${date} · SESAI/MS · Página ${r*cols+c+1}/${total}</span></div>
-          <div class="tile" style="left:${-Math.round(c*PW)}px;top:${-Math.round(r*TH)}px">${svgStr}</div>
+          <div class="tile" style="left:${Math.round(45-c*TW)}px;top:${Math.round(60-r*TH)}px">${svgStr}</div>
         </div>`;
       }
     }
@@ -3039,16 +3084,17 @@ async function bPrint(){
 <meta charset="UTF-8">
 <title>SESAI — ${sanitize(title)}</title>
 <style>
-  @page{size:A4 landscape;margin:12mm}
+  @page{size:A4 landscape;margin:0}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#111}
-  .sheet{position:relative;width:${PW}px;height:${HEADER+TH+2}px;overflow:hidden;page-break-after:always;break-after:page}
+  .sheet{position:relative;width:297mm;height:209.5mm;overflow:hidden;page-break-after:always;break-after:page}
   .sheet:last-of-type{page-break-after:auto;break-after:auto}
-  .phead{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #1b4332;padding-bottom:4px;margin-bottom:4px;color:#1b4332}
+  .phead{position:absolute;left:12mm;top:8mm;right:12mm;display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #1b4332;padding-bottom:4px;margin-bottom:4px;color:#1b4332}
   .pt{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
   .phead span:last-child{font-size:10px;color:#666}
   .tile{position:absolute}
-  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid #ddd}
+  .after{page-break-before:always;break-before:page;padding:12mm}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;padding-top:8px;border-top:1px solid #ddd}
   .legend-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#888;width:100%}
   .legend-item{display:flex;align-items:center;gap:5px;font-size:9.5px;color:#333}
   .legend-swatch{width:14px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,.15);flex-shrink:0}
@@ -3062,6 +3108,7 @@ async function bPrint(){
 </style>
 </head><body>
 ${pages}
+<div class="after">
 <div class="legend">
   <div class="legend-title">Legenda de raias (atores)</div>
   ${Object.entries(BIZAGI_COLORS).filter(([k])=>[...new Set(steps.map(s=>s.actor))].includes(k)).map(([k,c])=>`
@@ -3099,6 +3146,7 @@ ${pages}
     }).join('')}
   </tbody>
 </table>
+</div>
 <scr'+'ipt>window.onload=()=>{window.print();}<\/script>
 </body></html>`);
     win.document.close();
@@ -4802,8 +4850,7 @@ function getModeler(){
   if(modeler) return modeler;
   if(typeof BpmnJS==='undefined') return null;
   modeler=new BpmnJS({
-    container:'#bpmnCanvas',
-    additionalModules:[...(window.Minimap?[window.Minimap]:[])],
+    container:'#bpmnCanvas'
   });
   modeler.on('element.hover',({element})=>{
     if(!element.businessObject||element.waypoints) return;
@@ -4837,6 +4884,28 @@ function getModeler(){
     document.getElementById('ppSave').style.display=canEdit?'block':'none';
     document.getElementById('ppLock').style.display=canEdit?'none':'block';
   });
+  modeler.on('canvas.viewbox.changed',()=>{
+    if(document.getElementById('customMinimap')?.classList.contains('show')) updateMiniViewport();
+  });
+  const cmb=document.getElementById('cmBody');
+  if(cmb&&!cmb._nav){
+    cmb._nav=true;
+    cmb.addEventListener('mousedown',e=>{
+      if(!cmData) return;
+      e.preventDefault();
+      const rect=cmb.getBoundingClientRect();
+      const nav=ev=>{
+        const dx=(ev.clientX-rect.left-cmData.x0)/cmData.scale+cmData.x;
+        const dy=(ev.clientY-rect.top-cmData.y0)/cmData.scale+cmData.y;
+        const vb=modeler.get('canvas').viewbox();
+        modeler.get('canvas').viewbox({x:dx-vb.width/2,y:dy-vb.height/2,width:vb.width,height:vb.height});
+      };
+      nav(e);
+      const up=()=>{document.removeEventListener('mousemove',nav);document.removeEventListener('mouseup',up);};
+      document.addEventListener('mousemove',nav);
+      document.addEventListener('mouseup',up);
+    });
+  }
   const ppStatusEl=document.getElementById('ppStatus');
   if(ppStatusEl&&bpmnSelected){
     const mm=bpmnSelected.businessObject&&String(bpmnSelected.businessObject.id||'').match(/^T_(\d+)$/);
@@ -4848,7 +4917,7 @@ async function loadBPMN(xml){
   const m=getModeler();
   if(!m) return;
   document.getElementById('syncOverlay').classList.add('show');
-  try{await m.importXML(xml);m.get('canvas').zoom('fit-viewport');bpmnReady=true;applyExecutionOverlays();}
+  try{await m.importXML(xml);m.get('canvas').zoom('fit-viewport');bpmnReady=true;applyExecutionOverlays();refreshMinimapIfOpen();}
   catch(e){console.error('BPMN:',e);}
   document.getElementById('syncOverlay').classList.remove('show');
   const pn = document.getElementById('bpmnProcName');
@@ -5140,24 +5209,25 @@ function showStepDetail(idx) {
     </div>`;
 }
 
-/* --- JSONBIN CONFIG ------------------------------------ */
+/* --- SUPABASE CONFIG ------------------------------------ */
 function openSbConfig() {
-  document.getElementById('sb-url-input').value = localStorage.getItem('jbin_key') || '';
-  document.getElementById('sb-key-input').value = localStorage.getItem('jbin_bin') || '';
+  document.getElementById('sb-url-input').value = localStorage.getItem('sb_url') || JBIN_URL || '';
+  document.getElementById('sb-key-input').value = localStorage.getItem('sb_key') || JBIN_BIN || '';
   document.getElementById('sbConfigOverlay').classList.add('show');
 }
 
 async function saveSbConfig() {
-  const key = document.getElementById('sb-url-input').value.trim();
-  const bin = document.getElementById('sb-key-input').value.trim();
-  if (!key || !bin) { toast('Preencha Master Key e Bin ID.', 'error'); return; }
-  localStorage.setItem('jbin_key', key);
-  localStorage.setItem('jbin_bin', bin);
-  JBIN_KEY = key; JBIN_BIN = bin; JBIN_CONFIGURED = true;
+  const url = document.getElementById('sb-url-input').value.trim().replace(/\/+$/, '');
+  const key = document.getElementById('sb-key-input').value.trim();
+  if (!url || !key) { toast('Preencha Project URL e chave API.', 'error'); return; }
+  if (!/^https:\/\/[a-z0-9]+\.supabase\.co$/i.test(url)) { toast('URL inválida — use https://xxxx.supabase.co', 'error'); return; }
+  localStorage.setItem('sb_url', url);
+  localStorage.setItem('sb_key', key);
+  JBIN_URL = url; JBIN_BIN = key; JBIN_CONFIGURED = true;
   document.getElementById('sbConfigOverlay').classList.remove('show');
   updateSbIndicator();
-  toast('JSONBin configurado! Sincronizando dados…', 'success');
-  await jbinLoadAndRefresh();
+  toast('Supabase configurado! Sincronizando dados…', 'success');
+  await sbSyncNow();
 }
 
 function updateSbIndicator() {
@@ -5165,15 +5235,21 @@ function updateSbIndicator() {
   if (!el) return;
   if (!JBIN_CONFIGURED) {
     el.textContent = '⚫ local';
-    el.title = 'Dados salvos apenas neste dispositivo. Clique para configurar a nuvem (JSONBin).';
+    el.title = 'Dados salvos apenas neste dispositivo. Clique para configurar a nuvem (Supabase).';
     el.style.color = 'var(--gray-400)';
+  } else if (window._sbLastError) {
+    el.textContent = '🔴 nuvem erro';
+    el.title = 'Falha na sincronização: ' + window._sbLastError + ' — clique para tentar novamente.';
+    el.style.color = '#dc2626';
   } else {
-    el.textContent = '🟢 nuvem';
-    el.title = 'JSONBin configurado — dados sincronizados entre todos os usuários.';
+    const t = window._sbLastSync
+      ? new Date(window._sbLastSync).toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' })
+      : 'aguardando';
+    el.textContent = '🟢 nuvem · ' + t;
+    el.title = 'Supabase conectado — clique para sincronizar agora. Dados compartilhados com toda a equipe.';
     el.style.color = 'var(--green)';
   }
 }
-
 
 /* ===================================================
    BPMN EXPERIENCE UPGRADE
@@ -5231,11 +5307,47 @@ function bpmnSearchNav(d){
 }
 
 /* ---- minimap & legenda ---- */
+let cmData=null;
 function bToggleMinimap(){
-  if(!modeler||!bpmnReady){ toast('Abra o diagrama primeiro.','error'); return; }
-  const mm=modeler.get('minimap',false);
-  if(!mm){ toast('Minimap indisponível (biblioteca não carregada).','error'); return; }
-  mm.toggle();
+  const el=document.getElementById('customMinimap');
+  if(!el) return;
+  el.classList.toggle('show');
+  if(el.classList.contains('show')) renderMinimap();
+}
+function refreshMinimapIfOpen(){
+  const el=document.getElementById('customMinimap');
+  if(el&&el.classList.contains('show')) renderMinimap();
+}
+function renderMinimap(){
+  if(!modeler||!bpmnReady) return;
+  const canvas=modeler.get('canvas'),reg=modeler.get('elementRegistry');
+  const gfx=canvas.getContainer().querySelector('svg');
+  const holder=document.getElementById('cmContent');
+  if(!gfx||!holder) return;
+  let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+  reg.forEach(el=>{try{const g=reg.getGraphics(el);if(!g||!el.businessObject)return;const b=g.getBBox?g.getBBox():null;if(!b)return;minX=Math.min(minX,b.x);minY=Math.min(minY,b.y);maxX=Math.max(maxX,b.x+b.width);maxY=Math.max(maxY,b.y+b.height);}catch(e){}});
+  if(!isFinite(minX)){const vb=canvas.viewbox();minX=vb.x;minY=vb.y;maxX=vb.x+vb.width;maxY=vb.y+vb.height;}
+  const pad=30;minX-=pad;minY-=pad;maxX+=pad;maxY+=pad;
+  const W=220,H=150;
+  const scale=Math.min(W/(maxX-minX),H/(maxY-minY));
+  const clone=gfx.cloneNode(true);
+  const vp=clone.querySelector('g.viewport');if(vp)vp.removeAttribute('transform');
+  clone.setAttribute('viewBox',`${minX} ${minY} ${maxX-minX} ${maxY-minY}`);
+  clone.setAttribute('width',Math.round((maxX-minX)*scale));
+  clone.setAttribute('height',Math.round((maxY-minY)*scale));
+  holder.innerHTML='';holder.appendChild(clone);
+  cmData={x:minX,y:minY,scale,x0:Math.round((W-(maxX-minX)*scale)/2),y0:Math.round((H-(maxY-minY)*scale)/2)};
+  holder.style.left=cmData.x0+'px';holder.style.top=cmData.y0+'px';
+  updateMiniViewport();
+}
+function updateMiniViewport(){
+  if(!cmData||!modeler) return;
+  const vb=modeler.get('canvas').viewbox();
+  const v=document.getElementById('cmViewport');if(!v) return;
+  v.style.left=(cmData.x0+(vb.x-cmData.x)*cmData.scale)+'px';
+  v.style.top=(cmData.y0+(vb.y-cmData.y)*cmData.scale)+'px';
+  v.style.width=Math.max(6,vb.width*cmData.scale)+'px';
+  v.style.height=Math.max(6,vb.height*cmData.scale)+'px';
 }
 function toggleBpmnLegend(){
   const l=document.querySelector('.bpmn-legend');
