@@ -2459,7 +2459,6 @@ function sbHeaders(){
 function buildSavePayload() {
   const toSave = JSON.parse(JSON.stringify(PROCS));
   toSave.list.forEach(p => {
-    if (p.id === 'p_indireta') { p.steps = []; return; }
     p.steps = (p.steps || []).map(s => ({
       ...s,
       attachments: (s.attachments || []).map(a => ({
@@ -2533,6 +2532,13 @@ async function jbinLoadAndRefresh() {
   });
   if (indireta && !PROCS.list.find(p => p.id === 'p_indireta')) {
     PROCS.list.unshift(indireta);
+  }
+  // Repara p_indireta salvo com etapas vazias (formato legado do JSONBin)
+  const _ind = PROCS.list.find(p => p.id === 'p_indireta');
+  if (_ind && (!_ind.steps || !_ind.steps.length) && typeof MACRO_ACTIVITIES !== 'undefined') {
+    _ind.steps = macroToSteps(MACRO_ACTIVITIES.filter(a => ['STAGE_3','STAGE_4','STAGE_5','STAGE_6'].includes(a.stage))).concat(JSON.parse(JSON.stringify(IND_POS_STEPS)));
+    if (!_ind.name) _ind.name = 'Execução Indireta de Obra';
+    if (!_ind.icon) _ind.icon = '⚖️';
   }
   _ensureDefaultProcs();
   activeProcessId = PROCS.active || PROCS.list[0]?.id;
