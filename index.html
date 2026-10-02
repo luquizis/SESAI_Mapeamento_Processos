@@ -6,6 +6,7 @@
 <title>SESAI — Modelagem de Processos</title>
 <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17/dist/assets/bpmn-js.css">
 <link rel="stylesheet" href="https://unpkg.com/bpmn-js@17/dist/assets/diagram-js.css">
+<link rel="stylesheet" href="https://unpkg.com/diagram-js-minimap@4/dist/diagram-js-minimap.css">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap">
 <style>
@@ -151,6 +152,10 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
 @keyframes bodyIn{from{opacity:0}to{opacity:1}}
 .card-desc{font-size:13px;color:var(--gray-600);line-height:1.75;padding-top:14px;margin-bottom:14px}
 .card-items{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.card-passos{margin-bottom:14px}
+.card-passos .cp-title{font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.card-passos ol{margin:0;padding-left:18px}
+.card-passos li{font-size:12.5px;color:var(--gray-600);line-height:1.6;margin-bottom:3px}
 .card-item{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--gray-600);line-height:1.55}
 .item-dot{width:5px;height:5px;border-radius:50%;background:var(--green-l);flex-shrink:0;margin-top:7px}
 .docs-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
@@ -607,7 +612,43 @@ body.theme-black .mm-item        { background:#334155 }
 body.theme-black .mm-title       { color:#cbd5e1 }
 body.theme-black .mm-actor       { color:#64748b }
 body.theme-black .step-card.locked { background:#161f2e }
+/* ===== BPMN EXPERIENCE UPGRADE ===== */
+:root{--bpmn-selected:#005A30;--bpmn-hit:#d97706}
+#bpmnCanvas .djs-container{background:#fff}
+#bpmnCanvas .djs-element .djs-visual{filter:drop-shadow(0 1px 1px rgba(15,23,42,.06))}
+#bpmnCanvas .djs-element.selected .djs-visual>:nth-child(1){stroke:var(--bpmn-selected)!important;stroke-width:2.5px!important}
+#bpmnCanvas .djs-connection.selected path{stroke:var(--bpmn-selected)!important}
+#bpmnCanvas.focus-mode .djs-element{opacity:.18;transition:opacity .15s ease}
+#bpmnCanvas.focus-mode .djs-element.highlight,#bpmnCanvas.focus-mode .djs-element.highlight-conn{opacity:1}
+#bpmnCanvas .highlight .djs-visual>:nth-child(1){stroke:var(--bpmn-selected)!important;stroke-width:2px!important}
+#bpmnCanvas .highlight-conn path,#bpmnCanvas .highlight-conn polyline{stroke:var(--bpmn-selected)!important;stroke-width:2px!important}
+#bpmnCanvas .bpmn-status-done .djs-visual>:nth-child(1){fill:#d1fae5!important;stroke:#16a34a!important}
+#bpmnCanvas .bpmn-status-done .djs-visual text{fill:#14532d!important}
+#bpmnCanvas .bpmn-status-current .djs-visual>:nth-child(1){fill:#dbeafe!important;stroke:#2563eb!important;animation:bpmnPulse 2.2s ease-in-out infinite}
+#bpmnCanvas .bpmn-status-current .djs-visual text{fill:#1e3a8a!important}
+@keyframes bpmnPulse{0%,100%{stroke-opacity:1}50%{stroke-opacity:.35}}
+#bpmnCanvas .bpmn-search-hit .djs-visual>:nth-child(1){stroke:var(--bpmn-hit)!important;stroke-dasharray:5 3!important}
+#bpmnCanvas .bpmn-search-current .djs-visual>:nth-child(1){stroke:#dc2626!important;stroke-width:3px!important;stroke-dasharray:none!important}
+.bpmn-breadcrumb{position:absolute;top:12px;left:12px;z-index:11;background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:7px 12px;font-size:11.5px;color:var(--gray-500);box-shadow:var(--shadow-sm);max-width:44%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.bpmn-breadcrumb .bc-sep{opacity:.4;margin:0 4px}
+.bpmn-breadcrumb .bc-current{color:var(--green);font-weight:600}
+#bpmnSearchInput{height:30px;padding:0 9px;border:1px solid var(--gray-200);border-radius:var(--radius-sm);font-size:11.5px;font-family:var(--font);outline:none;width:150px}
+#bpmnSearchInput:focus{border-color:var(--green-l);box-shadow:0 0 0 3px var(--green-ring)}
+.bpmn-legend.hidden{display:none}
+.djs-minimap{z-index:9!important}
+@media(max-width:900px){.props-panel{position:absolute;top:auto;bottom:0;left:0;right:0;width:100%;max-height:45vh;overflow-y:auto;border-radius:16px 16px 0 0}}
+/* dark mode tokens */
+body.theme-black #bpmnCanvas .djs-container{background:#0f172a}
+body.theme-black #bpmnCanvas .djs-element text{fill:#e2e8f0}
+body.theme-black #bpmnCanvas .djs-connection path{stroke:#94a3b8}
+body.theme-black .djs-minimap{filter:invert(.92) hue-rotate(180deg)}
+body.theme-black .bpmn-breadcrumb{background:#1e293b;border-color:#334155;color:#94a3b8}
+body.theme-black .bpmn-legend{background:#1e293b;border-color:#334155;color:#cbd5e1}
+body.theme-green #bpmnCanvas .djs-container{background:#f0faf4}
+
 </style>
+<base target="_blank">
+<base target="_blank">
 <base target="_blank">
 </head>
 <body>
@@ -656,6 +697,7 @@ body.theme-black .step-card.locked { background:#161f2e }
   <div class="tab-nav">
     <button class="tab-btn active" id="tab-flow" onclick="switchTab('flow')">Fluxo Interativo <span class="tab-count" id="tc-flow">0 / 0</span></button>
     <button class="tab-btn" id="tab-bpmn" onclick="switchTab('bpmn')">Diagrama BPMN <span class="tab-count">auto</span></button>
+    <button class="tab-btn" id="tab-macro" onclick="switchTab('macro')">Macroprocesso <span class="tab-count">52 ativ.</span></button>
     <button class="tab-btn" id="tab-fb" onclick="switchTab('fb')">Contribuições <span class="tab-count" id="tc-fb">0</span></button>
   </div>
   <div class="topbar-end">
@@ -835,12 +877,26 @@ body.theme-black .step-card.locked { background:#161f2e }
         <input type="file" id="bpmnImport" accept=".bpmn,.xml" style="display:none" onchange="bImport(this)">
         <button class="tb-btn" onclick="bReset()">↺ Restaurar</button>
       </div>
+      <div class="tb-group">
+        <span class="tb-lbl">Localizar</span>
+        <input id="bpmnSearchInput" placeholder="Buscar atividade…" oninput="bpmnSearch(this.value)">
+        <span class="tb-lbl" id="bpmnSearchCount" style="min-width:56px"></span>
+        <button class="tb-btn" onclick="bpmnSearchNav(-1)" title="Resultado anterior">↑</button>
+        <button class="tb-btn" onclick="bpmnSearchNav(1)" title="Próximo resultado">↓</button>
+      </div>
+      <div class="tb-sep"></div>
+      <div class="tb-group">
+        <button class="tb-btn" onclick="bToggleMinimap()" title="Alternar minimap (tecla M)">🗺 Minimap</button>
+        <button class="tb-btn" onclick="toggleBpmnLegend()" title="Alternar legenda">◫ Legenda</button>
+      </div>
+      <div class="tb-sep"></div>
       <div class="bpmn-indicator" id="bpmnIndicator">
         <div class="ind-dot"></div><span id="bpmnIndText">Somente leitura</span>
         <span id="bpmnProcName" style="margin-left:6px;font-weight:600;font-size:11px;opacity:.8;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
       </div>
     </div>
     <div class="bpmn-wrap">
+      <div class="bpmn-breadcrumb" id="bpmnBreadcrumb" onclick="if(window.modeler&&bpmnReady)modeler.get('selection').select(null)"></div>
       <div id="bpmnCanvas"></div>
       <div class="sync-overlay" id="syncOverlay"><div class="sync-spinner"></div><div class="sync-text">Sincronizando com BPMN…</div></div>
       <div class="props-panel" id="propsPanel">
@@ -848,6 +904,7 @@ body.theme-black .step-card.locked { background:#161f2e }
         <div class="pp-body">
           <div class="pp-empty" id="ppEmpty">Clique em uma tarefa ou gateway para editar.</div>
           <div id="ppForm" style="display:none">
+            <div style="display:flex;gap:6px;align-items:center;margin-bottom:10px;font-size:11.5px;color:var(--gray-500)">Status: <strong id="ppStatus" style="color:var(--green)">—</strong></div>
             <label class="pp-label">Nome</label><input class="pp-input" id="ppName" placeholder="Nome do elemento">
             <label class="pp-label">Descrição</label><textarea class="pp-textarea" id="ppDoc" placeholder="Notas…"></textarea>
             <button class="pp-save" id="ppSave" onclick="bSaveProps()">Salvar</button>
@@ -856,7 +913,7 @@ body.theme-black .step-card.locked { background:#161f2e }
         </div>
       </div>
       <div class="bpmn-legend">
-        <div class="bl-title">Raias — atores</div>
+        <div class="bl-title" style="display:flex;justify-content:space-between;align-items:center"><span>Raias — atores</span><span onclick="toggleBpmnLegend()" style="cursor:pointer;font-size:11px;color:var(--gray-300)" title="Fechar legenda">✕</span></div>
         <div class="bl-item"><div class="bl-dot" style="background:#c5d9f0;border:1.5px solid #1b4d8a"></div>DSEI / Gabinete</div>
         <div class="bl-item"><div class="bl-dot" style="background:#c3e8d2;border:1.5px solid #1b6e3e"></div>SESANI</div>
         <div class="bl-item"><div class="bl-dot" style="background:#f9dbb0;border:1.5px solid #c06000"></div>SEOFI</div>
@@ -879,7 +936,11 @@ body.theme-black .step-card.locked { background:#161f2e }
         </div>
         <div class="bl-item">
           <svg width="14" height="14" style="flex-shrink:0"><polygon points="7,1 13,7 7,13 1,7" fill="white" stroke="#b7860a" stroke-width="1.5"/></svg>
-          Gateway XOR (opcional)
+          Ponto de decisão (sim/não)
+        </div>
+        <div class="bl-item">
+          <svg width="14" height="14" style="flex-shrink:0"><polygon points="7,1 13,7 7,13 1,7" fill="white" stroke="#1b6e3e" stroke-width="1.5"/><text x="7" y="10.5" font-size="10" text-anchor="middle" fill="#1b6e3e" font-weight="bold">+</text></svg>
+          Abertura/conclusão de trilhas
         </div>
         <div class="bl-item">
           <svg width="22" height="10" style="flex-shrink:0"><line x1="0" y1="5" x2="18" y2="5" stroke="#555" stroke-width="1.5"/><polygon points="16,2 22,5 16,8" fill="#555"/></svg>
@@ -1286,6 +1347,7 @@ body.theme-black .step-card.locked { background:#161f2e }
 <div class="toast-stack" id="toastStack"></div>
 
 <script src="https://unpkg.com/bpmn-js@17/dist/bpmn-modeler.development.js"></script>
+<script src="https://unpkg.com/diagram-js-minimap@4/dist/diagram-minimap.umd.js"></script>
 <script>
 /* ===================================================
    DATA
@@ -1326,6 +1388,7 @@ const DEFAULT_STEPS = [
     "actor": "dsei",
     "title": "Aprovação da demanda",
     "desc": "Gatilho 1 — A demanda é priorizada (PDSI/PCA) e formalmente aprovada pelo DSEI/Gabinete antes de qualquer aquisição.",
+    "_passos": ["Confirmar a demanda no PDSI e no PCA", "Obter a aprovação formal do DSEI/Gabinete", "Definir o objeto e o valor estimado"],
     "items": [
       "Demanda registrada no SEI e vinculada ao PDSI/PCA",
       "Aprovação formal pelo DSEI/Gabinete",
@@ -1335,212 +1398,170 @@ const DEFAULT_STEPS = [
       "DFD aprovado",
       "PCA"
     ],
-    "alert": null,
+    "alert": "A demanda só deve ser executada se estiver prevista no PDSI e no PCA (Lei nº 14.133/2021, arts. 12 e 18).",
     "btnLabel": "Demanda aprovada →",
     "attachments": [],
     "_btype": "user_task",
     "_bnote": ""
   },
   {
-    "id": "ed2",
+    "id": "ed2b",
     "num": "2",
+    "phase": "p1",
+    "actor": "ses",
+    "title": "Termo de abertura do processo de gestão e execução",
+    "desc": "Inicia formalmente a gestão e o acompanhamento da execução da obra no SEI, abrindo o processo filho de Gestão de contrato: Execução e fiscalização - Construção. Centraliza os registros técnicos, operacionais e documentais, dá transparência e rastreabilidade e identifica o rateio patrimonial.",
+    "items": [
+      "Descrição do objeto e aldeia contemplada",
+      "Equipe técnica e ART",
+      "Plano de ação com cronograma e marcos de execução",
+      "Processos relacionados vinculados (numeração SEI)",
+      "Identificação do rateio patrimonial"
+    ],
+    "docs": [
+      "Termo de abertura do processo de Gestão de contrato: Execução e fiscalização - Construção"
+    ],
+    "alert": "O termo só é válido com a autorização do DSEI/Gabinete. A ART da equipe técnica passa a constar deste documento.",
+    "btnLabel": "Processo de gestão aberto →",
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": "abertura do processo filho no SEI",
+    "_passos": [
+      "Descrever o objeto e a aldeia contemplada",
+      "Registrar a equipe técnica e a ART",
+      "Anexar o plano de ação com cronograma e marcos de execução",
+      "Vincular os processos administrativos (numeração SEI) e o rateio patrimonial",
+      "Obter a autorização do DSEI/Gabinete para a abertura"
+    ]
+  },
+  {
+    "id": "ed2c",
+    "num": "3",
+    "phase": "p1",
+    "actor": "dsei",
+    "title": "Análise preliminar e projeto básico da obra",
+    "desc": "Avaliação inicial da demanda para definição da estratégia técnica: análise do objeto, necessidade de apoio técnico do DEAMB, projeto padronizado ou específico e cadastro técnico da obra com projeto de engenharia simplificado. O DSEI/Gabinete atribui formalmente os responsáveis por portaria.",
+    "items": [
+      "Análise do objeto da intervenção e verificação de requisitos técnicos e operacionais",
+      "Avaliação da necessidade de apoio técnico do DEAMB",
+      "Definição de projeto padronizado ou projeto específico",
+      "Projeto de engenharia simplificado: ficha técnica, identificação territorial e populacional, coordenadas, PDSI/DFD/PCA vinculado e lista de materiais do projeto",
+      "Portaria de atribuição: gestor técnico (SESANI), responsável pelo controle de estoque e equipe de apoio (técnicos de edificações)"
+    ],
+    "docs": [
+      "Projeto de engenharia simplificado",
+      "Portaria de designação"
+    ],
+    "alert": "Mapeie os riscos da execução (logística de transporte, sazonalidade e clima, acesso às aldeias, disponibilidade de equipe, situações emergenciais) — a gestão de risco orienta o cronograma e as solicitações de distribuição.",
+    "btnLabel": "Estratégia técnica definida →",
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": "estratégia técnica e cadastro da obra",
+    "_passos": [
+      "Analisar o objeto da intervenção e os requisitos técnicos e operacionais",
+      "Avaliar a necessidade de apoio técnico do DEAMB",
+      "Definir projeto padronizado ou específico",
+      "Elaborar o projeto de engenharia simplificado com ficha técnica, coordenadas e lista de materiais",
+      "Emitir a portaria atribuindo gestor técnico, responsável pelo estoque e equipe de apoio"
+    ]
+  },
+  {
+    "id": "ed2",
+    "num": "4",
     "phase": "p1",
     "actor": "dsei",
     "title": "Definição da rota de execução direta",
-    "desc": "Gateway — define-se como a obra será executada. São três rotas possíveis (podem se combinar): (a) licitar apenas a compra dos materiais; (b) contratar mão de obra especializada; (c) executar com mão de obra própria do DSEI ou voluntária (comunidade/parceiros).",
+    "desc": "Decisão — define-se como a obra será executada. Na execução direta, os materiais de construção são sempre licitados; o que muda de obra para obra é a forma de obter a mão de obra e os equipamentos.",
+    "_passos": ["Verificar a necessidade de materiais, mão de obra e equipamentos para a obra", "Definir quais trilhas serão acionadas (podem se combinar)", "Registrar a decisão e a justificativa no SEI"],
     "items": [
-      "Rota A: licitação para aquisição de materiais",
-      "Rota B: licitação para contratação de mão de obra especializada",
-      "Rota C: mão de obra própria do DSEI ou voluntária (registrar doação de material)",
-      "Registro da decisão e da justificativa no SEI"
+      "Trilha A — licitação para aquisição de materiais (sempre necessária)",
+      "Trilha B — licitação para contratação de mão de obra especializada",
+      "Trilha C — mão de obra própria do DSEI ou voluntária (registrar doação de material)",
+      "Trilha D — locação ou compra de equipamentos (quando o DSEI não os tem)",
+      "Análise de riscos da execução direta, com controles mínimos e responsáveis (matriz simples já atende)"
     ],
     "docs": [
       "Despacho de decisão",
-      "Registro de doação de material (rota C)"
+      "Registro de doação de material (trilha C)"
     ],
-    "alert": null,
-    "btnLabel": "Rota definida →",
+    "alert": "Os materiais são sempre licitados (Trilha A). Defina a mão de obra — contratada (B) ou própria/voluntária (C) — e os equipamentos — locados/comprados (D) ou do próprio DSEI. As trilhas correm em paralelo; use o botão Pular nas que não se aplicam.",
+    "btnLabel": "Trilhas abertas →",
     "attachments": [],
     "_btype": "user_task",
-    "_bnote": ""
+    "_bnote": "ponto de decisão: abertura das trilhas",
+    "_fork": true
   },
   {
     "id": "ed3a",
-    "num": "3a",
+    "num": "5",
     "phase": "p2",
     "actor": "selog",
-    "title": "Processo licitatório para compra de materiais",
-    "desc": "Gatilho 2 (rota A) — SELOG conduz o processo licitatório (pregão/concorrência) para aquisição dos materiais de construção.",
+    "title": "Trilha A — Licitação para compra de materiais",
+    "desc": "Gatilho 2 (trilha A) — sempre necessária: o SELOG conduz o processo licitatório (pregão/concorrência) para aquisição dos materiais de construção.",
+    "_passos": ["Elaborar o ETP e o TR para a aquisição de materiais", "Conduzir o certame no Compras.gov/PNCP", "Homologar e contratar o fornecedor", "Programar as entregas conforme o cronograma da obra"],
     "items": [
+      "Definição do processo de aquisição: por projeto ou aquisição geral centralizada (processo mãe)",
       "ETP/TR para aquisição de materiais",
       "Execução do certame no Compras.gov/PNCP",
-      "Homologação e contratação do fornecedor",
-      "OBS: entrega programada conforme cronograma de execução (evitar vencimento/estoque inadequado)"
+      "Homologação e contratação do fornecedor"
     ],
     "docs": [
       "ETP",
       "TR",
       "Contrato de aquisição"
     ],
-    "alert": "OBS do fluxo: responsável específico pelo controle dos materiais nos DSEIs e verificação de cota de combustível na execução direta.",
+    "alert": "Entrega programada conforme o cronograma de execução, para evitar vencimento de materiais e estoque inadequado. As compras de apoio seguem a Lei nº 14.133/2021, com planejamento mínimo e justificativa de preço.",
     "btnLabel": "Materiais contratados →",
     "attachments": [],
     "_btype": "subprocess",
-    "_bnote": "certame de materiais"
-  },
-  {
-    "id": "ed3b",
-    "num": "3b",
-    "phase": "p2",
-    "actor": "selog",
-    "title": "Processo de fornecimento de mão de obra especializada",
-    "desc": "Gatilho 2 (rota B) — contratação de mão de obra especializada (ex.: serviços de construção) quando o DSEI não executa com equipe própria.",
-    "items": [
-      "Definição do escopo da mão de obra",
-      "Certame e contratação",
-      "Cláusulas de responsabilidade e segurança do trabalho"
-    ],
-    "docs": [
-      "TR mão de obra",
-      "Contrato"
-    ],
-    "alert": null,
-    "btnLabel": "Mão de obra contratada →",
-    "optional": true,
-    "optLabel": "Pular — mão de obra própria/voluntária",
-    "attachments": [],
-    "_btype": "subprocess",
-    "_bnote": "contratação de mão de obra"
-  },
-  {
-    "id": "ed3c",
-    "num": "3c",
-    "phase": "p2",
-    "actor": "dsei",
-    "title": "Plano de execução com mão de obra própria/voluntária",
-    "desc": "Gatilho 2 (rota C) — DSEI formaliza o plano de execução usando servidores e/ou voluntários da comunidade/parceiros, e registra a doação de material de construção quando houver.",
-    "items": [
-      "Plano de execução aprovado (equipe, cronograma, insumos)",
-      "Registro de doação de material de construção (quando aplicável)",
-      "Responsabilidade técnica e fiscal designadas por portaria"
-    ],
-    "docs": [
-      "Plano de execução",
-      "Registro de doação",
-      "Portaria de designação"
-    ],
-    "alert": null,
-    "btnLabel": "Plano aprovado →",
-    "optional": true,
-    "optLabel": "Pular — materiais/mão de obra contratados",
-    "attachments": [],
-    "_btype": "user_task",
-    "_bnote": ""
+    "_bnote": "certame de materiais",
+    "_track": "A"
   },
   {
     "id": "ed4",
-    "num": "4",
+    "num": "6",
     "phase": "p2",
     "actor": "seofi",
-    "title": "Cadastro do estoque e liberação de materiais",
-    "desc": "SEOFI cadastra e liquida o material recebido no SIAFI; SELOG vincula os itens à obra; liberação em remessas conforme etapa.",
+    "title": "Trilha A — Liquidação, vinculação à obra e liberação",
+    "desc": "SEOFI cadastra e liquida o material recebido no SIAFI; SELOG vincula os itens à obra; liberação em remessas conforme a etapa.",
+    "_passos": ["Receber e conferir a nota fiscal dos materiais", "Liquidar a despesa no SIAFI e registrar no almoxarifado", "Vincular os itens à obra (SELOG) e liberar em remessas"],
     "items": [
-      "Liquidação da NF no SIAFI e registro no almoxarifado",
-      "Vinculação de itens à obra (SELOG)",
+      "Liquidação do material: o documento de liquidação (SEOFI) passa a ser a referência oficial — material recebido, conferido, nota fiscal validada e despesa reconhecida",
+      "Vinculação formal do material à obra: Autorização de distribuição (SESANI e DSEI/Gabinete), com responsável pela custódia",
+      "Remanejamento entre obras, quando necessário: justificativa técnica e autorização formal",
       "Liberação física em remessas",
       "Realocação: SESANI justifica → DEAMB aprova"
     ],
     "docs": [
+      "Documento de liquidação do material",
+      "Autorização de distribuição de material",
       "Nota fiscal",
-      "Liquidação SIAFI",
       "Requisição de material"
     ],
-    "alert": "Dificuldade mapeada: falta de padronização nos registros de entrada/saída e de rastreabilidade até o ponto de uso.",
-    "btnLabel": "Estoque liberado →",
+    "alert": "Dificuldade mapeada: falta de padronização nos registros de entrada e saída e de rastreabilidade até o ponto de uso.",
+    "btnLabel": "Materiais liberados →",
     "attachments": [],
     "_btype": "service_task",
-    "_bnote": "liquidação/registro no SIAFI"
-  },
-  {
-    "id": "ed5",
-    "num": "5",
-    "phase": "p3",
-    "actor": "ses",
-    "title": "Reunião com a comunidade",
-    "desc": "SESANI organiza reunião para apresentar a obra, alinhar responsabilidades e validar a data de início com a comunidade.",
-    "items": [
-      "Pauta: obra, etapas, cronograma e impactos",
-      "Validação da data de início",
-      "ATA assinada ou relato fotográfico"
-    ],
-    "docs": [
-      "ATA de reunião",
-      "Lista de presença"
-    ],
-    "alert": null,
-    "btnLabel": "Reunião realizada →",
-    "attachments": [],
-    "_btype": "user_task",
-    "_bnote": ""
-  },
-  {
-    "id": "ed6",
-    "num": "6",
-    "phase": "p3",
-    "actor": "ses",
-    "title": "Emissão da Ordem de Serviço",
-    "desc": "A OS deflagra oficialmente o início da obra — o marco formal que substitui o início de um contrato licitado de obra.",
-    "items": [
-      "Data oficial de início",
-      "Escopo detalhado e equipe designada",
-      "Co-assinada por DSEI/Gabinete e SESANI"
-    ],
-    "docs": [
-      "Ordem de Serviço",
-      "Escopo de obra"
-    ],
-    "alert": null,
-    "btnLabel": "OS emitida →",
-    "attachments": [],
-    "_btype": "send_task",
-    "_bnote": "emissão e envio da OS"
-  },
-  {
-    "id": "ed7",
-    "num": "7",
-    "phase": "p3",
-    "actor": "deamb",
-    "title": "ART e documentos técnicos",
-    "desc": "Quando exigida, SESANI solicita a ART à COABS. NÃO se aplica a reforma, manutenção e serviços similares.",
-    "items": [
-      "Solicitação e pagamento da ART à COABS",
-      "Anexos dos documentos técnicos da obra"
-    ],
-    "docs": [
-      "ART",
-      "Projeto executivo"
-    ],
-    "alert": null,
-    "btnLabel": "ART inserida →",
-    "optional": true,
-    "optLabel": "Pular — não exige ART",
-    "attachments": [],
-    "_btype": "user_task",
-    "_bnote": ""
+    "_bnote": "liquidação/registro no SIAFI",
+    "_track": "A"
   },
   {
     "id": "ed8",
-    "num": "8",
+    "num": "7",
     "phase": "p3",
     "actor": "sepat",
-    "title": "Atesto de retirada de material (SEPAT)",
-    "desc": "Com a OS, SESANI aciona o SEPAT para retirada do material; ambos assinam o atesto (formulário único 8→9).",
+    "title": "Trilha A — Atesto de retirada de material (SEPAT)",
+    "desc": "Com a Ordem de Serviço, SESANI aciona o SEPAT para retirada do material; ambos assinam o atesto (formulário único).",
+    "_passos": ["Acionar o SEPAT para a liberação do material", "Conferir as quantidades e assinar o atesto de retirada", "Organizar o transporte em remessas, por etapa da obra"],
     "items": [
-      "Liberação do material pelo SEPAT",
-      "Assinatura do atesto de retirada",
+      "Solicitação formal de distribuição e retirada (SESANI e SELOG)",
+      "Liberação do material pelo SEPAT, com guia de saída e baixa do estoque",
+      "Assinatura e validação do atesto de retirada",
       "Retirada possível em remessas por etapa"
     ],
     "docs": [
+      "Solicitação de distribuição e retirada de materiais",
+      "Guia de saída de material",
       "Atesto de retirada",
       "Formulário único"
     ],
@@ -1548,15 +1569,17 @@ const DEFAULT_STEPS = [
     "btnLabel": "Retirada atestada →",
     "attachments": [],
     "_btype": "user_task",
-    "_bnote": ""
+    "_bnote": "",
+    "_track": "A"
   },
   {
     "id": "ed9",
-    "num": "9",
+    "num": "8",
     "phase": "p3",
     "actor": "ses",
-    "title": "Atesto de entrega do material na aldeia",
-    "desc": "SESANI assina o atesto de entrega no canteiro de obras na aldeia, encerrando o formulário único.",
+    "title": "Trilha A — Atesto de entrega do material na aldeia",
+    "desc": "SESANI assina o atesto de entrega no canteiro de obras na aldeia, encerrando o formulário único. As entregas programadas (gatilho 3*) ocorrem ao longo da execução da obra.",
+    "_passos": ["Entregar o material no canteiro de obras na aldeia", "Assinar o atesto de entrega junto à comunidade", "Registrar o encerramento do formulário único (origem → almoxarifado → obra)"],
     "items": [
       "Entrega física no canteiro de obras",
       "Assinatura do atesto de entrega",
@@ -1569,20 +1592,152 @@ const DEFAULT_STEPS = [
     "btnLabel": "Entrega atestada →",
     "attachments": [],
     "_btype": "user_task",
-    "_bnote": ""
+    "_bnote": "",
+    "_track": "A"
+  },
+  {
+    "id": "ed3b",
+    "num": "9",
+    "phase": "p2",
+    "actor": "selog",
+    "title": "Trilha B — Contratação de mão de obra especializada",
+    "desc": "Gatilho 2 (trilha B) — contratação de mão de obra especializada (ex.: serviços de construção) quando o DSEI não executa com equipe própria. Pode ser licitação, contratação direta ou contrato continuado.",
+    "_passos": ["Definir o escopo da mão de obra especializada", "Conduzir o certame e formalizar o contrato", "Incluir cláusulas de responsabilidade e de segurança do trabalho"],
+    "items": [
+      "Definição do escopo da mão de obra",
+      "Certame e contratação",
+      "Cláusulas de responsabilidade e segurança do trabalho"
+    ],
+    "docs": [
+      "TR mão de obra",
+      "Contrato"
+    ],
+    "alert": "A contratação direta de mão de obra só cabe nas hipóteses legais (art. 75, Lei nº 14.133/2021); o contrato deve prever treinamento em Segurança do Trabalho e Equipamentos.",
+    "btnLabel": "Mão de obra contratada →",
+    "optional": true,
+    "optLabel": "Pular — mão de obra própria/voluntária",
+    "attachments": [],
+    "_btype": "subprocess",
+    "_bnote": "contratação de mão de obra",
+    "_track": "B"
+  },
+  {
+    "id": "ed3c",
+    "num": "10",
+    "phase": "p2",
+    "actor": "dsei",
+    "title": "Trilha C — Execução com mão de obra própria ou voluntária",
+    "desc": "Gatilho 2 (trilha C) — DSEI formaliza o plano de execução usando servidores e/ou voluntários da comunidade/parceiros, e registra a doação de material de construção quando houver.",
+    "_passos": ["Formalizar o plano de execução: equipe, cronograma e insumos", "Registrar a doação de material de construção, quando houver", "Designar os responsáveis técnicos e fiscais por portaria"],
+    "items": [
+      "Plano de execução aprovado (equipe, cronograma, insumos)",
+      "Registro de doação de material de construção (quando aplicável)",
+      "Responsabilidade técnica e fiscal designadas por portaria"
+    ],
+    "docs": [
+      "Plano de execução",
+      "Registro de doação",
+      "Portaria de designação"
+    ],
+    "alert": "Registre formalmente a doação de materiais e a mão de obra voluntária, com portaria de designação dos responsáveis técnicos e fiscais.",
+    "btnLabel": "Plano aprovado →",
+    "optional": true,
+    "optLabel": "Pular — materiais/mão de obra contratados",
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": "",
+    "_track": "C"
+  },
+  {
+    "id": "ed3d",
+    "num": "11",
+    "phase": "p2",
+    "actor": "selog",
+    "title": "Trilha D — Locação ou compra de equipamentos",
+    "desc": "Quando a obra exigir equipamentos que o DSEI não possui (caminhão, betoneira, escavadeira, gerador etc.), o SELOG conduz a licitação para locação ou aquisição. Se o DSEI já tem o equipamento, esta trilha é dispensada.",
+    "_passos": ["Verificar a disponibilidade de equipamentos no patrimônio do DSEI (SEPAT)", "Elaborar o ETP e o TR para locação ou compra", "Conduzir o certame e assinar o contrato", "Receber e vistoriar o equipamento contratado"],
+    "items": [
+      "Verificar a disponibilidade de equipamentos no patrimônio do DSEI (SEPAT)",
+      "ETP/TR para locação ou compra de equipamentos",
+      "Execução do certame no Compras.gov/PNCP",
+      "Contrato com cláusulas de operação, manutenção e seguro",
+      "Entrega e vistoria do equipamento"
+    ],
+    "docs": [
+      "ETP",
+      "TR",
+      "Contrato de locação/aquisição"
+    ],
+    "alert": "Antes de contratar, verifique a disponibilidade de equipamentos no patrimônio do DSEI (SEPAT) — só licite o que o distrito realmente não tem.",
+    "btnLabel": "Equipamentos contratados →",
+    "optional": true,
+    "optLabel": "Pular — usar equipamento do próprio DSEI",
+    "attachments": [],
+    "_btype": "subprocess",
+    "_bnote": "licitação de equipamentos",
+    "_track": "D"
+  },
+  {
+    "id": "ed5",
+    "num": "12",
+    "phase": "p3",
+    "actor": "ses",
+    "title": "Reunião com a comunidade",
+    "desc": "As trilhas se unem aqui. SESANI organiza reunião para apresentar a obra, alinhar responsabilidades e validar a data de início com a comunidade.",
+    "_passos": ["Convidar a comunidade e as lideranças locais", "Apresentar a obra, as etapas, o cronograma e os impactos", "Validar a data de início e registrar a ata assinada"],
+    "items": [
+      "Pauta: obra, etapas, cronograma e impactos",
+      "Validação da data de início",
+      "ATA assinada ou relato fotográfico"
+    ],
+    "docs": [
+      "ATA de reunião",
+      "Lista de presença"
+    ],
+    "alert": "Materiais entregues, mão de obra contratada e/ou equipe própria prontos: a obra se inicia com a comunidade.",
+    "btnLabel": "Reunião realizada →",
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": "",
+    "_join": true
+  },
+  {
+    "id": "ed6",
+    "num": "13",
+    "phase": "p3",
+    "actor": "ses",
+    "title": "Emissão da Ordem de Serviço",
+    "desc": "A OS deflagra oficialmente o início da obra — o marco formal que substitui o início de um contrato licitado de obra.",
+    "_passos": ["Detalhar o escopo da obra e a equipe designada", "Emitir a OS co-assinada pelo DSEI/Gabinete e pela SESANI", "Comunicar a data oficial de início a todos os envolvidos"],
+    "items": [
+      "Data oficial de início",
+      "Escopo detalhado e equipe designada",
+      "Co-assinada por DSEI/Gabinete e SESANI"
+    ],
+    "docs": [
+      "Ordem de Serviço",
+      "Escopo de obra"
+    ],
+    "alert": "A OS é o marco formal de início e define escopo da execução, equipe responsável, data prevista de início e responsabilidades técnicas e operacionais. Boa prática: assinatura de todas as partes no mesmo dia, garantindo alinhamento prévio, formalização simultânea e início coordenado das atividades.",
+    "btnLabel": "OS emitida →",
+    "attachments": [],
+    "_btype": "send_task",
+    "_bnote": "emissão e envio da OS"
   },
   {
     "id": "ed10",
-    "num": "10",
+    "num": "14",
     "phase": "p4",
     "actor": "ses",
     "title": "Execução e acompanhamento da obra",
-    "desc": "Gatilho 3 — execução da obra com diário de obras semanal (fotos georreferenciadas, cronograma, problemas). Pode ser preenchido por AISAN e comunidade.",
+    "desc": "Gatilho 3 — execução da obra com diário de obras semanal (fotos georreferenciadas, cronograma, problemas). As entregas programadas de materiais (3*) acontecem ao longo desta etapa. Pode ser preenchido por AISAN e comunidade.",
+    "_passos": ["Iniciar a execução conforme a Ordem de Serviço", "Preencher o diário de obras semanal, com fotos georreferenciadas", "Registrar problemas e ajustar o cronograma", "Acompanhar as entregas programadas de materiais (3*)"],
     "items": [
       "Diário de obras semanal (7 dias)",
       "Registro fotográfico georreferenciado",
       "Ajuste de cronograma e registro de problemas",
-      "Preenchimento também por AISAN e comunidade"
+      "Preenchimento também por AISAN e comunidade",
+      "Registro formal de mudanças de escopo, com justificativa e aprovação quando houver"
     ],
     "docs": [
       "Diário de obras",
@@ -1596,11 +1751,12 @@ const DEFAULT_STEPS = [
   },
   {
     "id": "ed11",
-    "num": "11",
+    "num": "15",
     "phase": "p4",
     "actor": "deamb",
     "title": "Relatório situacional mensal",
     "desc": "Gerado automaticamente a cada 4 semanas a partir do diário; validado pelo SESANI e pelo DEAMB/COABS.",
+    "_passos": ["Consolidar os diários de obras do mês", "Gerar o relatório situacional com a curva previsto × executado", "Submeter à validação do SESANI e do DEAMB/COABS"],
     "items": [
       "% executado no mês e acumulado vs previsto",
       "Curva previsto × executado",
@@ -1619,24 +1775,51 @@ const DEFAULT_STEPS = [
     "_bnote": "gerado automaticamente do diário de obras"
   },
   {
+    "id": "ed11a",
+    "num": "15a",
+    "phase": "p4",
+    "actor": "deamb",
+    "title": "Apuração de responsabilidade (quando houver inadimplemento)",
+    "desc": "Em caso de descumprimento no fornecimento de materiais ou na execução da mão de obra contratada, instaura-se a apuração de responsabilidade.",
+    "_passos": ["Registrar as não conformidades identificadas", "Notificar o fornecedor ou contratado responsável", "Instaurar a apuração com análise jurídica e sanções cabíveis"],
+    "items": [
+      "Registro das não conformidades",
+      "Notificação ao fornecedor/contratado",
+      "Análise jurídica (CJU/DSEI/SESAI) e sanções cabíveis"
+    ],
+    "docs": [
+      "Autos de apuração"
+    ],
+    "alert": "A apuração de responsabilidade deve observar o devido processo legal, com defesa prévia do notificado.",
+    "btnLabel": "Responsabilidade apurada →",
+    "optional": true,
+    "optLabel": "Pular — sem inadimplemento",
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
+  },
+  {
     "id": "ed12",
-    "num": "12",
+    "num": "16",
     "phase": "p5",
     "actor": "ses",
     "title": "Entrega à comunidade e Termo de Conclusão",
     "desc": "Gatilho 4 — reunião formal de entrega, assinatura da liderança local, Termo de Conclusão e encerramento do processo no SEI.",
+    "_passos": ["Realizar a reunião formal de entrega com a comunidade", "Colher a assinatura da liderança local", "Emitir o Termo de Conclusão e encerrar o processo no SEI"],
     "items": [
       "Entrega formal com registro fotográfico",
       "Assinatura da liderança local",
       "Termo de Conclusão de Obra (SESANI)",
+      "Termo de aceite/recebimento interno circunstanciado: quem vistoria, o que foi verificado, pendências e prazos",
       "DEAMB instrui o encerramento do processo SEI"
     ],
     "docs": [
       "Ata de entrega",
       "Termo de conclusão",
+      "Termo de aceite/recebimento interno",
       "Encerramento SEI"
     ],
-    "alert": null,
+    "alert": "Após a conclusão, registre o estabelecimento no CNES como unidade de saúde indígena (Portaria SAS/MS nº 1.317/2017). O aceite deve se apoiar em vistoria, relatório e checklists — controle por evidências, não apenas por declarações (boas práticas reiteradas pelo TCU).",
     "btnLabel": "Obra entregue! 🏁",
     "attachments": [],
     "_btype": "user_task",
@@ -1644,11 +1827,12 @@ const DEFAULT_STEPS = [
   },
   {
     "id": "ed13",
-    "num": "13",
+    "num": "17",
     "phase": "p5",
     "actor": "dsei",
     "title": "Registro de entrega e acionamento da manutenção",
     "desc": "Registro formal de entrega da obra e início do ciclo contínuo de manutenção/monitoramento do patrimônio.",
+    "_passos": ["Registrar a entrega da obra no sistema", "Ativar o plano de manutenção e monitoramento", "Nomear o responsável do DSEI pelo acompanhamento pós-obra"],
     "items": [
       "Registro de entrega da obra no sistema",
       "Plano de manutenção/monitoramento",
@@ -1658,7 +1842,7 @@ const DEFAULT_STEPS = [
       "Registro de entrega",
       "Plano de manutenção"
     ],
-    "alert": null,
+    "alert": "A manutenção preventiva preserva o investimento e realimenta o planejamento. A liquidação e o pagamento das compras de apoio exigem a comprovação do que foi entregue (Lei nº 4.320/1964, art. 63); a motivação e a rastreabilidade do processo decorrem do art. 37 da Constituição.",
     "btnLabel": "Manutenção acionada ↻",
     "isLast": true,
     "attachments": [],
@@ -1674,18 +1858,46 @@ const CD_STEPS = [
     "phase": "p1",
     "actor": "dsei",
     "title": "Aprovação da demanda e enquadramento legal",
-    "desc": "Gatilho 1 — demanda aprovada e enquadrada em hipótese legal de dispensa ou inexigibilidade.",
+    "desc": "Gatilho 1 — demanda registrada no DFD/DOD e enquadrada em hipótese legal: inexigibilidade (art. 74), dispensa (art. 75), licitação deserta (art. 76) ou valor inferior ao estipulado.",
+    "_passos": ["Confirmar a demanda aprovada e vinculada ao PDSI/PCA", "Identificar a hipótese legal aplicável (dispensa, inexigibilidade, licitação deserta ou valor inferior ao estipulado)", "Aprovar o enquadramento pelo DSEI/Gabinete"],
     "items": [
-      "Demanda registrada no SEI e vinculada ao PDSI/PCA",
-      "Identificação da hipótese legal (dispensa/inexigibilidade)",
+      "DFD/DOD completo: problema, justificativa, resultado esperado, condições do território e urgência com evidências",
+      "Evidências que fortalecem o DFD: fotos datadas, relatório de inspeção, ocorrências anteriores, registro de risco",
+      "Identificação da hipótese legal: inexigibilidade (art. 74), dispensa (art. 75), licitação deserta (art. 76) ou valor inferior ao estipulado",
+      "Registro de necessidade superveniente, quando não prevista no PCA/PGC: data do fato gerador, evidência e justificativa",
       "Aprovação pelo DSEI/Gabinete"
     ],
     "docs": [
-      "DFD",
+      "DFD/DOD",
       "PCA"
     ],
-    "alert": null,
+    "alert": "A inexigibilidade está no art. 74, a dispensa no art. 75 e a licitação deserta no art. 76 da Lei nº 14.133/2021. Erros comuns a evitar: texto genérico (precisa reformar) sem dizer o quê; urgência sem evidência; não registrar as restrições de logística, que depois viram aditivo ou atraso. Não force o encaixe em item planejado diferente do PCA — isso gera ruído em auditoria.",
     "btnLabel": "Demanda aprovada →",
+    "attachments": [],
+    "_btype": "user_task",
+    "_bnote": ""
+  },
+  {
+    "id": "cd1b",
+    "num": "1b",
+    "phase": "p1",
+    "actor": "selog",
+    "title": "Tentativa licitatória prévia registrada (quando aplicável)",
+    "desc": "Nos casos de licitação deserta ou frustada, registrar o certame anterior e o motivo que enseja a contratação direta.",
+    "_passos": ["Localizar o processo do certame deserte ou frustrado", "Registrar o motivo da inviabilidade de nova licitação", "Juntar o edital e a ata do certame anterior ao processo SEI"],
+    "items": [
+      "Registro do certame deserte ou frustrado",
+      "Justificativa da inviabilidade de nova licitação",
+      "Anexos do edital e da ata ao processo SEI"
+    ],
+    "docs": [
+      "Edital anterior",
+      "Ata do certame"
+    ],
+    "alert": null,
+    "btnLabel": "Tentativa registrada →",
+    "optional": true,
+    "optLabel": "Pular — dispensa/inexigibilidade direta",
     "attachments": [],
     "_btype": "user_task",
     "_bnote": ""
@@ -1697,17 +1909,24 @@ const CD_STEPS = [
     "actor": "selog",
     "title": "Justificativa da contratação direta",
     "desc": "Instrução do processo com justificativa fundamentada e demonstração da compatibilidade dos preços praticados com os de mercado.",
+    "_passos": ["Fundamentar a escolha do fornecedor", "Realizar a pesquisa de preços, com no mínimo três cotações", "Instruir a justificativa, a minuta do TR e a compatibilidade de preços"],
     "items": [
       "Justificativa da escolha do fornecedor",
-      "Pesquisa de preços / compatibilidade de preços",
+      "ETP enxuto com alternativas avaliadas (mínimo duas), comparadas por tempo, logística, manutenção, segurança e custo total",
+      "Análise de riscos com controles preventivo e detectivo, responsáveis e evidência no SEI",
+      "TR com aceite verificável (não a contento), pagamento atado a evidências, logística e manutenção viáveis no território",
+      "Pesquisa de preços com ajustes territoriais (mobilização, frete, sazonalidade, apoio local) e memória de cálculo",
       "Minuta do TR e do contrato"
     ],
     "docs": [
       "Justificativa",
+      "ETP",
+      "Análise de riscos",
       "Pesquisa de preços",
+      "Memória de cálculo",
       "TR"
     ],
-    "alert": null,
+    "alert": "A pesquisa de preços deve seguir a IN SEGES/ME nº 65/2021 (mínimo de três cotações, salvo justificativa) e registrar o impacto territorial — mobilização, frete, sazonalidade — com memória de cálculo. O objetivo não é justificar qualquer preço, é demonstrar por que o custo se comporta assim naquele território.",
     "btnLabel": "Justificativa instruída →",
     "attachments": [],
     "_btype": "user_task",
@@ -1720,6 +1939,7 @@ const CD_STEPS = [
     "actor": "deamb",
     "title": "Análise jurídica — CJU, DSEI e SESAI",
     "desc": "Todos os processos de contratação direta devem passar por análise jurídica da Advocacia-Geral da União (CJU), do DSEI e da SESAI.",
+    "_passos": ["Encaminhar o processo à análise da CJU", "Obter as análises do DSEI e da SESAI", "Juntar os pareceres ao processo no SEI"],
     "items": [
       "Parecer da CJU",
       "Análise jurídica do DSEI",
@@ -1741,6 +1961,7 @@ const CD_STEPS = [
     "actor": "seofi",
     "title": "Emissão do empenho",
     "desc": "SEOFI verifica disponibilidade orçamentária e emite a Nota de Empenho no SIAFI.",
+    "_passos": ["Verificar a disponibilidade de crédito orçamentário", "Emitir a Nota de Empenho no SIAFI", "Confirmar a descentralização orçamentária, quando aplicável"],
     "items": [
       "Verificação de crédito orçamentário",
       "Emissão da NE no SIAFI",
@@ -1749,7 +1970,7 @@ const CD_STEPS = [
     "docs": [
       "Nota de Empenho"
     ],
-    "alert": null,
+    "alert": "O empenho só pode ser emitido após a confirmação da disponibilidade orçamentária.",
     "btnLabel": "Empenho emitido →",
     "attachments": [],
     "_btype": "service_task",
@@ -1762,6 +1983,7 @@ const CD_STEPS = [
     "actor": "selog",
     "title": "Formalização e publicação do contrato",
     "desc": "Assinatura do contrato pelo contratado e pela autoridade competente, com publicação do extrato (DOU/PNCP).",
+    "_passos": ["Coletar as assinaturas do contratado e da autoridade competente", "Publicar o extrato do contrato no DOU e no PNCP", "Designar os fiscais técnico e administrativo por portaria"],
     "items": [
       "Assinatura pelas partes",
       "Publicação do extrato do contrato",
@@ -1771,7 +1993,7 @@ const CD_STEPS = [
       "Contrato",
       "Portaria de fiscalização"
     ],
-    "alert": null,
+    "alert": "A publicação do extrato do contrato no DOU e no PNCP é obrigatória (Lei nº 14.133/2021, art. 106), e a divulgação no PNCP deve ocorrer em até 10 dias úteis da assinatura — é condição de eficácia do contrato. Anexe o comprovante ao processo.",
     "btnLabel": "Contrato formalizado →",
     "attachments": [],
     "_btype": "send_task",
@@ -1784,6 +2006,7 @@ const CD_STEPS = [
     "actor": "ses",
     "title": "Execução contratual e fiscalização",
     "desc": "Execução da obra/serviço com fiscalização técnica e administrativa; acompanhamento de cronograma e medições.",
+    "_passos": ["Acompanhar a execução com o fiscal designado", "Registrar medições e o andamento do cronograma", "Elaborar relatórios periódicos de acompanhamento"],
     "items": [
       "Fiscalização técnica e administrativa",
       "Medições e acompanhamento de cronograma",
@@ -1793,7 +2016,7 @@ const CD_STEPS = [
       "Relatórios de fiscalização",
       "Medições"
     ],
-    "alert": null,
+    "alert": "A fiscalização segue a IN SEGES/ME nº 75/2021 e o Decreto nº 11.246/2022: recebimento provisório por fiscais (técnico e administrativo) e recebimento definitivo pelo gestor do contrato ou comissão designada.",
     "btnLabel": "Execução acompanhada →",
     "attachments": [],
     "_btype": "user_task",
@@ -1806,6 +2029,7 @@ const CD_STEPS = [
     "actor": "seofi",
     "title": "Entregas parciais e pagamentos",
     "desc": "Gatilho 3 — pagamentos vinculados a entregas/etapas parciais verificadas e aceitas pela fiscalização.",
+    "_passos": ["Verificar e aceitar as entregas parciais (gatilho 3)", "Conferir as faturas contra o IMR e o contrato", "Efetuar os pagamentos por etapa executada"],
     "items": [
       "Verificação e aceite das etapas parciais",
       "Pagamento por etapa executada",
@@ -1815,7 +2039,7 @@ const CD_STEPS = [
       "Atestos de entrega parcial",
       "Faturas"
     ],
-    "alert": null,
+    "alert": "Os pagamentos devem estar vinculados a entregas verificadas e aceitas (IMR). Antes de atestar e pagar, o processo deve conter relatório de fiscalização, checklist de conformidade e evidências (fotos datadas, laudos e testes quando aplicável).",
     "btnLabel": "Entregas parciais pagas →",
     "attachments": [],
     "_btype": "service_task",
@@ -1828,6 +2052,7 @@ const CD_STEPS = [
     "actor": "ses",
     "title": "Entrega definitiva e conclusão",
     "desc": "Gatilho 4 — entrega definitiva, termo de conclusão/recebimento definitivo e encerramento do processo no SEI.",
+    "_passos": ["Verificar a entrega definitiva (gatilho 4)", "Emitir o termo de conclusão e o recebimento definitivo", "Encerrar o processo no SEI"],
     "items": [
       "Entrega definitiva verificada",
       "Termo de conclusão / recebimento definitivo",
@@ -1837,7 +2062,7 @@ const CD_STEPS = [
       "Termo de conclusão",
       "Encerramento SEI"
     ],
-    "alert": null,
+    "alert": "Guarde toda a documentação de encerramento — ela é memória institucional e suporte para a prestação de contas e os órgãos de controle.",
     "btnLabel": "Contrato concluído! 🏁",
     "attachments": [],
     "_btype": "user_task",
@@ -1850,6 +2075,7 @@ const CD_STEPS = [
     "actor": "dsei",
     "title": "Registro de entrega e manutenção/monitoramento",
     "desc": "Registro formal de entrega e início do ciclo de manutenção/monitoramento do bem construído.",
+    "_passos": ["Registrar a entrega do bem construído", "Ativar o plano de manutenção e monitoramento", "Designar o responsável do DSEI pelo pós-obra"],
     "items": [
       "Registro de entrega",
       "Plano de manutenção/monitoramento",
@@ -1867,7 +2093,338 @@ const CD_STEPS = [
   }
 ];
 
-const IC_STEPS = [{"id": "ic1", "num": "1", "phase": "p1", "actor": "dsei", "title": "Aprovação da demanda e análise de alternativas", "desc": "Demanda aprovada e estudo comparativo: construir nova obra versus incorporar imóvel existente.", "items": ["Demanda registrada no SEI", "Estudo comparativo de custo, prazo e adequação", "Decisão fundamentada pela via mais adequada, econômica ou ágil"], "docs": ["DFD", "Estudo comparativo"], "alert": null, "btnLabel": "Demanda aprovada →", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic2", "num": "2", "phase": "p1", "actor": "ses", "title": "Avaliações técnicas, patrimoniais, jurídicas e orçamentárias", "desc": "A incorporação só deve ser adotada após avaliações técnicas, patrimoniais, jurídicas e orçamentárias aplicáveis.", "items": ["Vistoria técnica e avaliação do imóvel", "Análise patrimonial e documentação do imóvel", "Análise jurídica (titularidade, ônus, restrições)", "Análise orçamentária e fonte de recursos"], "docs": ["Laudo de avaliação", "Certidões", "Parecer jurídico"], "alert": null, "btnLabel": "Avaliações concluídas →", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic3", "num": "3", "phase": "p2", "actor": "selog", "title": "Processo de aquisição do imóvel", "desc": "Instrução do processo de aquisição (dispensa/inexigibilidade ou licitação, conforme o caso) e formalização da compra.", "items": ["Instrução do processo de aquisição", "Justificativa e compatibilidade de preço", "Escritura/contrato de compra e venda"], "docs": ["Processo SEI", "Escritura"], "alert": null, "btnLabel": "Imóvel adquirido →", "attachments": [], "_btype": "subprocess", "_bnote": "aquisição e formalização"}, {"id": "ic4", "num": "4", "phase": "p3", "actor": "sepat", "title": "Regularização e registro no patrimônio da União", "desc": "Registro do imóvel no patrimônio da União (SEPAT) com toda a documentação de incorporação patrimonial.", "items": ["Registro patrimonial do imóvel", "Atualização da documentação de titularidade", "Cadastro nos sistemas de patrimônio"], "docs": ["Termo de incorporação patrimonial"], "alert": null, "btnLabel": "Imóvel registrado →", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic5", "num": "5", "phase": "p3", "actor": "dsei", "title": "Destinação à prestação dos serviços da SESAI", "desc": "Imóvel destinado ao uso dos serviços da SESAI, com comunicação à comunidade/ala de atendimento.", "items": ["Destinação formal do imóvel", "Ativação do imóvel para o serviço", "Comunicação à comunidade beneficiária"], "docs": ["Despacho de destinação"], "alert": null, "btnLabel": "Imóvel destinado →", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic6", "num": "6", "phase": "p5", "actor": "dsei", "title": "Manutenção e monitoramento", "desc": "Ciclo contínuo de manutenção e monitoramento do imóvel incorporado.", "items": ["Plano de manutenção do imóvel", "Responsável pelo acompanhamento", "Registros periódicos de conservação"], "docs": ["Plano de manutenção"], "alert": null, "btnLabel": "Manutenção acionada ↻", "isLast": true, "attachments": [], "_btype": "service_task", "_bnote": "monitoramento contínuo em sistema"}];
+const IC_STEPS = [{"id": "ic1", "num": "1", "phase": "p1", "actor": "dsei", "title": "Aprovação da demanda e análise de alternativas", "desc": "Demanda aprovada e estudo comparativo: construir nova obra versus incorporar imóvel existente — por aquisição ou por doação (obra pronta, materiais e/ou mão de obra voluntária da comunidade/parceiros).",
+    "_passos": ["Registrar a demanda no SEI", "Elaborar o estudo comparativo: construir, adquirir ou receber por doação", "Mapear as doações disponíveis (obra pronta, materiais, mão de obra voluntária)", "Decidir e fundamentar a via mais adequada, econômica ou ágil"], "items": ["Demanda registrada no SEI", "Estudo comparativo de custo, prazo e adequação", "Mapeamento de doações disponíveis (obra pronta, materiais, mão de obra voluntária)", "Decisão fundamentada pela via mais adequada, econômica ou ágil"], "docs": ["DFD", "Estudo comparativo"], "alert": "A escolha da via — construir, adquirir ou receber por doação — deve ser devidamente fundamentada no estudo comparativo de custo, prazo e adequação.", "btnLabel": "Demanda aprovada →", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic1b", "num": "1b", "phase": "p1", "actor": "dsei", "title": "Registro da doação recebida", "desc": "Quando a origem for doação: registrar a obra pronta doada, os materiais de construção doados e/ou a mão de obra voluntária da comunidade/parceiros.",
+    "_passos": ["Receber e registrar o termo de doação", "Registrar os materiais doados e a mão de obra voluntária mapeada", "Vincular a doação ao processo no SEI"], "items": ["Termo de doação ou registro formal da oferta", "Registro de doação de material de construção (quando houver)", "Mapeamento da mão de obra voluntária (comunidade/parceiros)"], "docs": ["Termo de doação", "Registro de doação de material"], "alert": null, "btnLabel": "Doação registrada →", "optional": true, "optLabel": "Pular — aquisição por compra", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic1c", "num": "1c", "phase": "p2", "actor": "ses", "title": "Projeto da obra doada (quando necessário)", "desc": "Para doações que envolvem execução (obra, materiais ou mão de obra), elaborar o projeto de construção de edificação ou saneamento antes da execução.",
+    "_passos": ["Elaborar o projeto da obra doada (edificação ou saneamento)", "Aprovar o plano de execução (equipe, cronograma, insumos)", "Designar os responsáveis técnicos por portaria"], "items": ["Projeto de construção de obra de edificação ou saneamento", "Plano de execução (equipe, cronograma, insumos)", "Responsabilidade técnica designada por portaria"], "docs": ["Projeto da obra doada", "Plano de execução"], "alert": null, "btnLabel": "Projeto elaborado →", "optional": true, "optLabel": "Pular — obra pronta doada", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic1d", "num": "1d", "phase": "p3", "actor": "ses", "title": "Acompanhamento da execução da obra doada", "desc": "Acompanhamento da execução quando a doação envolve obra a construir, com mão de obra própria do DSEI ou voluntária (comunidade/parceiros).",
+    "_passos": ["Acompanhar a execução com diário de obras", "Registrar as entregas parciais conforme o cronograma", "Conferir e registrar a entrega da obra doada concluída"], "items": ["Execução e acompanhamento da obra doada", "Diário de obras e registros fotográficos", "Entregas parciais conforme cronograma", "Entrega da obra doada concluída"], "docs": ["Diário de obras", "Registro de entrega da obra"], "alert": null, "btnLabel": "Execução acompanhada →", "optional": true, "optLabel": "Pular — obra pronta doada", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic2", "num": "2", "phase": "p1", "actor": "ses", "title": "Avaliações e diligência documental", "desc": "A incorporação só deve ser adotada após avaliações técnicas, patrimoniais, jurídicas e orçamentárias aplicáveis, com diligência documental mínima organizada em cinco grupos.", "_passos": ["Levantar o termo de doação/transferência/entrega e as condições da entrega", "Reunir projetos, memoriais, especificações e o registro do executado (as built)", "Solicitar ART/RRT, quando aplicável", "Colher laudos, testes e certificados de funcionamento (elétrica, hidrossanitária, SPDA)", "Verificar licenças e regularizações exigíveis ao uso", "Confirmar a fonte de recursos para adequações"], "items": ["Origem e formalização da entrega: termo de doação/transferência/entrega, identificação do entregante e condições", "Base técnica: projetos, memoriais, especificações e registro do que foi executado (as built)", "Responsabilidade técnica: ART/RRT, quando aplicável", "Conformidade e funcionamento: laudos, testes e certificados (elétrica, hidrossanitária, SPDA)", "Licenças e regularizações exigíveis ao uso", "Análise orçamentária e fonte de recursos para adequações"], "docs": ["Termo de doação/transferência/entrega", "Relatório de diligência documental", "Laudos e certificados"], "alert": "Se não houver documentação mínima, registre quais documentos faltam, quais riscos a ausência gera e quais medidas serão adotadas (vistoria ampliada, laudo independente, condicionantes para o aceite).", "btnLabel": "Avaliações concluídas →", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic3", "num": "3", "phase": "p2", "actor": "selog", "title": "Processo de aquisição do imóvel", "desc": "Instrução do processo de aquisição (dispensa/inexigibilidade ou licitação, conforme o caso) e formalização da compra.",
+    "_passos": ["Instruir o processo de aquisição conforme o caso (dispensa, inexigibilidade ou licitação)", "Verificar a justificativa e a compatibilidade de preços", "Formalizar a escritura ou o contrato de compra e venda"], "items": ["Instrução do processo de aquisição", "Justificativa e compatibilidade de preço", "Escritura/contrato de compra e venda"], "docs": ["Processo SEI", "Escritura"], "alert": null, "optional": true, "optLabel": "Pular — imóvel recebido por doação", "btnLabel": "Imóvel adquirido →", "attachments": [], "_btype": "subprocess", "_bnote": "aquisição ou doação formalizada"}, {"id": "ic4", "num": "4", "phase": "p3", "actor": "sepat", "title": "Regularização e registro no patrimônio da União", "desc": "Registro do imóvel ou da obra no patrimônio da União (SEPAT) com toda a documentação de incorporação patrimonial, inclusive de doações.", "_passos": ["Encaminhar a documentação de incorporação ao SEPAT", "Registrar o imóvel no patrimônio da União", "Atualizar a titularidade e os cadastros patrimoniais"], "items": ["Registro patrimonial do imóvel", "Atualização da documentação de titularidade", "Cadastro nos sistemas de patrimônio", "Decisão formal de aceite: sem ressalvas, condicionado ou recusa, com justificativa", "Pendências classificadas (crítica, relevante, menor) com prazo, responsável e forma de comprovação"], "docs": ["Termo de incorporação patrimonial", "Termo circunstanciado de recebimento com condicionantes"], "alert": "Quando houver gasto público com adequações posteriores, a comprovação do executado é condição para a liquidação da despesa (Lei nº 4.320/1964, art. 63); a incorporação deve observar motivação e eficiência na gestão do patrimônio (CF, art. 37).", "btnLabel": "Imóvel registrado →", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic5", "num": "5", "phase": "p3", "actor": "dsei", "title": "Destinação à prestação dos serviços da SESAI", "desc": "Imóvel destinado ao uso dos serviços da SESAI, com comunicação à comunidade/ala de atendimento.",
+    "_passos": ["Formalizar a destinação do imóvel aos serviços da SESAI", "Ativar o imóvel para o atendimento", "Comunicar a comunidade beneficiária"], "items": ["Destinação formal do imóvel", "Ativação do imóvel para o serviço", "Comunicação à comunidade beneficiária"], "docs": ["Despacho de destinação"], "alert": null, "btnLabel": "Imóvel destinado →", "attachments": [], "_btype": "user_task", "_bnote": ""}, {"id": "ic6", "num": "6", "phase": "p5", "actor": "dsei", "title": "Manutenção e monitoramento", "desc": "Ciclo contínuo de manutenção e monitoramento do imóvel incorporado.",
+    "_passos": ["Implantar o plano de manutenção do imóvel", "Designar o responsável pelo acompanhamento", "Registrar periodicamente o estado de conservação"], "items": ["Plano de manutenção do imóvel", "Responsável pelo acompanhamento", "Registros periódicos de conservação"], "docs": ["Plano de manutenção"], "alert": null, "btnLabel": "Manutenção acionada ↻", "isLast": true, "attachments": [], "_btype": "service_task", "_bnote": "monitoramento contínuo em sistema"}];
+const PE_STEPS = [
+  {
+    "id": "pe1", "num": "1", "phase": "p1", "actor": "com",
+    "title": "Escuta ativa e levantamento das necessidades",
+    "desc": "Processo transversal — comum à execução indireta, direta, contratação direta e incorporação. Reuniões com comunidades e lideranças indígenas para identificação participativa das necessidades de infraestrutura de saúde, saneamento e apoio logístico, conforme o princípio da participação social.",
+    "_passos": ["Convidar as lideranças e a comunidade para a reunião de escuta", "Registrar cada demanda com local, comunidade e descrição da necessidade", "Sistematizar as demandas levantadas para a análise técnica"],
+    "items": [
+      "Reuniões com comunidades e lideranças para escuta ativa",
+      "Registro sistematizado das demandas",
+      "Demandas originadas de pedidos recorrentes ou situações emergenciais"
+    ],
+    "docs": ["Atas de reuniões com comunidades"],
+    "alert": "Fundamento: participação social e consulta prévia aos povos indígenas (Convenção 169 da OIT; PNASPI, Portaria GM/MS nº 254/2002).", "btnLabel": "Demanda levantada →", "attachments": [], "_btype": "user_task", "_bnote": ""
+  },
+  {
+    "id": "pe2", "num": "2", "phase": "p1", "actor": "ses",
+    "title": "Análise da situação de saúde das comunidades",
+    "desc": "A DIASI analisa a pertinência da demanda a partir do contexto de saúde da comunidade: realidade local, condições de atendimento, acesso e fatores que impactam a prestação dos serviços. Os dados do SIASI subsidiam as justificativas.",
+    "_passos": ["Levantar os dados de saúde da comunidade no SIASI", "Relacionar a demanda às necessidades de saúde identificadas", "Registrar a análise de pertinência para subsidiar a priorização"],
+    "items": [
+      "Análise da situação de saúde e da pertinência da demanda",
+      "Consulta aos dados epidemiológicos do SIASI",
+      "Relacionamento da demanda às necessidades de saúde identificadas"
+    ],
+    "docs": ["Análise da situação de saúde"],
+    "alert": "Dica prática: quanto mais clara e documentada for a demanda nesta etapa inicial, mais eficiente será todo o processo subsequente.", "btnLabel": "Análise concluída →", "attachments": [], "_btype": "user_task", "_bnote": "consulta ao SIASI"
+  },
+  {
+    "id": "pe3", "num": "3", "phase": "p1", "actor": "com",
+    "title": "Definição das prioridades no CONDISI",
+    "desc": "O Conselho Distrital de Saúde Indígena (CONDISI) e a comunidade selecionam as ações prioritárias, combinando a análise técnica com as demandas apresentadas, considerando critérios técnicos, epidemiológicos, logísticos e culturais.",
+    "_passos": ["Agendar a reunião do CONDISI com pauta de priorização", "Apresentar as demandas com a respectiva análise técnica", "Registrar em ata as prioridades acordadas e as justificativas"],
+    "items": [
+      "Priorização conjunta das ações no CONDISI",
+      "Validação social das prioridades",
+      "Ata de reunião do CONDISI registrando as decisões"
+    ],
+    "docs": ["Ata de reunião do CONDISI"],
+    "alert": "Dica dos DSEIs: a atuação próxima do coordenador do DSEI junto ao CONDISI fortalece o diálogo e torna o PDSI mais aderente às realidades locais.",
+    "btnLabel": "Prioridades definidas →", "attachments": [], "_btype": "user_task", "_bnote": ""
+  },
+  {
+    "id": "pe4", "num": "4", "phase": "p1", "actor": "dsei",
+    "title": "Formatação do Plano Distrital de Saúde Indígena (PDSI)",
+    "desc": "O DSEI formata e formaliza o documento do PDSI, consolidando as diretrizes, metas, estratégias e ações coletivas debatidas com as comunidades, contemplando os três eixos: infraestruturas de saúde, infraestruturas sanitárias e ambientais e infraestruturas de apoio logístico e acesso.",
+    "_passos": ["Consolidar as diretrizes, metas e ações priorizadas nas reuniões", "Articular os três eixos: saúde, saneamento e apoio logístico", "Formatar o documento do PDSI"],
+    "items": [
+      "Consolidação das diretrizes, metas e ações priorizadas",
+      "Articulação dos três eixos estratégicos de infraestrutura",
+      "Documento do PDSI formatado pelo DSEI"
+    ],
+    "docs": ["Plano Distrital de Saúde Indígena (PDSI)"],
+    "alert": "O PDSI é elaborado de forma participativa, tem vigência de quatro anos e legitima o planejamento orçamentário da SESAI.", "btnLabel": "PDSI formatado →", "attachments": [], "_btype": "user_task", "_bnote": ""
+  },
+  {
+    "id": "pe5", "num": "5", "phase": "p1", "actor": "dsei",
+    "title": "Submissão do PDSI à CGPSI e homologação pela SESAI",
+    "desc": "O PDSI formatado é apresentado ao CONDISI para apreciação, aprovação e legitimação e, em seguida, enviado à CGPSI/SESAI para revisão técnica, garantindo coerência e padronização, sendo posteriormente homologado pela SESAI.",
+    "_passos": ["Encaminhar o PDSI ao CONDISI para apreciação e aprovação", "Submeter o documento à CGPSI/SESAI para revisão técnica", "Acompanhar a homologação pela SESAI"],
+    "items": [
+      "Apreciação e aprovação do PDSI pelo CONDISI",
+      "Revisão técnica na CGPSI/SESAI",
+      "Homologação institucional pela SESAI"
+    ],
+    "docs": ["PDSI submetido", "Parecer de revisão técnica"],
+    "alert": "A aprovação pelo CONDISI dá legitimidade social ao plano antes da revisão técnica na CGPSI/SESAI.", "btnLabel": "PDSI submetido →", "attachments": [], "_btype": "send_task", "_bnote": "envio à CGPSI/SESAI"
+  },
+  {
+    "id": "pe6", "num": "6", "phase": "p2", "actor": "deamb",
+    "title": "Divulgação do PDSI homologado",
+    "desc": "Publicação oficial do PDSI no portal do Ministério da Saúde, no Boletim de Serviços e no site da SESAI, conferindo validade institucional ao plano e permitindo o início das etapas de contratação.",
+    "_passos": ["Publicar o PDSI no portal do Ministério da Saúde", "Publicar no Boletim de Serviços e no site da SESAI", "Registrar o PDF finalizado no SEI"],
+    "items": [
+      "Publicação no portal do Ministério da Saúde",
+      "Publicação no Boletim de Serviços e no site da SESAI",
+      "Registro do PDSI finalizado em PDF no SEI (Institucional: Programa.Plano.Indicadores.Planejamento)"
+    ],
+    "docs": ["PDSI publicado"],
+    "alert": "A divulgação pública garante transparência, acesso à informação e validação institucional do planejamento.", "btnLabel": "PDSI divulgado →", "attachments": [], "_btype": "service_task", "_bnote": "Boletim de Serviços e site da SESAI"
+  },
+  {
+    "id": "pe7", "num": "7", "phase": "p2", "actor": "dsei",
+    "title": "Registro no SEI e decisão sobre apoio técnico ao DEAMB",
+    "desc": "Decisão — após a publicação do PDSI, cada obra prevista gera processo administrativo no SEI, podendo seguir por dois caminhos: (a) Solicitação de apoio técnico para elaboração dos projetos — ofício de abertura do processo dirigido ao DEAMB; ou (b) processo de contratação — termo de abertura do processo, com autorização da coordenação da unidade.",
+    "_passos": ["Abrir o processo no SEI com documento de abertura válido (ofício ou termo)", "Decidir se haverá solicitação de apoio técnico ao DEAMB para os projetos", "Registrar a decisão e o encaminhamento no SEI"],
+    "items": [
+      "Caminho A: solicitação de apoio técnico ao DEAMB (ofício de abertura do processo)",
+      "Caminho B: processo de contratação (Termo de Abertura do Processo)",
+      "Documento de abertura com dados do destinatário, identificação do interessado, pedido e data com assinatura"
+    ],
+    "docs": ["Ofício de Abertura do Processo", "Termo de Abertura do Processo"],
+    "alert": "Dica prática: não se deve iniciar processo com documentos acessórios (anexo, planilha, minuta, despacho). O tipo de documento mais usual é o ofício. (Cartilha do usuário SEI)",
+    "btnLabel": "Processo registrado →", "attachments": [], "_btype": "user_task", "_bnote": "ponto de decisão: apoio técnico ao DEAMB"
+  },
+  {
+    "id": "pe8", "num": "8", "phase": "p2", "actor": "ses",
+    "title": "Elaboração do Documento de Formalização da Demanda (DFD)",
+    "desc": "O SESANI elabora o DFD da obra de engenharia e saneamento, com justificativa técnica (problema, impacto atual e impacto futuro), localização detalhada, beneficiários, tipo de intervenção, evidências fotográficas, análise preliminar de riscos e demais elementos exigidos pela Lei nº 14.133/2021.",
+    "_passos": ["Descrever o objeto de forma sucinta e indicar o grau de prioridade", "Elaborar a justificativa técnica: problema, impacto atual e impacto futuro", "Informar localização detalhada, acessibilidade, beneficiários e evidências fotográficas", "Registrar o valor estimado e a análise inicial de riscos", "Salvar o DFD no Compras.gov selecionando a opção PCA em elaboração"],
+    "items": [
+      "Descrição sucinta do objeto e grau de prioridade",
+      "Justificativa técnica: problema, impacto atual e impacto futuro",
+      "Localização detalhada, acessibilidade e número estimado de beneficiários",
+      "Dados epidemiológicos, evidências fotográficas e indicação no PDSI",
+      "Valor estimado preliminar e análise inicial de riscos"
+    ],
+    "docs": ["Documento de Formalização da Demanda (DFD)"],
+    "alert": "Ao registrar o DFD no Compras.gov, selecione a opção 'PCA em elaboração', indicando que a contratação será executada no próximo exercício.",
+    "btnLabel": "DFD elaborado →", "attachments": [], "_btype": "user_task", "_bnote": "elaboração no ComprasGov – módulo PGC/DFD"
+  },
+  {
+    "id": "pe9", "num": "9", "phase": "p2", "actor": "selog",
+    "title": "Revisão do DFD pelo SELOG",
+    "desc": "O SELOG revisa a consistência, a clareza, a formatação e a conformidade administrativa dos DFDs antes de sua consolidação no PCA.",
+    "_passos": ["Conferir a clareza e a completude das informações do DFD", "Verificar a padronização dos formatos exigidos pela SESAI", "Encaminhar o DFD revisado à aprovação da coordenação do DSEI"],
+    "items": [
+      "Revisão de consistência e clareza das informações",
+      "Padronização dos formatos exigidos pela SESAI",
+      "DFD revisado encaminhado à aprovação"
+    ],
+    "docs": ["DFD revisado"],
+    "alert": "Dica dos DSEIs: envolver o SELOG na conferência dos DFDs elaborados pelo SESANI garante clareza, padronização e revisão administrativa antes do envio.",
+    "btnLabel": "DFD revisado →", "attachments": [], "_btype": "user_task", "_bnote": ""
+  },
+  {
+    "id": "pe10", "num": "10", "phase": "p2", "actor": "dsei",
+    "title": "Aprovação dos DFDs prioritários",
+    "desc": "A coordenação do DSEI aprova as demandas prioritárias que serão levadas ao Plano de Contratações Anual.",
+    "_passos": ["Analisar os DFDs revisados pelo SELOG", "Aprovar formalmente as demandas prioritárias", "Comunicar a decisão ao SELOG para consolidação no PCA"],
+    "items": [
+      "Aprovação formal dos DFDs prioritários pela coordenação do DSEI",
+      "Encaminhamento dos DFDs aprovados ao SELOG para consolidação"
+    ],
+    "docs": ["DFD aprovado"],
+    "alert": "O DFD só entra no PCA depois de aprovado pela coordenação do DSEI — demandas sem aprovação não são planejadas.", "btnLabel": "DFDs aprovados →", "attachments": [], "_btype": "user_task", "_bnote": ""
+  },
+  {
+    "id": "pe11", "num": "11", "phase": "p2", "actor": "selog",
+    "title": "Consolidação do Plano de Contratações Anual (PCA)",
+    "desc": "O SELOG consolida os DFDs aprovados no PCA, com cronograma, prioridade e previsões orçamentárias, alinhando as contratações ao orçamento disponível e às metas do PDSI e do PPA.",
+    "_passos": ["Acessar o PGC e iniciar a montagem do PCA", "Inserir os DFDs aprovados com cronograma, prioridade e previsões orçamentárias", "Atualizar o PCA nas janelas de julho, setembro e novembro"],
+    "items": [
+      "Montagem do PCA no PGC (Planejamento e Gerenciamento de Contratações)",
+      "Cronograma, classificação de prioridade e previsões orçamentárias",
+      "Ajustes do PCA nas janelas de julho, setembro e novembro"
+    ],
+    "docs": ["Plano de Contratações Anual (PCA)"],
+    "alert": "O PGC é a ferramenta oficial para a elaboração do PCA; consulte o manual do sistema e o Anexo I da IN SEGES/ME nº 1/2019 para os campos obrigatórios.", "btnLabel": "PCA consolidado →", "attachments": [], "_btype": "user_task", "_bnote": "montagem no PGC"
+  },
+  {
+    "id": "pe12", "num": "12", "phase": "p2", "actor": "dsei",
+    "title": "Aprovação e publicação do PCA",
+    "desc": "Aprovação do PCA pelo Coordenador do DSEI e pela SESAI e publicação no Portal Nacional de Contratações Públicas (PNCP), que confere publicidade e oficialidade ao planejamento anual. O PCA é coordenado e monitorado pela CGCSI/SESAI, do planejamento à execução.",
+    "_passos": ["Encaminhar o PCA à aprovação do Coordenador do DSEI", "Obter a análise e a aprovação pela SESAI", "Publicar o PCA no PNCP e registrar o PDF finalizado no SEI"],
+    "items": [
+      "Aprovação pelo Coordenador do DSEI e pela SESAI",
+      "Publicação do PCA no PNCP",
+      "Registro do PCA finalizado em PDF no SEI"
+    ],
+    "docs": ["PCA publicado"],
+    "alert": "A publicação do PCA no PNCP é obrigatória (Lei nº 14.133/2021, art. 13) e garante transparência (Lei nº 12.527/2011 – LAI).", "btnLabel": "PCA aprovado e publicado →", "attachments": [], "_btype": "service_task", "_bnote": "publicação no PNCP"
+  },
+  {
+    "id": "pe13", "num": "13", "phase": "p2", "actor": "ses",
+    "title": "Elaboração de projetos e orçamento da obra",
+    "desc": "Transformação da definição do objeto em documentos técnicos executivos: estudos de viabilidade (solo, topografia, condições ambientais), projeto básico, projeto executivo e complementares (arquitetônico, estrutural, elétrico, hidrossanitário, prevenção de incêndio e climatização), planilha orçamentária e cronograma físico-financeiro, com responsabilidades técnicas (ART/RRT/TRT). A base de preços é o SINAPI, com OrçaFascio e SICRO.",
+    "_passos": ["Realizar os estudos de viabilidade e levantamentos técnicos do local", "Elaborar o projeto básico e o executivo com os projetos complementares", "Montar a planilha orçamentária com base no SINAPI, OrçaFascio e SICRO", "Emitir as ART/RRT/TRT dos profissionais responsáveis"],
+    "items": [
+      "Estudos de viabilidade e levantamentos técnicos",
+      "Projeto básico e projeto executivo com projetos complementares",
+      "Planilha orçamentária, curva ABC, memória de cálculo, BDI e cronograma físico-financeiro",
+      "ART/RRT/TRT dos profissionais responsáveis",
+      "Projetos alinhados à Portaria nº 1.801/2015 (UBSI/polos) e à RDC nº 50/2002 (Anvisa)"
+    ],
+    "docs": ["Projeto Básico", "Projeto Executivo", "Planilha Orçamentária", "ART/RRT/TRT"],
+    "alert": "Dica prática: utilize ferramentas BIM sempre que possível para identificar interferências entre os projetos antes da execução, e consulte as comunidades para validar aspectos arquitetônicos e de uso dos espaços.",
+    "btnLabel": "Projetos elaborados →", "attachments": [], "_btype": "user_task", "_bnote": "SINAPI, OrçaFascio e SICRO"
+  },
+  {
+    "id": "pe14", "num": "14", "phase": "p2", "actor": "deamb",
+    "title": "Validação técnica do projeto e verificação orçamentária",
+    "desc": "O DEAMB emite o parecer técnico atestando que o projeto atendeu a todas as exigências e padrões da SESAI (validação técnica central), e o SEOFI confirma a disponibilidade orçamentária no SIAFI.",
+    "_passos": ["Encaminhar as peças técnicas e o orçamento ao DEAMB", "Obter o parecer técnico de validação do projeto", "Confirmar a disponibilidade orçamentária no SIAFI"],
+    "items": [
+      "Parecer técnico do DEAMB sobre o projeto básico e executivo",
+      "Verificação de aderência aos padrões e de viabilidade",
+      "Confirmação de disponibilidade orçamentária (SIAFI) e estimativa no OrçaFascio"
+    ],
+    "docs": ["Parecer técnico do projeto", "Nota de disponibilidade orçamentária"],
+    "alert": "A declaração de disponibilidade orçamentária é obrigatória antes de qualquer contratação; solicite-a à SESAI nas etapas iniciais da instrução processual.", "btnLabel": "Projeto validado →", "attachments": [], "_btype": "user_task", "_bnote": "validação técnica central"
+  },
+  {
+    "id": "pe15", "num": "15", "phase": "p2", "actor": "dsei",
+    "title": "Definição da rota de execução",
+    "desc": "Decisão — o DSEI/Gabinete define COMO a necessidade aprovada no PCA será atendida: execução indireta (licitação tradicional de obra, Lei nº 14.133/2021), execução direta (compra de materiais e/ou mão de obra, ou mão de obra própria/voluntária), contratação direta (dispensa, inexigibilidade ou licitação deserta) ou incorporação de imóvel existente ou doado.",
+    "_passos": ["Reunir as informações do PCA e das validações técnicas e jurídicas", "Decidir a rota de execução da obra", "Registrar a decisão com a justificativa no SEI"],
+    "items": [
+      "Rota 1: execução indireta — licitação tradicional de obra",
+      "Rota 2: execução direta — licitação de materiais e/ou mão de obra, ou mão de obra própria/voluntária",
+      "Rota 3: contratação direta — dispensa, inexigibilidade ou licitação deserta",
+      "Rota 4: incorporação de imóvel existente ou doado",
+      "Registro da decisão e da justificativa no SEI"
+    ],
+    "docs": ["Despacho de decisão"],
+    "alert": "Dica dos DSEIs: descreva a realidade do seu distrito, e não apenas a teoria — isso dá legitimidade ao processo, evita questionamentos e fortalece tecnicamente o documento.", "btnLabel": "Rota definida →", "attachments": [], "_btype": "user_task", "_bnote": "ponto de decisão da rota"
+  },
+  {
+    "id": "pe16", "num": "16", "phase": "p2", "actor": "dsei",
+    "title": "Designação de responsáveis e aprovação formal do planejamento",
+    "desc": "Formalização por portaria dos fiscais (técnico e administrativo) e dos responsáveis técnico e fiscal, e aprovação final do planejamento pelo DSEI/Gabinete, que responde pelo resultado e toma as decisões. A DEAMB aprova o parecer técnico. Encerrado o planejamento, abre-se o fluxo da rota escolhida.",
+    "_passos": ["Emitir as portarias de designação de fiscais e responsáveis técnicos", "Aprovar formalmente o planejamento pelo DSEI/Gabinete", "Comunicar os envolvidos e registrar o planejamento no SEI e no Contratos.gov"],
+    "items": [
+      "Portaria de designação dos fiscais e responsáveis técnicos",
+      "Aprovação formal pelo DSEI/Gabinete e pelo parecer técnico da DEAMB",
+      "Comunicação aos envolvidos e abertura do fluxo da rota escolhida",
+      "Planejamento registrado no SEI e no Contratos.gov"
+    ],
+    "docs": ["Portaria de designação", "Despacho de aprovação", "Planejamento no Contratos.gov"],
+    "alert": "A designação e a atuação de fiscais e gestores de contrato devem seguir a IN SEGES/ME nº 75/2021.", "btnLabel": "Planejamento aprovado 🏁", "isLast": true,
+    "attachments": [], "_btype": "user_task", "_bnote": ""
+  }
+];
+
+const IND_POS_STEPS = [
+  {
+    "id": "indp1", "num": "40", "phase": "p3", "actor": "ses",
+    "title": "Mobilização e execução contratual da obra",
+    "desc": "Após a assinatura do contrato, a empresa contratada mobiliza mão de obra, equipamentos e materiais e inicia a execução da obra (execução indireta — Lei 14.133).",
+    "_passos": ["Acompanhar a mobilização da empresa contratada (mão de obra, equipamentos, materiais)", "Conferir a ART da executora e os documentos técnicos", "Registrar o início da execução conforme o cronograma físico-financeiro"],
+    "items": [
+      "Mobilização da empresa contratada (mão de obra, equipamentos, materiais)",
+      "Início da execução conforme contrato e cronograma físico-financeiro",
+      "ART da empresa executora e responsáveis técnicos anexados ao processo"
+    ],
+    "docs": ["Contrato publicado", "Cronograma físico-financeiro", "ART"],
+    "alert": "OBS do fluxo: verificar a legalidade da mobilização da obra pelo DSEI na execução indireta.",
+    "btnLabel": "Execução iniciada →", "attachments": [], "_btype": "user_task", "_bnote": ""
+  },
+  {
+    "id": "indp2", "num": "41", "phase": "p4", "actor": "ses",
+    "title": "Acompanhamento da obra e fiscalização do contrato",
+    "desc": "Fiscalização técnica e administrativa do contrato, com acompanhamento contínuo do cronograma, da qualidade e da segurança do trabalho.",
+    "_passos": ["Articular a atuação do fiscal técnico e do fiscal administrativo", "Exigir o treinamento obrigatório em Segurança do Trabalho e Equipamentos", "Acompanhar cronograma, qualidade e diário de obras"],
+    "items": [
+      "Fiscalização técnica e administrativa pelo fiscal designado",
+      "Relatórios periódicos de acompanhamento da obra",
+      "Diário de obras com registros fotográficos georreferenciados",
+      "Treinamento em Segurança no Trabalho e Equipamentos (obrigação contratual)"
+    ],
+    "docs": ["Relatórios de fiscalização", "Diário de obras"],
+    "alert": "O contrato deve descrever a obrigatoriedade de treinamento em Segurança no Trabalho e Equipamentos e a alocação de responsabilidades.",
+    "btnLabel": "Obra acompanhada →", "attachments": [], "_btype": "user_task", "_bnote": ""
+  },
+  {
+    "id": "indp3", "num": "42", "phase": "p4", "actor": "seofi",
+    "title": "Entregas parciais, medições e pagamentos",
+    "desc": "Gatilho 3 — pagamentos vinculados a entregas parciais verificadas e aceitas pela fiscalização, com medições e atestos.",
+    "_passos": ["Medir as etapas executadas pela empresa", "Atestar e aceitar as entregas parciais (gatilho 3)", "Liquidar e pagar a medição no SIAFI, com a nota fiscal"],
+    "items": [
+      "Medição das etapas executadas",
+      "Atesto de entrega parcial pela fiscalização",
+      "Pagamento da medição no SIAFI",
+      "Nota fiscal e liquidação da despesa"
+    ],
+    "docs": ["Medições", "Atestos de entrega parcial", "Nota fiscal"],
+    "alert": "A fiscalização técnica e administrativa deve seguir a IN SEGES/ME nº 75/2021 e o modelo de gestão do contrato previsto no TR.", "btnLabel": "Entregas parciais pagas →", "attachments": [], "_btype": "service_task", "_bnote": "pagamento por medição no SIAFI"
+  },
+  {
+    "id": "indp4", "num": "43", "phase": "p4", "actor": "deamb",
+    "title": "Apuração de responsabilidade (quando houver inadimplemento)",
+    "desc": "Em caso de descumprimento contratual, instaura-se a apuração de responsabilidade da empresa, com análise jurídica e sanções cabíveis.",
+    "_passos": ["Documentar as não conformidades e o inadimplemento", "Instaurar a apuração e notificar a empresa", "Concluir com a análise jurídica e as sanções cabíveis"],
+    "items": [
+      "Registro das não conformidades pela fiscalização",
+      "Notificação e instauração do processo de apuração",
+      "Análise jurídica (CJU/DSEI/SESAI) e aplicação de sanções"
+    ],
+    "docs": ["Autos de apuração", "Notificações"],
+    "alert": "Os pagamentos devem seguir o Instrumento de Medição de Resultados (IMR) e as medições aceitas pela fiscalização.", "btnLabel": "Responsabilidade apurada →",
+    "optional": true, "optLabel": "Pular — sem inadimplemento",
+    "attachments": [], "_btype": "user_task", "_bnote": ""
+  },
+  {
+    "id": "indp5", "num": "44", "phase": "p5", "actor": "dsei",
+    "title": "Termo de Recebimento Provisório (TRP)",
+    "desc": "Emissão do Termo de Recebimento Provisório, com análise do Relatório de Capacidade Técnica (DOCIÊ) elaborado pela licitada e aprovação pelo DSEI/Gabinete, fiscal de contrato e empresa licitada.",
+    "_passos": ["Solicitar à licitada o Relatório de Capacidade Técnica (DOCIÊ)", "Realizar a vistoria conjunta para o recebimento provisório", "Emitir o TRP com a aprovação do DSEI, do fiscal e da empresa"],
+    "items": [
+      "Relatório de Capacidade Técnica (DOCIÊ) elaborado pela licitada",
+      "Vistoria conjunta para o recebimento provisório",
+      "Aprovação do TRP: DSEI/Gabinete, fiscal de contrato e empresa licitada"
+    ],
+    "docs": ["Termo de Recebimento Provisório (TRP)", "Relatório de Capacidade Técnica (DOCIÊ)"],
+    "alert": "As sanções seguem o contrato e a Lei nº 14.133/2021 (arts. 107 e seguintes), sempre com defesa prévia.", "btnLabel": "TRP emitido →", "attachments": [], "_btype": "user_task", "_bnote": ""
+  },
+  {
+    "id": "indp6", "num": "45", "phase": "p5", "actor": "ses",
+    "title": "Conclusão da obra e Termo de Recebimento Definitivo (TRD)",
+    "desc": "Gatilho 4 — conclusão da obra, entrega definitiva verificada e emissão do Termo de Recebimento Definitivo, com encerramento do contrato no SEI e no Contratos.gov.",
+    "_passos": ["Verificar a entrega definitiva da obra (gatilho 4)", "Emitir e assinar o Termo de Recebimento Definitivo (TRD)", "Encerrar o contrato no SEI e no Contratos.gov"],
+    "items": [
+      "Entrega definitiva verificada pela fiscalização",
+      "Termo de Recebimento Definitivo (TRD) assinado",
+      "Encerramento do contrato no SEI e no Contratos.gov"
+    ],
+    "docs": ["Termo de Recebimento Definitivo (TRD)", "Encerramento SEI/Contratos.gov"],
+    "alert": "O recebimento provisório não elimina as responsabilidades da empresa durante o período de garantia.", "btnLabel": "Obra entregue! 🏁", "attachments": [], "_btype": "user_task", "_bnote": ""
+  },
+  {
+    "id": "indp7", "num": "46", "phase": "p5", "actor": "dsei",
+    "title": "Registro de entrega e acionamento da manutenção",
+    "desc": "Registro formal de entrega da obra e início do ciclo contínuo de manutenção/monitoramento do patrimônio, sob responsabilidade do DSEI.",
+    "_passos": ["Registrar a entrega da obra no sistema", "Ativar o ciclo de manutenção e monitoramento", "Designar o responsável do DSEI pelo pós-obra"],
+    "items": [
+      "Registro de entrega da obra no sistema",
+      "Plano de manutenção/monitoramento",
+      "Responsável DSEI pelo acompanhamento pós-obra"
+    ],
+    "docs": ["Registro de entrega", "Plano de manutenção"],
+    "alert": "O encerramento deve estar registrado no SEI e no Contratos.gov, garantindo memória e prestação de contas.", "btnLabel": "Manutenção acionada ↻", "isLast": true,
+    "attachments": [], "_btype": "service_task", "_bnote": "registro formal em sistema"
+  }
+];
+
 
 /* ====================================================
    JSONBIN BACKEND — shared storage for all users
@@ -1954,11 +2511,17 @@ async function jbinLoadAndRefresh() {
    ==================================================== */
 function _defaultProcesses() {
   return {
-    active: 'p_direta',
+    active: 'p_planejamento',
     list: [
       {
+        id:'p_planejamento', name:'Planejamento Estratégico', icon:'🧭',
+        desc:'Da escuta da comunidade ao PCA aprovado e aos projetos validados — comum a todos os fluxos (Vol. 2, cap. 4) · 16 etapas',
+        steps: JSON.parse(JSON.stringify(PE_STEPS)),
+        feedbacks:[], history:[], doneSteps:[], currentStep:0,
+      },
+      {
         id:'p_direta', name:'Execução Direta de Obras — Completa', icon:'🏗',
-        desc:'Licitação de materiais + mão de obra própria/voluntária · 15 etapas',
+        desc:'Processo filho de gestão no SEI; materiais sempre licitados; mão de obra e equipamentos conforme a obra · 18 etapas',
         steps: JSON.parse(JSON.stringify(DEFAULT_STEPS)),
         feedbacks:[], history:[], doneSteps:[], currentStep:0,
       },
@@ -1984,16 +2547,21 @@ function _ensureDefaultProcs() {
   const defs = _defaultProcesses().list;
   // Atualiza Execução Direta se ainda estiver na versão antiga (13 etapas, ids s1…)
   const pd = PROCS.list.find(p => p.id === 'p_direta');
-  if (pd && pd.steps && ((pd.steps.length === 13 && pd.steps[0] && pd.steps[0].id === 's1') || (pd.steps.length && !pd.steps[0]._btype))) {
+  if (pd && pd.steps && ((pd.steps.length === 13 && pd.steps[0] && pd.steps[0].id === 's1') || (pd.steps.length && !pd.steps[0]._btype) || (pd.steps[0] && pd.steps[0].id === 'ed1' && pd.steps.length !== 18))) {
     pd.steps = JSON.parse(JSON.stringify(DEFAULT_STEPS));
     pd.name = 'Execução Direta de Obras — Completa';
-    pd.desc = 'Licitação de materiais + mão de obra própria/voluntária · 15 etapas';
+    pd.desc = 'Processo filho de gestão no SEI; materiais sempre licitados; mão de obra e equipamentos conforme a obra · 18 etapas';
   }
   defs.forEach(d => {
     if (!PROCS.list.find(p => p.id === d.id)) {
       d.steps = JSON.parse(JSON.stringify(d.steps));
       PROCS.list.push(d);
     }
+  });
+  const _PROC_ORDER = ['p_planejamento','p_indireta','p_direta','p_contratacao_direta','p_incorporacao'];
+  PROCS.list.sort((a,b) => {
+    const ia = _PROC_ORDER.indexOf(a.id), ib = _PROC_ORDER.indexOf(b.id);
+    return ((ia < 0) ? 99 : ia) - ((ib < 0) ? 99 : ib);
   });
   if (!PROCS.list.find(p => p.id === activeProcessId)) activeProcessId = PROCS.list[0]?.id;
 }
@@ -2095,215 +2663,245 @@ const LANE_FILL = {
 function buildBPMN(stepsData) {
   if (!stepsData || stepsData.length === 0) return buildEmptyBPMN();
 
-  const LANE_H    = 110;   // height of each swim lane
-  const TASK_W    = 160;   // task width
-  const TASK_H    = 70;    // task height
-  const STEP_X    = 210;   // x spacing between tasks
-  const X_START   = 260;   // first task x (after pool label + lane label)
-  const Y_POOL    = 20;    // pool y origin
-  const POOL_LABEL_W = 30; // pool header width
-  const LANE_LABEL_W = 120;// lane label width
-  const ELEM_X0   = POOL_LABEL_W + LANE_LABEL_W; // first element starts here
-  const GW_SIZE   = 44;    // gateway diamond size
+  const LANE_H    = 110;
+  const TASK_W    = 160;
+  const TASK_H    = 70;
+  const STEP_X    = 210;
+  const X_START   = 260;
+  const Y_POOL    = 20;
+  const POOL_LABEL_W = 30;
+  const LANE_LABEL_W = 120;
+  const ELEM_X0   = POOL_LABEL_W + LANE_LABEL_W;
+  const GW_SIZE   = 44;
 
-  // -- 1. Compute which lanes are actually used ----
   const usedActors = [...new Set(stepsData.map(s => s.actor || 'ses'))];
   const activeLanes = LANE_ORDER.filter(a => usedActors.includes(a));
-
-  // -- 2. Assign Y center per lane -----------------
   const laneYMap = {};
-  activeLanes.forEach((a, i) => {
-    laneYMap[a] = Y_POOL + i * LANE_H + LANE_H / 2;
-  });
+  activeLanes.forEach((a, i) => { laneYMap[a] = Y_POOL + i * LANE_H + LANE_H / 2; });
 
-  // -- 3. Assign X position to each step (sequential, global) -
-  // Each step gets an x slot regardless of lane
-  const stepX = []; // stepX[i] = center X of step i
+  // ---- Trilhas paralelas (uma região por processo) ----
+  let forkIdx = stepsData.findIndex(s => s._fork);
+  let joinIdx = -1;
+  let tracks = [];
+  if (forkIdx >= 0) {
+    joinIdx = stepsData.findIndex((s, i) => i > forkIdx && s._join);
+    if (joinIdx > forkIdx) {
+      const names = [];
+      for (let k = forkIdx + 1; k < joinIdx; k++) {
+        const t = stepsData[k]._track;
+        if (t && !names.includes(t)) names.push(t);
+      }
+      tracks = names.map(n => ({ name: n, idxs: [] }));
+      for (let k = forkIdx + 1; k < joinIdx; k++) {
+        const tr = tracks.find(t => t.name === stepsData[k]._track);
+        if (tr) tr.idxs.push(k);
+      }
+      if (!tracks.length) { forkIdx = -1; joinIdx = -1; }
+    } else { forkIdx = -1; }
+  }
+  const spacing = (s, nxt) => ((s && s.optional) || (nxt && nxt.optional)) ? STEP_X + 60 : STEP_X;
+
+  // ---- 1. Posição X de cada etapa ----
+  const stepX = new Array(stepsData.length).fill(0);
   let curX = ELEM_X0 + X_START;
-  stepsData.forEach((s, i) => {
+  let forkGX = 0, joinGX = 0;
+  for (let i = 0; i < stepsData.length; i++) {
+    if (forkIdx >= 0 && i > forkIdx && i < joinIdx) continue; // atribuído pelas trilhas abaixo
     stepX[i] = curX;
-    const next = stepsData[i + 1];
-    // If next step is optional gateway, reserve extra X space
-    const hasGw = s.optional || (next && next.optional);
-    curX += hasGw ? STEP_X + 60 : STEP_X;
-  });
+    curX += spacing(stepsData[i], stepsData[i + 1]);
+    if (forkIdx >= 0 && i === forkIdx) {
+      forkGX = curX + 20;
+      const baseX = forkGX + GW_SIZE + 60;
+      let joinNeed = baseX;
+      tracks.forEach(tr => {
+        let x = baseX;
+        tr.idxs.forEach((idx, k) => {
+          stepX[idx] = x;
+          const nxt = k + 1 < tr.idxs.length ? stepsData[tr.idxs[k + 1]] : stepsData[joinIdx];
+          x += spacing(stepsData[idx], nxt);
+        });
+        const lastIdx = tr.idxs[tr.idxs.length - 1];
+        let end = stepX[lastIdx] + TASK_W / 2;
+        if (stepsData[lastIdx].optional) end += 30 + GW_SIZE;
+        if (end > joinNeed) joinNeed = end;
+      });
+      joinGX = joinNeed + 60;
+      curX = joinGX + GW_SIZE + 60;
+    }
+  }
 
-  // Start event and end event X
   const X_START_EVT = ELEM_X0 + 80;
   const X_END_EVT   = curX + 60;
   const TOTAL_W     = X_END_EVT + 80;
   const TOTAL_H     = activeLanes.length * LANE_H;
   const POOL_H      = TOTAL_H;
 
-  // -- 4. Build XML elements ------------------------
-  let seqFlowDefs  = '';
-  let seqFlowEdges = '';
-  let taskDefs     = '';
-  let taskShapes   = '';
-  let gwDefs       = '';
-  let gwShapes     = '';
+  // ---- 2. Emissores de XML ----
+  let seqFlowDefs = '', seqFlowEdges = '', taskDefs = '', taskShapes = '', gwDefs = '', gwShapes = '';
+  const laneExtra = {};
+  const addLaneExtra = (a, id) => { (laneExtra[a] = laneExtra[a] || []).push(id); };
 
-  // Start event — in the first lane of first step
-  const firstActor = stepsData[0]?.actor || activeLanes[0];
-  const startY = laneYMap[firstActor] - 18;
-  const startX = X_START_EVT;
+  const flowEdge = (sfId, src, tgt, x1, y1, x2, y2, label) => {
+    const nameAttr = label ? ` name="${sanitizeXml(label)}"` : '';
+    seqFlowDefs += `    <sequenceFlow id="${sfId}"${nameAttr} sourceRef="${src}" targetRef="${tgt}"/>`;
+    let wps;
+    if (Math.abs(y1 - y2) < 4) {
+      wps = `<di:waypoint x="${Math.round(x1)}" y="${Math.round(y1)}"/><di:waypoint x="${Math.round(x2)}" y="${Math.round(y2)}"/>`;
+    } else {
+      const midX = Math.round((x1 + x2) / 2);
+      wps = `<di:waypoint x="${Math.round(x1)}" y="${Math.round(y1)}"/><di:waypoint x="${midX}" y="${Math.round(y1)}"/><di:waypoint x="${midX}" y="${Math.round(y2)}"/><di:waypoint x="${Math.round(x2)}" y="${Math.round(y2)}"/>`;
+    }
+    seqFlowEdges += `      <bpmndi:BPMNEdge id="ed_${sfId}" bpmnElement="${sfId}">${wps}</bpmndi:BPMNEdge>`;
+  };
 
-  // End event — in the last lane of last step
-  const lastActor = stepsData[stepsData.length - 1]?.actor || activeLanes[activeLanes.length - 1];
-  const endY = laneYMap[lastActor] - 18;
-  const endX = X_END_EVT;
-
-  let prevId = 'Ev_Start';
-  let prevX  = startX + 36; // right edge of start event
-  let prevY  = laneYMap[firstActor];
-
-  stepsData.forEach((s, i) => {
-    const tid   = `T_${i}`;
+  const emitTask = (i) => {
+    const s = stepsData[i];
+    const tid = `T_${i}`;
     const actor = s.actor || 'ses';
-    const col   = BIZAGI_COLORS[actor] || BIZAGI_COLORS.ses;
-    const cx    = stepX[i];
-    const cy    = laneYMap[actor];
-    const tx    = cx - TASK_W / 2;
-    const ty    = cy - TASK_H / 2;
-    const label = sanitizeXml(`${s.num}. ${s.title.substring(0, 42)}${s.title.length > 42 ? '…' : ''}`);
-
-    // Map _btype to proper BPMN element type
+    const col = BIZAGI_COLORS[actor] || BIZAGI_COLORS.ses;
+    const cx = stepX[i];
+    const cy = laneYMap[actor];
+    const tx = cx - TASK_W / 2;
+    const ty = cy - TASK_H / 2;
+    const cleanTitle = s.title.replace(/^Trilha [A-Z] — /, '');
+    const label = sanitizeXml(`${s.num}. ${cleanTitle.substring(0, 42)}${cleanTitle.length > 42 ? '…' : ''}`);
     const btype = s._btype || 'user_task';
     let taskTag = 'userTask';
     if (btype === 'send_task')    taskTag = 'sendTask';
     else if (btype === 'service_task') taskTag = 'serviceTask';
     else if (btype === 'subprocess')   taskTag = 'subProcess';
     else if (btype === 'intermediate_message_event') taskTag = 'intermediateCatchEvent';
-
     if (taskTag === 'intermediateCatchEvent') {
-      taskDefs += `    <intermediateCatchEvent id="${tid}" name="${label}"><messageEventDefinition/></intermediateCatchEvent>\n`;
-      taskShapes += `      <bpmndi:BPMNShape id="sh_${tid}" bpmnElement="${tid}">
-        <dc:Bounds x="${tx+TASK_W/2-18}" y="${ty+TASK_H/2-18}" width="36" height="36"/>
-        <bpmndi:BPMNLabel/>
-      </bpmndi:BPMNShape>\n`;
+      taskDefs += `    <intermediateCatchEvent id="${tid}" name="${label}"><messageEventDefinition/></intermediateCatchEvent>`;
+      taskShapes += `      <bpmndi:BPMNShape id="sh_${tid}" bpmnElement="${tid}"><dc:Bounds x="${tx + TASK_W/2 - 18}" y="${ty + TASK_H/2 - 18}" width="36" height="36"/><bpmndi:BPMNLabel/></bpmndi:BPMNShape>`;
     } else if (taskTag === 'subProcess') {
-      taskDefs += `    <subProcess id="${tid}" name="${label}"/>\n`;
-      taskShapes += `      <bpmndi:BPMNShape id="sh_${tid}" bpmnElement="${tid}" isExpanded="false"
-          bioc:fill="${col.fill}" bioc:stroke="${col.stroke}" color:background-color="${col.fill}" color:border-color="${col.stroke}">
-        <dc:Bounds x="${tx}" y="${ty}" width="${TASK_W}" height="${TASK_H}"/>
-        <bpmndi:BPMNLabel/>
-      </bpmndi:BPMNShape>\n`;
+      taskDefs += `    <subProcess id="${tid}" name="${label}"/>`;
+      taskShapes += `      <bpmndi:BPMNShape id="sh_${tid}" bpmnElement="${tid}" isExpanded="false" bioc:fill="${col.fill}" bioc:stroke="${col.stroke}" color:background-color="${col.fill}" color:border-color="${col.stroke}"><dc:Bounds x="${tx}" y="${ty}" width="${TASK_W}" height="${TASK_H}"/><bpmndi:BPMNLabel/></bpmndi:BPMNShape>`;
     } else {
-      taskDefs += `    <${taskTag} id="${tid}" name="${label}"/>\n`;
-      taskShapes += `      <bpmndi:BPMNShape id="sh_${tid}" bpmnElement="${tid}"
-          bioc:fill="${col.fill}" bioc:stroke="${col.stroke}" color:background-color="${col.fill}" color:border-color="${col.stroke}">
-        <dc:Bounds x="${tx}" y="${ty}" width="${TASK_W}" height="${TASK_H}"/>
-        <bpmndi:BPMNLabel/>
-      </bpmndi:BPMNShape>\n`;
+      taskDefs += `    <${taskTag} id="${tid}" name="${label}"/>`;
+      taskShapes += `      <bpmndi:BPMNShape id="sh_${tid}" bpmnElement="${tid}" bioc:fill="${col.fill}" bioc:stroke="${col.stroke}" color:background-color="${col.fill}" color:border-color="${col.stroke}"><dc:Bounds x="${tx}" y="${ty}" width="${TASK_W}" height="${TASK_H}"/><bpmndi:BPMNLabel/></bpmndi:BPMNShape>`;
     }
+    return { id: tid, left: tx, right: tx + TASK_W, cy: cy };
+  };
 
-    // Sequence flow from previous element to this task
-    const sfId = `sf_${prevId}_${tid}`;
-    seqFlowDefs += `    <sequenceFlow id="${sfId}" sourceRef="${prevId}" targetRef="${tid}"/>\n`;
-    seqFlowEdges += buildEdge(sfId, prevX, prevY, tx, cy);
+  const emitXor = (i, t) => {
+    const gwId = `GW_${i}`;
+    const gwX = t.right + 30;
+    const gwY = t.cy - GW_SIZE / 2;
+    gwDefs += `    <exclusiveGateway id="${gwId}" name="Necessário?"/>`;
+    gwShapes += `      <bpmndi:BPMNShape id="sh_${gwId}" bpmnElement="${gwId}" isMarkerVisible="true"><dc:Bounds x="${gwX}" y="${gwY}" width="${GW_SIZE}" height="${GW_SIZE}"/><bpmndi:BPMNLabel><dc:Bounds x="${gwX - 10}" y="${gwY - 20}" width="64" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>`;
+    addLaneExtra(stepsData[i].actor || 'ses', gwId);
+    flowEdge(`sf_${t.id}_${gwId}`, t.id, gwId, t.right, t.cy, gwX, t.cy);
+    return { id: gwId, right: gwX + GW_SIZE, cy: t.cy };
+  };
 
-    prevId = tid;
-    prevX  = tx + TASK_W;
-    prevY  = cy;
+  const emitParallel = (pid, name, gx, gy) => {
+    gwDefs += `    <parallelGateway id="${pid}" name="${sanitizeXml(name)}"/>`;
+    gwShapes += `      <bpmndi:BPMNShape id="sh_${pid}" bpmnElement="${pid}" isMarkerVisible="true"><dc:Bounds x="${gx}" y="${gy - GW_SIZE/2}" width="${GW_SIZE}" height="${GW_SIZE}"/><bpmndi:BPMNLabel><dc:Bounds x="${gx - 34}" y="${gy + GW_SIZE/2 + 4}" width="112" height="26"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>`;
+  };
 
-    // Macro gateway (encruzilhada) — decisão com retorno de correção
-    if (s._gw && typeof MACRO_GATEWAYS !== 'undefined' && MACRO_GATEWAYS[s._gw]) {
-      const gwm  = MACRO_GATEWAYS[s._gw];
-      const gwId2= 'GWX_' + s._gw;
+  // ---- 3. Percorrido do fluxo ----
+  const firstActor = stepsData[0]?.actor || activeLanes[0];
+  const lastActor  = stepsData[stepsData.length - 1]?.actor || activeLanes[activeLanes.length - 1];
+  const startX = X_START_EVT;
+  const startY = laneYMap[firstActor] - 18;
+  const endX = X_END_EVT;
+  const endY = laneYMap[lastActor] - 18;
+  const GWF_ID = 'GW_FORK', GWJ_ID = 'GW_JOIN';
+
+  let prevId = 'Ev_Start', prevX = startX + 36, prevY = laneYMap[firstActor];
+
+  let i = 0;
+  while (i < stepsData.length) {
+    if (forkIdx >= 0 && i === forkIdx) {
+      const t = emitTask(i);
+      flowEdge(`sf_${prevId}_${t.id}`, prevId, t.id, prevX, prevY, t.left, t.cy);
+      const fy = laneYMap[stepsData[i].actor || 'ses'];
+      emitParallel(GWF_ID, 'Início das trilhas\nem paralelo', forkGX, fy);
+      addLaneExtra(stepsData[i].actor || 'ses', GWF_ID);
+      flowEdge(`sf_${t.id}_${GWF_ID}`, t.id, GWF_ID, t.right, fy, forkGX, fy);
+      const jy = laneYMap[stepsData[joinIdx].actor || 'ses'];
+      tracks.forEach(tr => {
+        let pId = GWF_ID, pX = forkGX + GW_SIZE, pY = fy;
+        tr.idxs.forEach(idx => {
+          const tt = emitTask(idx);
+          const lbl = pId === GWF_ID ? `Trilha ${tr.name}` : undefined;
+          flowEdge(`sf_${pId}_T_${idx}`, pId, `T_${idx}`, pX, pY, tt.left, tt.cy, lbl);
+          pId = tt.id; pX = tt.right; pY = tt.cy;
+          if (stepsData[idx].optional) { const g = emitXor(idx, tt); pId = g.id; pX = g.right; pY = g.cy; }
+        });
+        flowEdge(`sf_${pId}_${GWJ_ID}`, pId, GWJ_ID, pX, pY, joinGX, jy);
+      });
+      emitParallel(GWJ_ID, 'Conclusão\ndas trilhas', joinGX, jy);
+      addLaneExtra(stepsData[joinIdx].actor || 'ses', GWJ_ID);
+      prevId = GWJ_ID; prevX = joinGX + GW_SIZE; prevY = jy;
+      i = joinIdx;
+      continue;
+    }
+    const t = emitTask(i);
+    flowEdge(`sf_${prevId}_${t.id}`, prevId, t.id, prevX, prevY, t.left, t.cy);
+    prevId = t.id; prevX = t.right; prevY = t.cy;
+
+    if (stepsData[i]._gw && typeof MACRO_GATEWAYS !== 'undefined' && MACRO_GATEWAYS[stepsData[i]._gw]) {
+      const gwm = MACRO_GATEWAYS[stepsData[i]._gw];
+      const gwId2 = 'GWX_' + stepsData[i]._gw;
       const gwX2 = prevX + 30;
-      const gwY2 = cy - GW_SIZE / 2;
-      gwDefs   += `    <exclusiveGateway id="${gwId2}" name="${sanitizeXml(gwm.question)}"/>` + '\n';
-      gwShapes += `      <bpmndi:BPMNShape id="sh_${gwId2}" bpmnElement="${gwId2}" isMarkerVisible="true">
-        <dc:Bounds x="${gwX2}" y="${gwY2}" width="${GW_SIZE}" height="${GW_SIZE}"/>
-        <bpmndi:BPMNLabel><dc:Bounds x="${gwX2 - 20}" y="${gwY2 - 22}" width="96" height="14"/></bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>` + '\n';
-      // fluxo principal: tarefa → gateway ("Sim" segue em frente)
-      const sfA = `sf_${tid}_${gwId2}`;
-      seqFlowDefs  += `    <sequenceFlow id="${sfA}" name="Sim" sourceRef="${tid}" targetRef="${gwId2}"/>` + '\n';
-      seqFlowEdges += buildEdge(sfA, prevX, cy, gwX2, cy);
-      // retorno de correção: gateway → atividade alvo ("Não")
-      const loopTarget = (typeof GW_LOOP !== 'undefined') ? GW_LOOP[s._gw] : null;
+      const gwY2 = prevY - GW_SIZE / 2;
+      gwDefs += `    <exclusiveGateway id="${gwId2}" name="${sanitizeXml(gwm.question)}"/>`;
+      gwShapes += `      <bpmndi:BPMNShape id="sh_${gwId2}" bpmnElement="${gwId2}" isMarkerVisible="true"><dc:Bounds x="${gwX2}" y="${gwY2}" width="${GW_SIZE}" height="${GW_SIZE}"/><bpmndi:BPMNLabel><dc:Bounds x="${gwX2 - 20}" y="${gwY2 - 22}" width="96" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>`;
+      addLaneExtra(stepsData[i].actor || 'ses', gwId2);
+      flowEdge(`sf_${prevId}_${gwId2}`, prevId, gwId2, prevX, prevY, gwX2, prevY, 'Sim');
+      const loopTarget = (typeof GW_LOOP !== 'undefined') ? GW_LOOP[stepsData[i]._gw] : null;
       const tIdx = loopTarget ? stepsData.findIndex(x => x.id === loopTarget) : -1;
       if (tIdx >= 0) {
-        const tgt  = stepsData[tIdx];
-        const ty2  = laneYMap[tgt.actor || 'ses'];
-        const tx2  = stepX[tIdx] - TASK_W / 2;
-        const sfB  = `sf_${gwId2}_loop_${tIdx}`;
-        seqFlowDefs += `    <sequenceFlow id="${sfB}" name="Não — retorna p/ correção" sourceRef="${gwId2}" targetRef="T_${tIdx}"/>` + '\n';
+        const tgt = stepsData[tIdx];
+        const ty2 = laneYMap[tgt.actor || 'ses'];
+        const tx2 = stepX[tIdx] - TASK_W / 2;
+        const sfB = `sf_${gwId2}_loop_${tIdx}`;
+        seqFlowDefs += `    <sequenceFlow id="${sfB}" name="Não — retorna para correção" sourceRef="${gwId2}" targetRef="T_${tIdx}"/>`;
         const bx = gwX2 + GW_SIZE + 46;
-        seqFlowEdges += `      <bpmndi:BPMNEdge id="ed_${sfB}" bpmnElement="${sfB}">
-        <di:waypoint x="${gwX2 + GW_SIZE}" y="${cy}"/>
-        <di:waypoint x="${bx}" y="${cy}"/>
-        <di:waypoint x="${bx}" y="${ty2}"/>
-        <di:waypoint x="${tx2 + TASK_W}" y="${ty2}"/>
-      </bpmndi:BPMNEdge>` + '\n';
+        seqFlowEdges += `      <bpmndi:BPMNEdge id="ed_${sfB}" bpmnElement="${sfB}"><di:waypoint x="${gwX2 + GW_SIZE}" y="${prevY}"/><di:waypoint x="${bx}" y="${prevY}"/><di:waypoint x="${bx}" y="${ty2}"/><di:waypoint x="${tx2 + TASK_W}" y="${ty2}"/></bpmndi:BPMNEdge>`;
       }
-      prevId = gwId2;
-      prevX  = gwX2 + GW_SIZE;
-      prevY  = cy;
+      prevId = gwId2; prevX = gwX2 + GW_SIZE;
     }
-
-    // Optional gateway (XOR) after this task if step is optional
-    if (s.optional) {
-      const gwId  = `GW_${i}`;
-      const gwX   = prevX + 30;
-      const gwY   = cy - GW_SIZE / 2;
-      gwDefs   += `    <exclusiveGateway id="${gwId}" name="Necessário?"/>\n`;
-      gwShapes += `      <bpmndi:BPMNShape id="sh_${gwId}" bpmnElement="${gwId}" isMarkerVisible="true">
-        <dc:Bounds x="${gwX}" y="${gwY}" width="${GW_SIZE}" height="${GW_SIZE}"/>
-        <bpmndi:BPMNLabel><dc:Bounds x="${gwX - 10}" y="${gwY - 20}" width="64" height="14"/></bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>\n`;
-      // flow: task → gateway
-      const sf1 = `sf_${tid}_${gwId}`;
-      seqFlowDefs  += `    <sequenceFlow id="${sf1}" sourceRef="${tid}" targetRef="${gwId}"/>\n`;
-      seqFlowEdges += buildEdge(sf1, prevX, cy, gwX, cy);
-      prevId = gwId;
-      prevX  = gwX + GW_SIZE;
-      prevY  = cy;
-      // "Não" path label will be on the main flow (handled by next iteration)
+    if (stepsData[i].optional) {
+      const g = emitXor(i, t);
+      prevId = g.id; prevX = g.right; prevY = g.cy;
     }
-  });
+    i++;
+  }
+  flowEdge(`sf_${prevId}_Ev_End`, prevId, 'Ev_End', prevX, prevY, endX, endY);
 
-  // Final flow → End event
-  const sfEnd = `sf_${prevId}_Ev_End`;
-  seqFlowDefs  += `    <sequenceFlow id="${sfEnd}" sourceRef="${prevId}" targetRef="Ev_End"/>\n`;
-  seqFlowEdges += buildEdge(sfEnd, prevX, prevY, endX, endY);
-
-  // -- 5. Lane XML ----------------------------------
-  let laneChildRefs = '';
-  const allTids = stepsData.map((_, i) => `T_${i}`);
-  // assign elements to lanes
+  // ---- 4. Raias ----
   const laneElements = {};
-  activeLanes.forEach(a => { laneElements[a] = []; });
-  stepsData.forEach((s, i) => {
+  activeLanes.forEach(a => { laneElements[a] = new Set(); });
+  stepsData.forEach((s, idx) => {
     const a = s.actor || 'ses';
-    if (laneElements[a]) laneElements[a].push(`T_${i}`);
-    // gateway also belongs to same lane
-    if (s.optional) { if (laneElements[a]) laneElements[a].push(`GW_${i}`); }
+    if (laneElements[a]) {
+      laneElements[a].add(`T_${idx}`);
+      if (s.optional) laneElements[a].add(`GW_${idx}`);
+      if (s._fork)    laneElements[a].add(GWF_ID);
+      if (s._join)    laneElements[a].add(GWJ_ID);
+    }
   });
-  // start/end belong to their respective actor lanes
-  if (laneElements[firstActor]) laneElements[firstActor].unshift('Ev_Start');
-  if (laneElements[lastActor])  laneElements[lastActor].push('Ev_End');
+  Object.entries(laneExtra).forEach(([a, ids]) => { if (laneElements[a]) ids.forEach(id => laneElements[a].add(id)); });
+  if (laneElements[firstActor]) laneElements[firstActor].add('Ev_Start');
+  if (laneElements[lastActor])  laneElements[lastActor].add('Ev_End');
 
-  let laneSetXml = `    <laneSet id="LaneSet1" name="Processo">\n`;
+  let laneSetXml = `    <laneSet id="LaneSet1" name="Processo">`;
   let laneShapes = '';
   activeLanes.forEach((a, li) => {
-    const laneId     = `Lane_${a}`;
-    const laneY      = Y_POOL + li * LANE_H;
+    const laneId = `Lane_${a}`;
     const actorLabel = ACTORS[a]?.label || a;
-    const lFill      = LANE_FILL[a] || '#f8fafc';
-    const lStroke    = BIZAGI_COLORS[a]?.stroke || '#94a3b8';
-    const childRefs  = laneElements[a].map(id => `      <flowNodeRef>${id}</flowNodeRef>`).join('\n');
-    laneSetXml += `      <lane id="${laneId}" name="${sanitizeXml(actorLabel)}">\n${childRefs}\n      </lane>\n`;
-    laneShapes += `      <bpmndi:BPMNShape id="sh_${laneId}" bpmnElement="${laneId}" isHorizontal="true"
-          bioc:fill="${lFill}" bioc:stroke="${lStroke}" color:background-color="${lFill}" color:border-color="${lStroke}">
-        <dc:Bounds x="${POOL_LABEL_W}" y="${Y_POOL + li * LANE_H}" width="${TOTAL_W - POOL_LABEL_W}" height="${LANE_H}"/>
-        <bpmndi:BPMNLabel><dc:Bounds x="${POOL_LABEL_W + 2}" y="${Y_POOL + li * LANE_H + LANE_H/2 - 6}" width="${LANE_LABEL_W - 8}" height="12"/></bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>\n`;
+    const lFill = LANE_FILL[a] || '#f8fafc';
+    const lStroke = BIZAGI_COLORS[a]?.stroke || '#94a3b8';
+    const childRefs = [...laneElements[a]].map(id => `      <flowNodeRef>${id}</flowNodeRef>`).join('\n');
+    laneSetXml += `      <lane id="${laneId}" name="${sanitizeXml(actorLabel)}">\n${childRefs}\n      </lane>`;
+    laneShapes += `      <bpmndi:BPMNShape id="sh_${laneId}" bpmnElement="${laneId}" isHorizontal="true" bioc:fill="${lFill}" bioc:stroke="${lStroke}" color:background-color="${lFill}" color:border-color="${lStroke}"><dc:Bounds x="${POOL_LABEL_W}" y="${Y_POOL + li * LANE_H}" width="${TOTAL_W - POOL_LABEL_W}" height="${LANE_H}"/><bpmndi:BPMNLabel><dc:Bounds x="${POOL_LABEL_W + 2}" y="${Y_POOL + li * LANE_H + LANE_H/2 - 6}" width="${LANE_LABEL_W - 8}" height="12"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>`;
   });
-  laneSetXml += `    </laneSet>\n`;
+  laneSetXml += `    </laneSet>`;
 
-  // -- 6. Assemble XML ------------------------------
+  // ---- 5. Montagem final ----
   return `<?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
   xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
@@ -2319,49 +2917,37 @@ function buildBPMN(stepsData) {
 
   <process id="Proc_Main" isExecutable="false">
 ${laneSetXml}
-    <!-- Events -->
     <startEvent id="Ev_Start" name="Início&#10;do fluxo">
       <outgoing>sf_Ev_Start_T_0</outgoing>
     </startEvent>
     <endEvent id="Ev_End" name="Processo&#10;concluído">
     </endEvent>
 
-    <!-- Tasks -->
+    <!-- Tarefas -->
 ${taskDefs}
-    <!-- Gateways -->
+    <!-- Pontos de decisão e trilhas -->
 ${gwDefs}
-    <!-- Sequence Flows -->
+    <!-- Fluxos de sequência -->
 ${seqFlowDefs}
   </process>
 
   <bpmndi:BPMNDiagram id="BPMNDiag1">
     <bpmndi:BPMNPlane id="Plane1" bpmnElement="Collab1">
-
-      <!-- Pool -->
       <bpmndi:BPMNShape id="sh_Pool_SESAI" bpmnElement="Pool_SESAI" isHorizontal="true">
         <dc:Bounds x="0" y="${Y_POOL}" width="${TOTAL_W}" height="${POOL_H}"/>
         <bpmndi:BPMNLabel/>
       </bpmndi:BPMNShape>
-
-      <!-- Lanes -->
 ${laneShapes}
-      <!-- Start Event -->
       <bpmndi:BPMNShape id="sh_Ev_Start" bpmnElement="Ev_Start">
         <dc:Bounds x="${startX}" y="${startY}" width="36" height="36"/>
         <bpmndi:BPMNLabel><dc:Bounds x="${startX - 10}" y="${startY + 40}" width="56" height="28"/></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-
-      <!-- End Event -->
       <bpmndi:BPMNShape id="sh_Ev_End" bpmnElement="Ev_End">
         <dc:Bounds x="${endX}" y="${endY}" width="36" height="36"/>
         <bpmndi:BPMNLabel><dc:Bounds x="${endX - 10}" y="${endY + 40}" width="56" height="28"/></bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-
-      <!-- Tasks -->
 ${taskShapes}
-      <!-- Gateways -->
 ${gwShapes}
-      <!-- Edges -->
 ${seqFlowEdges}
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
@@ -2408,63 +2994,74 @@ function sanitizeXml(str) {
 
 function dlFile(content,name,type) { const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([content],{type})); a.download=name; a.click(); }
 
-async function bPrint() {
-  // Export current diagram as SVG then open a clean print window
-  let svg;
-  try { const res = await modeler.saveSVG(); svg = res.svg; }
-  catch(e) { toast('Erro ao gerar SVG para impressão.','error'); return; }
-
-  const totalSteps = steps.length;
-  const actors = [...new Set(steps.map(s => ACTORS[s.actor]?.label || s.actor))].join(', ');
-  const date = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
-
-  const win = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html><html lang="pt-BR"><head>
+async function bPrint(){
+  if(!modeler||!bpmnReady){toast('Gere o diagrama primeiro.','error');return;}
+  try{
+    const m=getModeler();
+    const canvas=m.get('canvas'),reg=m.get('elementRegistry');
+    const gfx=canvas.getContainer().querySelector('svg');
+    if(!gfx){toast('Nada para imprimir.','error');return;}
+    // bounding box de todo o conteúdo
+    let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
+    reg.forEach(el=>{try{const b=el.businessObject;if(!b)return;const g=reg.getGraphics(el);if(!g)return;const bb2=g.getBBox?g.getBBox():null;if(!bb2)return;minX=Math.min(minX,bb2.x);minY=Math.min(minY,bb2.y);maxX=Math.max(maxX,bb2.x+bb2.width);maxY=Math.max(maxY,bb2.y+bb2.height);}catch(e){}});
+    if(!isFinite(minX)){const vb=canvas.viewbox();minX=vb.x;minY=vb.y;maxX=vb.x+vb.width;maxY=vb.y+vb.height;}
+    const pad=40;minX-=pad;minY-=pad;maxX+=pad;maxY+=pad;
+    const w=maxX-minX,h=maxY-minY;
+    // A4 paisagem, margem 12mm → área útil ~1032x703px a 96dpi
+    const PW=1030,HEADER=30,TH=703-HEADER;
+    let scale=Math.min(PW/w,1.6);scale=Math.max(scale,0.2);
+    const contentW=w*scale,contentH=h*scale;
+    const cols=Math.max(1,Math.ceil(contentW/PW));
+    const rows=Math.max(1,Math.ceil(contentH/TH));
+    const total=rows*cols;
+    const serializer=new XMLSerializer();
+    const title=(_activeProc()?.name||'Fluxo');
+    const date=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+    const actors=[...new Set(steps.map(s=>ACTORS[s.actor]?.label||s.actor))].join(', ');
+    let pages='';
+    for(let r=0;r<rows;r++){
+      for(let c=0;c<cols;c++){
+        const clone=gfx.cloneNode(true);
+        clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+        clone.setAttribute('viewBox',`${minX} ${minY} ${w} ${h}`);
+        clone.setAttribute('width',Math.round(contentW));
+        clone.setAttribute('height',Math.round(contentH));
+        const svgStr=serializer.serializeToString(clone);
+        pages+=`<div class="sheet">
+          <div class="phead"><span class="pt">${sanitize(title)}</span><span>${date} · SESAI/MS · Página ${r*cols+c+1}/${total}</span></div>
+          <div class="tile" style="left:${-Math.round(c*PW)}px;top:${-Math.round(r*TH)}px">${svgStr}</div>
+        </div>`;
+      }
+    }
+    const win=window.open('','_blank');
+    if(!win){toast('Popup bloqueado.','error');return;}
+    win.document.write(`<!DOCTYPE html><html lang="pt-BR"><head>
 <meta charset="UTF-8">
-<title>SESAI — Modelagem de Processos</title>
+<title>SESAI — ${sanitize(title)}</title>
 <style>
-  @page { size: A3 landscape; margin: 15mm; }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Arial', sans-serif; background: white; color: #111; }
-  .print-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 2px solid #1b4332; }
-  .print-title { font-size: 18px; font-weight: 700; color: #1b4332; }
-  .print-sub { font-size: 11px; color: #555; margin-top: 3px; }
-  .print-meta { text-align: right; font-size: 10px; color: #666; line-height: 1.7; }
-  .print-meta strong { color: #1b4332; }
-  .diagram-wrap { width: 100%; overflow: hidden; }
-  .diagram-wrap svg { width: 100%; height: auto; max-height: 180mm; }
-  .legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; padding-top: 8px; border-top: 1px solid #ddd; }
-  .legend-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: #888; width: 100%; }
-  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 9.5px; color: #333; }
-  .legend-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid rgba(0,0,0,.15); flex-shrink: 0; }
-  .legend-sym { display: flex; align-items: center; gap: 10px; margin-left: 16px; }
-  .sym-item { display: flex; align-items: center; gap: 5px; font-size: 9.5px; color: #333; }
-  .step-table { width: 100%; margin-top: 10px; border-collapse: collapse; font-size: 9px; }
-  .step-table th { background: #1b4332; color: white; padding: 4px 6px; text-align: left; font-weight: 600; }
-  .step-table td { padding: 3px 6px; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
-  .step-table tr:nth-child(even) td { background: #f8fafc; }
-  .actor-pill { display: inline-block; padding: 1px 6px; border-radius: 8px; font-size: 8.5px; font-weight: 600; }
-  .print-footer { margin-top: 8px; font-size: 8.5px; color: #aaa; display: flex; justify-content: space-between; border-top: 1px solid #eee; padding-top: 6px; }
-  @media print {
-    .no-print { display: none; }
-    body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  }
+  @page{size:A4 landscape;margin:12mm}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#111}
+  .sheet{position:relative;width:${PW}px;height:${HEADER+TH+2}px;overflow:hidden;page-break-after:always;break-after:page}
+  .sheet:last-of-type{page-break-after:auto;break-after:auto}
+  .phead{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #1b4332;padding-bottom:4px;margin-bottom:4px;color:#1b4332}
+  .pt{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+  .phead span:last-child{font-size:10px;color:#666}
+  .tile{position:absolute}
+  .legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;padding-top:8px;border-top:1px solid #ddd}
+  .legend-title{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#888;width:100%}
+  .legend-item{display:flex;align-items:center;gap:5px;font-size:9.5px;color:#333}
+  .legend-swatch{width:14px;height:14px;border-radius:3px;border:1px solid rgba(0,0,0,.15);flex-shrink:0}
+  .step-table{width:100%;margin-top:10px;border-collapse:collapse;font-size:9px}
+  .step-table th{background:#1b4332;color:#fff;padding:4px 6px;text-align:left;font-weight:600}
+  .step-table td{padding:3px 6px;border-bottom:1px solid #e5e7eb;vertical-align:top}
+  .step-table tr{page-break-inside:avoid;break-inside:avoid}
+  .step-table tr:nth-child(even) td{background:#f8fafc}
+  .actor-pill{display:inline-block;padding:1px 6px;border-radius:8px;font-size:8.5px;font-weight:600}
+  @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head><body>
-<div class="print-header">
-  <div>
-    <div class="print-title">SESAI — ${sanitize(_activeProc()?.name||'Fluxo')}</div>
-    <div class="print-sub">${sanitize(_activeProc()?.desc||'Ministério da Saúde · Secretaria Especial de Saúde Indígena')}</div>
-  </div>
-  <div class="print-meta">
-    <div><strong>Gerado em:</strong> ${date}</div>
-    <div><strong>Etapas:</strong> ${totalSteps}</div>
-    <div><strong>Atores:</strong> ${actors}</div>
-  </div>
-</div>
-
-<div class="diagram-wrap">${svg}</div>
-
+${pages}
 <div class="legend">
   <div class="legend-title">Legenda de raias (atores)</div>
   ${Object.entries(BIZAGI_COLORS).filter(([k])=>[...new Set(steps.map(s=>s.actor))].includes(k)).map(([k,c])=>`
@@ -2472,14 +3069,7 @@ async function bPrint() {
       <div class="legend-swatch" style="background:${c.fill};border-color:${c.stroke}"></div>
       ${ACTORS[k]?.label||k}
     </div>`).join('')}
-  <div class="legend-sym">
-    <div class="sym-item"><svg width="18" height="18"><circle cx="9" cy="9" r="8" fill="white" stroke="#1b4332" stroke-width="1.5"/></svg> Evento de início</div>
-    <div class="sym-item"><svg width="18" height="18"><circle cx="9" cy="9" r="8" fill="white" stroke="#1b4332" stroke-width="3"/></svg> Evento de fim</div>
-    <div class="sym-item"><svg width="18" height="18"><rect x="1" y="1" width="16" height="16" rx="2" fill="#e4f4ec" stroke="#1b6e3e" stroke-width="1.5"/></svg> Tarefa (atividade)</div>
-    <div class="sym-item"><svg width="18" height="18"><polygon points="9,1 17,9 9,17 1,9" fill="white" stroke="#b7860a" stroke-width="1.5"/></svg> Gateway XOR (decisão)</div>
-  </div>
 </div>
-
 <table class="step-table">
   <thead>
     <tr>
@@ -2487,34 +3077,32 @@ async function bPrint() {
       <th style="width:28%">Atividade</th>
       <th style="width:12%">Ator</th>
       <th style="width:10%">Fase</th>
-      <th style="width:10%">Classificação</th>
-      <th style="width:36%">Descrição / Checklist</th>
+      <th style="width:42%">Explicação, pontos de atenção e checklist</th>
     </tr>
   </thead>
   <tbody>
-    ${steps.map((s,i) => {
-      const ac = ACTORS[s.actor]||{label:s.actor,color:'#555',bg:'#eee'};
-      const ph = PHASES.find(p=>p.id===s.phase)||{label:'',color:'#555'};
+    ${steps.map((s,i)=>{
+      const ac=ACTORS[s.actor]||{label:s.actor,color:'#555',bg:'#eee'};
+      const ph=PHASES.find(p=>p.id===s.phase)||{label:''};
       return `<tr>
         <td style="font-weight:700;color:#1b4332">${sanitize(s.num)}</td>
         <td style="font-weight:600">${sanitize(s.title)}</td>
         <td><span class="actor-pill" style="background:${ac.bg};color:${ac.color}">${ac.label}</span></td>
         <td style="color:#555">${ph.label}</td>
-        <td>${s._btype && (typeof MACRO_BPMN_TYPES!=='undefined') && MACRO_BPMN_TYPES[s._btype] ? MACRO_BPMN_TYPES[s._btype].icon+' '+MACRO_BPMN_TYPES[s._btype].label : '👤 Tarefa humana'}</td>
-        <td style="color:#444">${s.items.map(it=>`• ${sanitize(it)}`).join('<br>')}</td>
+        <td style="color:#444">
+          ${s.desc?`<div style="margin-bottom:4px;color:#333;line-height:1.5">${sanitize(s.desc)}</div>`:''}
+          ${s.alert?`<div style="margin-bottom:4px;color:#92400e;line-height:1.5">⚠️ <strong>Ponto de atenção:</strong> ${sanitize(s.alert)}</div>`:''}
+          ${s._passos&&s._passos.length?`<ol style="margin:4px 0 0 14px;padding:0">${s._passos.map(pp=>`<li style="margin-bottom:2px">${sanitize(pp)}</li>`).join('')}</ol>`:''}
+          ${s.items.map(it=>`• ${sanitize(it)}`).join('<br>')}
+        </td>
       </tr>`;
     }).join('')}
   </tbody>
 </table>
-
-<div class="print-footer">
-  <span>SESAI / Ministério da Saúde — documento gerado automaticamente pelo sistema de fluxos</span>
-  <span>Página 1</span>
-</div>
-
-<scr'+'ipt>window.onload = () => { window.print(); }<\/script>
+<scr'+'ipt>window.onload=()=>{window.print();}<\/script>
 </body></html>`);
-  win.document.close();
+    win.document.close();
+  }catch(e){console.error(e);toast('Erro ao imprimir.','error');}
 }
 
 /* ===================================================
@@ -2688,6 +3276,8 @@ function renderCards() {
             <span class="actor-pill" style="background:${ac.bg};color:${ac.color}">● ${ac.label}</span>
             <span class="phase-pill-sm">${ph.label}</span>
             ${s._btype && (typeof MACRO_BPMN_TYPES!=='undefined') && MACRO_BPMN_TYPES[s._btype] ? `<span class="phase-pill-sm" title="Classificação BPMN da atividade">${MACRO_BPMN_TYPES[s._btype].icon} ${MACRO_BPMN_TYPES[s._btype].label}</span>` : '<span class="phase-pill-sm">👤 Tarefa humana</span>'}
+            ${s._track?`<span class="phase-pill-sm" title="Esta etapa faz parte de uma trilha que pode correr em paralelo às demais">🔀 Trilha ${s._track}</span>`:''}
+            ${s._join?`<span class="phase-pill-sm" title="A partir daqui as trilhas se unem">🤝 Trilhas unidas</span>`:''}
             ${atts.length>0?`<span style="font-size:10.5px;color:var(--gray-400)">📎 ${atts.length}</span>`:''}
             ${(s.comments&&s.comments.length)?`<span style="font-size:10.5px;color:var(--gray-400)">💬 ${s.comments.length}</span>`:''}
           </div>
@@ -2699,6 +3289,7 @@ function renderCards() {
       </div>
       <div class="card-body">
         <p class="card-desc">${sanitize(s.desc)}</p>
+        ${s._passos&&s._passos.length?`<div class="card-passos"><div class="cp-title">Passo a passo</div><ol>${s._passos.map(pp=>`<li>${sanitize(pp)}</li>`).join('')}</ol></div>`:''}
         ${s.alert?`<div class="alert-strip"><span style="font-size:15px;flex-shrink:0">⚠️</span><div>${sanitize(s.alert)}</div></div>`:''}
         <div class="card-items">${s.items.map(it=>`<div class="card-item"><div class="item-dot"></div><span>${sanitize(it)}</span></div>`).join('')}</div>
         <div class="docs-row">${s.docs.map(d=>`<div class="doc-chip">📄 ${sanitize(d)}</div>`).join('')}</div>
@@ -3492,15 +4083,15 @@ const MACRO_ACTIVITIES = [
   { id:'ACT_003', stage:'STAGE_1', lane:'LANE_DIASI',      type:'user_task', name:'Analisar situação de saúde da comunidade', desc:'Avaliação da pertinência da demanda à luz do contexto de saúde, acesso, cobertura assistencial e condições de atendimento.', inputs:['Registro preliminar'], outputs:['Análise da situação de saúde'], docs:[], systems:['SIASI'] },
   { id:'ACT_004', stage:'STAGE_1', lane:'LANE_CONDISI',    type:'user_task', name:'Definir prioridades e consolidar planejamento', desc:'Priorização conjunta entre conselho distrital, comunidade e instâncias locais, combinando análise técnica e demanda social.', inputs:['Análise de saúde','Registro preliminar'], outputs:['Priorização social validada'], docs:['Ata de reunião do CONDISI'], systems:[] },
   { id:'ACT_005', stage:'STAGE_1', lane:'LANE_DSEI',       type:'user_task', name:'Formatar PDSI', desc:'Consolidação documental das diretrizes, metas, estratégias e ações priorizadas no planejamento distrital.', inputs:['Priorização social'], outputs:['PDSI'], docs:['Plano Distrital de Saúde Indígena (PDSI)'], systems:[] },
-  { id:'ACT_006', stage:'STAGE_1', lane:'LANE_DSEI',       type:'send_task', name:'Submeter PDSI para revisão e homologação', desc:'Envio do PDSI consolidado para revisão técnica e posterior homologação institucional.', inputs:['PDSI'], outputs:['PDSI submetido'], docs:['PDSI'], systems:['SEI'] },
-  { id:'ACT_007', stage:'STAGE_1', lane:'LANE_DEAMB',      type:'service_task', name:'Publicar PDSI', desc:'Publicação oficial do PDSI validado, conferindo-lhe validade institucional e transparência.', inputs:['PDSI submetido'], outputs:['PDSI publicado'], docs:['PDSI publicado'], systems:['SEI'] },
+    { id:'ACT_006', stage:'STAGE_1', lane:'LANE_DSEI',       type:'send_task', name:'Submeter o PDSI para revisão e homologação', desc:'Envio do PDSI consolidado à CGPSI/SESAI para revisão técnica — após a apreciação e aprovação pelo CONDISI — e posterior homologação institucional.', inputs:['PDSI'], outputs:['PDSI submetido'], docs:['PDSI'], systems:['SEI'] },
+    { id:'ACT_007', stage:'STAGE_1', lane:'LANE_DEAMB',      type:'service_task', name:'Homologar e divulgar o PDSI (SESAI)', desc:'Homologação do PDSI pela SESAI e divulgação oficial no portal do Ministério da Saúde, no Boletim de Serviços e no site da SESAI, conferindo validade institucional ao plano e permitindo o início das etapas de contratação.', inputs:['PDSI submetido'], outputs:['PDSI homologado e divulgado'], docs:['PDSI publicado'], systems:['Boletim de Serviços','Site da SESAI'] },
   // STAGE 2
   { id:'ACT_008', stage:'STAGE_2', lane:'LANE_DSEI',       type:'user_task', name:'Abrir processo administrativo no SEI', desc:'Após publicação do PDSI, cada obra prevista gera processo administrativo específico no SEI, podendo seguir por apoio técnico para projeto ou diretamente por processo de contratação.', inputs:['PDSI publicado'], outputs:['Ofício/termo de abertura','Processo SEI aberto'], docs:['Ofício de abertura'], systems:['SEI'], gateway_after:'GW_001' },
-  { id:'ACT_009', stage:'STAGE_2', lane:'LANE_SESANI',     type:'user_task', name:'Elaborar DFD da obra', desc:'O SESANI elabora o Documento de Formalização da Demanda com justificativa técnica, localização, beneficiários, evidências, riscos preliminares e demais elementos exigidos pela NLLC.', inputs:['Processo SEI','PDSI'], outputs:['DFD'], docs:['Documento de Formalização da Demanda (DFD)'], systems:['ComprasGov/PGC'], requirements:['Descrição sucinta do objeto','Grau de prioridade','Valor estimado preliminar','Localização detalhada','Beneficiários estimados','Tipo de intervenção','Dados epidemiológicos','Evidências fotográficas','Indicação no PDSI'] },
-  { id:'ACT_010', stage:'STAGE_2', lane:'LANE_SELOG',      type:'user_task', name:'Revisar consistência do DFD', desc:'O SELOG revisa consistência, clareza, formatação e conformidade administrativa do DFD antes de sua consolidação no PCA.', inputs:['DFD'], outputs:['DFD revisado'], docs:['DFD revisado'], systems:[], gateway_after:'GW_002' },
+  { id:'ACT_009', stage:'STAGE_2', lane:'LANE_SESANI',     type:'user_task', name:'Elaborar DFD da obra', desc:'O SESANI elabora o Documento de Formalização da Demanda com justificativa técnica, localização, beneficiários, evidências, riscos preliminares e demais elementos exigidos pela NLLC.', inputs:['Processo SEI','PDSI'], outputs:['DFD'], docs:['Documento de Formalização da Demanda (DFD)'], systems:['ComprasGov/PGC'], alert:'Ao registrar o DFD no Compras.gov, selecione a opção "PCA em elaboração", indicando que a contratação será executada no próximo exercício.', requirements:['Descrição sucinta do objeto','Grau de prioridade','Valor estimado preliminar','Localização detalhada','Beneficiários estimados','Tipo de intervenção','Dados epidemiológicos','Evidências fotográficas','Indicação no PDSI'] },
+  { id:'ACT_010', stage:'STAGE_2', lane:'LANE_SELOG',      type:'user_task', name:'Revisar consistência do DFD', desc:'O SELOG revisa consistência, clareza, formatação e conformidade administrativa do DFD antes de sua consolidação no PCA.', inputs:['DFD'], outputs:['DFD revisado'], docs:['DFD revisado'], systems:[], gateway_after:'GW_002', alert:'Dica dos DSEIs: envolver o SELOG na conferência dos DFDs elaborados pelo SESANI, garantindo clareza, padronização e revisão administrativa antes do envio.' },
   { id:'ACT_011', stage:'STAGE_2', lane:'LANE_DSEI',       type:'user_task', name:'Aprovar DFD prioritário', desc:'A coordenação do DSEI aprova as demandas prioritárias a serem levadas ao PCA.', inputs:['DFD revisado'], outputs:['DFD aprovado'], docs:['DFD aprovado'], systems:[] },
-  { id:'ACT_012', stage:'STAGE_2', lane:'LANE_SELOG',      type:'user_task', name:'Consolidar PCA', desc:'Consolidação dos DFDs aprovados no Plano de Contratações Anual, com cronograma, prioridade e previsões orçamentárias.', inputs:['DFD aprovado'], outputs:['PCA'], docs:['Plano de Contratações Anual (PCA)'], systems:['ComprasGov/PGC','PNCP','SEI'] },
-  { id:'ACT_013', stage:'STAGE_2', lane:'LANE_DEAMB',      type:'service_task', name:'Aprovar e publicar PCA', desc:'Validação institucional do PCA e publicação para conferir publicidade e oficialidade ao planejamento anual de contratações.', inputs:['PCA'], outputs:['PCA publicado'], docs:['PCA publicado'], systems:['PNCP'] },
+    { id:'ACT_012', stage:'STAGE_2', lane:'LANE_SELOG',      type:'user_task', name:'Consolidar Plano de Contratações Anual (PCA)', desc:'Consolidação dos DFDs aprovados no Plano de Contratações Anual, com cronograma, prioridade e previsões orçamentárias. O PCA pode passar por ajustes em janelas específicas, geralmente nos meses de julho, setembro e novembro, permitindo incluir, revisar ou atualizar os DFDs conforme as necessidades identificadas ao longo do ano.', inputs:['DFD aprovado'], outputs:['PCA'], docs:['Plano de Contratações Anual (PCA)'], systems:['ComprasGov/PGC','PNCP','SEI'] },
+    { id:'ACT_013', stage:'STAGE_2', lane:'LANE_DSEI',       type:'service_task', name:'Aprovar e publicar o Plano de Contratações Anual (PCA)', desc:'Aprovação do PCA pelo Coordenador do DSEI e pela SESAI e publicação no Portal Nacional de Contratações Públicas (PNCP), que confere publicidade e oficialidade ao planejamento anual. O PCA é coordenado e monitorado pela CGCSI/SESAI, do planejamento à execução.', inputs:['PCA'], outputs:['PCA publicado'], docs:['PCA publicado'], systems:['PNCP','SEI'] },
   // STAGE 3
   { id:'ACT_014', stage:'STAGE_3', lane:'LANE_SESANI',     type:'user_task', name:'Definir objeto técnico da obra', desc:'Transformação da demanda aprovada em declaração técnica preliminar do objeto da obra, definindo escopo, tipo de intervenção, parâmetros e aderência territorial.', inputs:['PCA publicado','DFD'], outputs:['Objeto técnico preliminar'], docs:[], systems:[] },
   { id:'ACT_015', stage:'STAGE_3', lane:'LANE_SESANI',     type:'user_task', name:'Elaborar estudos de viabilidade e levantamentos técnicos', desc:'Realização de estudos de solo, topografia, condições ambientais, acesso e demais análises preliminares necessárias para embasar o projeto.', inputs:['Objeto técnico'], outputs:['Levantamentos técnicos'], docs:[], systems:[] },
@@ -3510,17 +4101,17 @@ const MACRO_ACTIVITIES = [
   { id:'ACT_019', stage:'STAGE_3', lane:'LANE_SESANI',     type:'user_task', name:'Emitir responsabilidades técnicas', desc:'Formalização da responsabilidade técnica dos profissionais que elaboraram peças técnicas e orçamento (ART, RRT, TRT).', inputs:['Projeto Executivo','Planilha Orçamentária'], outputs:['ART/RRT/TRT'], docs:['ART / RRT / TRT'], systems:[] },
   { id:'ACT_020', stage:'STAGE_3', lane:'LANE_DEAMB',      type:'user_task', name:'Validar tecnicamente o projeto', desc:'Análise técnica central do projeto pelo DEAMB, verificando aderência a padrões, viabilidade e completude de todas as peças técnicas.', inputs:['Projeto Básico','Projeto Executivo','Planilha','ART'], outputs:['Parecer técnico do projeto'], docs:['Parecer técnico'], systems:[], gateway_after:'GW_003' },
   // STAGE 4
-  { id:'ACT_021', stage:'STAGE_4', lane:'LANE_DIASI',      type:'send_task', name:'Solicitar parecer de pertinência do DAPSI', desc:'Nos casos de estabelecimentos de saúde, a DIASI solicita ao DAPSI parecer de pertinência assistencial antes de avançar na fase preparatória.', inputs:['Parecer técnico do projeto'], outputs:['Solicitação de pertinência'], docs:[], systems:['SEI'] },
-  { id:'ACT_022', stage:'STAGE_4', lane:'LANE_DAPSI',      type:'user_task', name:'Emitir parecer de pertinência', desc:'Análise de pertinência assistencial do estabelecimento de saúde proposto, verificando necessidade, cobertura e adequação à rede de atenção.', inputs:['Solicitação'], outputs:['Parecer de pertinência'], docs:['Parecer de pertinência'], systems:[] },
-  { id:'ACT_023', stage:'STAGE_4', lane:'LANE_SELOG',      type:'user_task', name:'Abrir processo licitatório no SEI', desc:'Abertura do processo de licitação no tipo processual correspondente a execução de obras e construção, com numeração própria.', inputs:['Parecer de pertinência','DFD','PCA'], outputs:['Processo licitatório aberto'], docs:[], systems:['SEI'] },
+    { id:'ACT_021', stage:'STAGE_4', lane:'LANE_SELOG',      type:'user_task', name:'Abrir processo licitatório no SEI', desc:'Abertura do processo de licitação no SEI, no tipo de processo "Logística: Execução de Obras – Construção", gerando o código que identifica oficialmente o início da tramitação administrativa. A solicitação de abertura é encaminhada à coordenação do DSEI, com a indicação da Equipe de Planejamento da Contratação (EPC).', inputs:['PCA publicado','DFD'], outputs:['Processo licitatório aberto','EPC indicada'], docs:['Termo de Abertura do Processo'], systems:['SEI'] },
+    { id:'ACT_022', stage:'STAGE_4', lane:'LANE_DIASI',      type:'send_task', name:'Solicitar Parecer de Pertinência do DAPSI', desc:'Para a construção de estabelecimentos de saúde, o primeiro passo após a abertura do processo é a solicitação, pela DIASI, do Parecer de Pertinência ao DAPSI, com a documentação que embasa a contratação.', inputs:['Processo licitatório aberto'], outputs:['Solicitação de pertinência'], docs:[], systems:['SEI'] },
+    { id:'ACT_023', stage:'STAGE_4', lane:'LANE_DAPSI',      type:'user_task', name:'Emitir Parecer de Pertinência', desc:'Análise de pertinência assistencial do estabelecimento de saúde proposto, verificando necessidade, cobertura e adequação à rede de atenção à saúde indígena.', inputs:['Solicitação de pertinência'], outputs:['Parecer de Pertinência'], docs:['Parecer de Pertinência'], systems:[] },
   { id:'ACT_024', stage:'STAGE_4', lane:'LANE_DSEI',       type:'user_task', name:'Designar Equipe de Planejamento da Contratação (EPC)', desc:'Formalização da Equipe de Planejamento da Contratação com competências técnicas, administrativas e jurídicas conforme exige a NLLC.', inputs:['Processo licitatório aberto'], outputs:['EPC designada'], docs:['Portaria de designação da EPC'], systems:['SEI'] },
-  { id:'ACT_025', stage:'STAGE_4', lane:'LANE_SESANI',     type:'user_task', name:'Elaborar mapa de riscos', desc:'Identificar, avaliar e tratar riscos do objeto, da seleção de fornecedores e da gestão contratual, com probabilidade, impacto e respostas.', inputs:['EPC designada','DFD','Projeto Básico'], outputs:['Mapa de Riscos'], docs:['Mapa de Riscos'], systems:['ComprasGov/Gestão de Riscos'] },
-  { id:'ACT_026', stage:'STAGE_4', lane:'LANE_SESANI',     type:'user_task', name:'Elaborar ETP', desc:'Produção do Estudo Técnico Preliminar com descrição da necessidade, requisitos, levantamento de mercado, solução escolhida, estimativas, valor e viabilidade.', inputs:['DFD','Projeto Básico','Mapa de Riscos'], outputs:['ETP'], docs:['Estudo Técnico Preliminar (ETP)'], systems:['ComprasGov/ETP Digital','SEI'] },
-  { id:'ACT_027', stage:'STAGE_4', lane:'LANE_SELOG',      type:'user_task', name:'Anexar documentos complementares da fase preparatória', desc:'Inserção do TJTR, planilhas, curvas, memórias, ART/RRT e demais documentos complementares necessários antes da elaboração do TR.', inputs:['ETP','Planilha Orçamentária','ART'], outputs:['TJTR','Fase preparatória complementada'], docs:['Termo de Justificativas Técnicas Relevantes (TJTR)'], systems:['SEI'] },
+    { id:'ACT_025', stage:'STAGE_4', lane:'LANE_SESANI',     type:'user_task', name:'Elaborar Estudo Técnico Preliminar (ETP)', desc:'Produção do Estudo Técnico Preliminar com a descrição da necessidade da contratação, os requisitos, o levantamento de mercado, a descrição da solução, os estudos de viabilidade, as estimativas de quantidades e de valor e a demonstração de alinhamento com o planejamento. Preferencialmente, utilizar a metodologia BIM (Decreto nº 10.306/2020). Ao final, encaminhar o ETP para aprovação pela autoridade.', inputs:['EPC designada','DFD','Projeto Básico'], outputs:['ETP aprovado pela autoridade'], docs:['Estudo Técnico Preliminar (ETP)'], systems:['ComprasGov/ETP Digital','SEI'] },
+    { id:'ACT_026', stage:'STAGE_4', lane:'LANE_SESANI',     type:'user_task', name:'Elaborar Matriz de Gerenciamento de Risco (Mapa de Riscos)', desc:'Identificar, avaliar, tratar e monitorar os riscos da contratação — no planejamento da contratação, na seleção de fornecedores e na gestão do contrato — com probabilidade, impacto e medidas de resposta. Elaborada após o ETP, a matriz integra o Termo de Referência como anexo do edital.', inputs:['ETP aprovado','DFD','Projeto Básico'], outputs:['Mapa de Riscos'], docs:['Mapa de Riscos'], systems:['ComprasGov/Gestão de Riscos'], alert:'Dicas dos DSEIs: elabore pelo menos um risco específico do objeto contratado, evitando apenas riscos genéricos; registre os riscos que realmente acontecem na rotina do DSEI, e não apenas o que consta nos manuais.' },
+    { id:'ACT_027', stage:'STAGE_4', lane:'LANE_SELOG',      type:'user_task', name:'Anexar documentos complementares da fase preparatória', desc:'Inserção do TJTR (elaborado pelo SELOG com apoio do SESANI), da Planilha Orçamentária (orçamento sintético e analítico, curva ABC, memória de cálculo, BDI), da pesquisa de preços com no mínimo três cotações e do RRT/ART antes da elaboração do Termo de Referência. A juntada do RRT definitivo é condicionante para a publicação da licitação.', inputs:['ETP','Planilha Orçamentária','ART'], outputs:['TJTR','Planilha Orçamentária','Pesquisa de preços (mínimo de três cotações)'], docs:['Termo de Justificativas Técnicas Relevantes (TJTR)','Pesquisa de preços'], systems:['SEI'] },
   { id:'ACT_028', stage:'STAGE_4', lane:'LANE_SESANI',     type:'user_task', name:'Elaborar Termo de Referência', desc:'Consolidar o objeto, requisitos, modelo de execução, modelo de gestão, critérios de seleção, valor estimado, cronograma, adequação orçamentária e anexos técnicos.', inputs:['ETP','Mapa de Riscos','TJTR','Planilha'], outputs:['Termo de Referência (TR)'], docs:['Termo de Referência (TR)'], systems:['TR Digital / modelos AGU-MGI'] },
   { id:'ACT_029', stage:'STAGE_4', lane:'LANE_DEAMB',      type:'user_task', name:'Validar TR e anexos', desc:'Conferência técnica do Termo de Referência e seus anexos pelo DEAMB antes da elaboração do edital, verificando completude e conformidade.', inputs:['TR'], outputs:['TR validado'], docs:['TR validado'], systems:[], gateway_after:'GW_004' },
   // STAGE 5
-  { id:'ACT_030', stage:'STAGE_5', lane:'LANE_SELOG',      type:'user_task', name:'Elaborar minuta do edital', desc:'Converter o conteúdo técnico do TR em instrumento convocatório com regras, prazos, documentos exigidos, critérios de julgamento e condições de participação.', inputs:['TR validado'], outputs:['Minuta do Edital'], docs:['Minuta do Edital'], systems:[] },
+    { id:'ACT_030', stage:'STAGE_5', lane:'LANE_SELOG',      type:'user_task', name:'Elaborar minuta do edital', desc:'Converter o conteúdo técnico do TR em instrumento convocatório com regras, prazos, documentos exigidos, critérios de julgamento e condições de participação. Definir o regime de execução (empreitada por preço global, empreitada por preço unitário, contratação integrada, tarefa ou empreitada por administração) e incluir as justificativas sobre a vedação à participação de consórcios e de cooperativas, quando for o caso.', inputs:['TR validado'], outputs:['Minuta do Edital'], docs:['Minuta do Edital','Justificativa de vedação a consórcio/cooperativas'], systems:[] },
   { id:'ACT_031', stage:'STAGE_5', lane:'LANE_SELOG',      type:'user_task', name:'Elaborar minuta do contrato', desc:'Preparar a minuta contratual com obrigações das partes, pagamentos, prazos, modelo de fiscalização e condições jurídicas da contratação.', inputs:['TR validado'], outputs:['Minuta do Contrato'], docs:['Minuta do Contrato'], systems:[] },
   { id:'ACT_032', stage:'STAGE_5', lane:'LANE_SELOG',      type:'user_task', name:'Emitir declarações e checklist de conformidade', desc:'Preparar declaração de uso de modelos AGU/MGI, declarações orçamentárias, adequação e listas de verificação exigidas pela NLLC.', inputs:['Minuta edital','Minuta contrato'], outputs:['Declarações formais'], docs:['Declarações formais'], systems:['SEI'] },
   { id:'ACT_033', stage:'STAGE_5', lane:'LANE_SELOG',      type:'send_task', name:'Encaminhar processo para análise jurídica', desc:'Enviar processo completo à assessoria jurídica (CONJUR/AGU) para controle de legalidade, incluindo TR, minutas e demais peças.', inputs:['TR','Minuta Edital','Minuta Contrato','Declarações'], outputs:['Processo submetido à análise jurídica'], docs:[], systems:['SAPIENS','SEI'] },
@@ -3528,7 +4119,7 @@ const MACRO_ACTIVITIES = [
   { id:'ACT_035', stage:'STAGE_5', lane:'LANE_SELOG',      type:'user_task', name:'Realizar saneamento jurídico e ajustes', desc:'Correção dos pontos levantados no parecer jurídico e atualização dos documentos do edital e contrato com os ajustes necessários.', inputs:['Parecer Jurídico'], outputs:['Processo saneado'], docs:[], systems:['SEI'] },
   { id:'ACT_036', stage:'STAGE_5', lane:'LANE_SELOG',      type:'send_task', name:'Submeter para conformidade técnica e processual', desc:'Encaminhar o processo saneado para conformidade técnica no DEAMB e conformidade processual na COEA, garantindo adequação antes da publicação.', inputs:['Processo saneado'], outputs:['Processo em conformidade'], docs:[], systems:['SEI'] },
   { id:'ACT_037', stage:'STAGE_5', lane:'LANE_CGPO_CORISC',type:'user_task', name:'Verificar disponibilidade orçamentária', desc:'Análise orçamentária detalhada e emissão de nota de disponibilidade para a contratação, confirmando crédito suficiente no exercício.', inputs:['Processo em conformidade'], outputs:['Disponibilidade orçamentária confirmada'], docs:['Nota de disponibilidade orçamentária'], systems:['SIAFI'] },
-  { id:'ACT_038', stage:'STAGE_5', lane:'LANE_CGPO_CORISC',type:'user_task', name:'Autorizar despesa', desc:'Autorizar a despesa segundo a governança aplicável, inclusive com submissão ao Comitê de Governança para contratos de maior valor conforme regulamento interno.', inputs:['Disponibilidade orçamentária'], outputs:['Despesa autorizada'], docs:['Despacho de autorização da despesa'], systems:[] },
+    { id:'ACT_038', stage:'STAGE_5', lane:'LANE_CGPO_CORISC',type:'user_task', name:'Autorizar despesa', desc:'Autorizar a despesa segundo a governança aplicável, inclusive com submissão ao Comitê de Governança para contratos de maior valor conforme regulamento interno.', inputs:['Disponibilidade orçamentária'], outputs:['Despesa autorizada'], docs:['Despacho de autorização da despesa'], systems:[], alert:'Contratos acima de R$ 1 milhão: submeter Nota Técnica SEI à governança e obter autorização da CORISC. Abaixo de R$ 1 milhão: utilizar o Formulário de Autorização de Despesa.' },
   { id:'ACT_039', stage:'STAGE_5', lane:'LANE_SELOG',      type:'send_task', name:'Solicitar publicação do edital', desc:'Marco final da instrução processual — encaminhar edital finalizado e autorizado para publicação oficial nos sistemas e canais obrigatórios.', inputs:['Despesa autorizada','Minuta Edital'], outputs:['Solicitação de publicação'], docs:[], systems:['SEI'] },
   // STAGE 6
   { id:'ACT_040', stage:'STAGE_6', lane:'LANE_LICITACAO',  type:'service_task', name:'Publicar edital', desc:'Publicação oficial do edital e início formal da fase externa da licitação, com divulgação obrigatória no PNCP, DOU e ComprasNet/SIASG.', inputs:['Solicitação de publicação'], outputs:['Edital Publicado'], docs:['Edital Publicado'], systems:['PNCP','SIASG/ComprasNet','DOU'] },
@@ -3542,31 +4133,34 @@ const MACRO_ACTIVITIES = [
   { id:'ACT_048', stage:'STAGE_6', lane:'LANE_CGPO_CORISC',type:'user_task', name:'Descentralizar crédito orçamentário', desc:'Transferência formal de créditos orçamentários necessários à execução da contratação entre unidades gestoras quando aplicável.', inputs:['Autorização técnica final'], outputs:['Crédito descentralizado'], docs:[], systems:['SIAFI'] },
   { id:'ACT_049', stage:'STAGE_6', lane:'LANE_CGPO_CORISC',type:'service_task', name:'Cadastrar projeto no CIPI', desc:'Cadastro dos dados da obra/projeto no sistema CIPI para controle de investimentos públicos antes da emissão do empenho.', inputs:['Crédito descentralizado'], outputs:['Projeto cadastrado no CIPI'], docs:[], systems:['CIPI'] },
   { id:'ACT_050', stage:'STAGE_6', lane:'LANE_SEOFI',      type:'user_task', name:'Emitir empenho', desc:'Registro contábil da reserva orçamentária correspondente à contratação no SIAFI, formalizado pela Nota de Empenho (NE).', inputs:['Projeto cadastrado CIPI'], outputs:['Empenho emitido'], docs:['Nota de Empenho (NE)'], systems:['SIAFI'] },
-  { id:'ACT_051', stage:'STAGE_6', lane:'LANE_SELOG',      type:'user_task', name:'Redigir contrato final', desc:'Inserção dos dados da empresa vencedora e fechamento definitivo do instrumento contratual com todas as cláusulas e condições.', inputs:['Empenho emitido'], outputs:['Contrato Final'], docs:['Contrato Final'], systems:['SEI'] },
-  { id:'ACT_052', stage:'STAGE_6', lane:'LANE_LICITACAO',  type:'user_task', name:'Assinar e publicar contrato', desc:'Formalização do contrato com assinatura das partes e publicação obrigatória do extrato no DOU e PNCP, encerrando o macroprocesso.', inputs:['Contrato Final'], outputs:['Contrato assinado e publicado'], docs:['Contrato Final publicado'], systems:['SEI','PNCP','Obrasgov.br'] },
+    { id:'ACT_051', stage:'STAGE_6', lane:'LANE_SELOG',      type:'user_task', name:'Redigir contrato final', desc:'Inserção dos dados da empresa vencedora e fechamento definitivo do instrumento contratual com todas as cláusulas e condições. Prever no contrato o registro da obra concluída no CNES como unidade de saúde indígena (Portaria SAS/MS nº 1.317/2017).', inputs:['Empenho emitido'], outputs:['Contrato Final'], docs:['Contrato Final'], systems:['SEI'] },
+    { id:'ACT_052', stage:'STAGE_6', lane:'LANE_LICITACAO',  type:'user_task', name:'Assinar e publicar contrato', desc:'Formalização do contrato com assinatura das partes e publicação obrigatória do extrato no DOU e PNCP. Após a formalização, cadastrar a obra no Obrasgov.br com dados técnicos e localização geoespacial, encerrando o macroprocesso.', inputs:['Contrato Final'], outputs:['Contrato assinado e publicado'], docs:['Contrato Final publicado'], systems:['SEI','PNCP','Obrasgov.br'] },
 ];
 
 // Register Execução Indireta as a real process — runs after MACRO_ACTIVITIES is defined
 (function _registerIndireta() {
   // Always regenerate from MACRO_ACTIVITIES (don't trust saved empty steps)
   const existing = PROCS.list.find(p => p.id === 'p_indireta');
-  const indSteps = macroToSteps(MACRO_ACTIVITIES);
+  const indSteps = macroToSteps(MACRO_ACTIVITIES.filter(a => ['STAGE_3','STAGE_4','STAGE_5','STAGE_6'].includes(a.stage))).concat(JSON.parse(JSON.stringify(IND_POS_STEPS)));
   if (existing) {
     // Update steps in place (always fresh from MACRO_ACTIVITIES)
     existing.steps = indSteps;
     existing.name  = 'Execução Indireta de Obra';
     existing.icon  = '⚖️';
-    existing.desc  = 'Da Identificação da Demanda à Licitação — 52 atividades';
+    existing.desc  = 'Após a aprovação do PCA: projetos, licitação e execução até a conclusão da obra — 46 atividades';
   } else {
-    // Add at position 0 (before Execução Direta)
-    PROCS.list.unshift({
+    // Ordem canônica: logo após o Planejamento Estratégico
+    const _peIdx = PROCS.list.findIndex(p => p.id === 'p_planejamento');
+    const _indProc = {
       id: 'p_indireta',
-      name: 'Execução Indireta de Obra',
+      name: 'Execução Indireta de Obra — da Licitação à Conclusão',
       icon: '⚖️',
-      desc: 'Da Identificação da Demanda à Licitação — 52 atividades',
+      desc: 'Após a aprovação do PCA: projetos, licitação e execução até a conclusão da obra — 46 atividades',
       steps: indSteps,
       feedbacks: [], doneSteps: [], currentStep: 0,
-    });
+    };
+    if (_peIdx >= 0) PROCS.list.splice(_peIdx + 1, 0, _indProc);
+    else PROCS.list.unshift(_indProc);
   }
   renderProcBar();
 })();
@@ -3612,7 +4206,7 @@ function renderMacroSidebar() {
     </div>`).join('') + `
     <div class="legend-item" style="margin-top:6px">
       <div style="width:20px;height:14px;border:1.5px dashed #f59e0b;background:#fffbeb;transform:rotate(45deg);border-radius:2px;flex-shrink:0"></div>
-      Gateway (decisão)
+      Ponto de decisão
     </div>`;
 }
 
@@ -3684,7 +4278,7 @@ function renderMacroCards() {
       if (gw && (allowedActs === null || allowedActs.some(id => id === a.id))) {
         html += `<div class="macro-gateway" onclick="showGatewayDetail('${Object.keys(MACRO_GATEWAYS).find(k => MACRO_GATEWAYS[k].after === a.id)}')">
           <div class="macro-gateway-diamond"></div>
-          <span style="font-weight:600">Gateway:</span>&nbsp;${sanitize(gw.question)}
+          <span style="font-weight:600">Decisão:</span>&nbsp;${sanitize(gw.question)}
         </div>`;
       }
     });
@@ -3715,7 +4309,7 @@ function showGatewayDetail(gwId) {
       <div class="macro-detail-id">${gwId}</div>
       <div class="macro-detail-title">${sanitize(gw.name)}</div>
       <div class="macro-detail-pills">
-        <span class="macro-detail-pill" style="background:#fef9c3;color:#854d0e">⬟ Gateway XOR</span>
+        <span class="macro-detail-pill" style="background:#fef9c3;color:#854d0e">⬟ Ponto de decisão</span>
         <span class="macro-detail-pill" style="background:#f3f4f6;color:#374151">${gw.stage}</span>
       </div>
     </div>
@@ -3730,7 +4324,7 @@ function showGatewayDetail(gwId) {
       </div>
       <div class="macro-detail-section">
         <div class="macro-detail-section-label">Tipo de fluxo</div>
-        <div class="macro-detail-desc">Gateway exclusivo (XOR) — apenas um caminho é seguido conforme resultado da decisão. O caminho negativo retorna ao ponto de correção mais próximo.</div>
+        <div class="macro-detail-desc">Ponto de decisão (sim/não) — apenas um caminho é seguido conforme o resultado. O caminho negativo retorna à etapa de correção mais próxima.</div>
       </div>
     </div>`;
 }
@@ -3765,6 +4359,7 @@ function showActDetail(a) {
         <div class="macro-detail-section-label">Descrição</div>
         <div class="macro-detail-desc">${sanitize(a.desc)}</div>
       </div>
+      ${a.alert?`<div class="macro-detail-section"><div class="macro-detail-section-label">Ponto de atenção</div><div class="macro-detail-desc" style="color:#92400e">${sanitize(a.alert)}</div></div>`:''}
       ${inputsHtml ? `<div class="macro-detail-section"><div class="macro-detail-section-label">Entradas</div><div class="macro-detail-list">${inputsHtml}</div></div>` : ''}
       ${outputsHtml ? `<div class="macro-detail-section"><div class="macro-detail-section-label">Saídas</div><div class="macro-detail-list">${outputsHtml}</div></div>` : ''}
       <div class="macro-detail-section"><div class="macro-detail-section-label">Documentos</div>${docsHtml}</div>
@@ -4069,25 +4664,36 @@ function macroToSteps(acts) {
   const gwMap = {};
   if (typeof MACRO_GATEWAYS!=='undefined')
     Object.entries(MACRO_GATEWAYS).forEach(([k,v])=>{ gwMap[v.after]=k; });
-  return acts.map((a,i)=>({
-    id:a.id, num:String(i+1), phase:sp[a.stage]||'p1', actor:lm[a.lane]||'ses',
-    title:a.name, desc:a.desc, items:a.outputs||[], alert:null,
-    docs:(a.docs||[]).map(d=>dn[d]||d), btnLabel:'Concluído',
-    attachments:[], comments:[],
-    _stage:a.stage, _lane:a.lane, _btype:a.type,
-    _inputs:a.inputs||[], _systems:(a.systems||[]).map(s=>sn[s]||s),
-    _gw:a.gateway_after||null, _children:a.children||[], _requirements:a.requirements||[],
-  }));
+  return acts.map((a,i)=>{
+    const _docs=(a.docs||[]).map(d=>dn[d]||d);
+    const _sys=(a.systems||[]).map(s=>sn[s]||s);
+    const _passos=[];
+    if(a.inputs&&a.inputs.length)  _passos.push('Reunir os insumos: '+a.inputs.join(', ').toLowerCase()+'.');
+    _passos.push('Executar a atividade conforme a descrição, as normas aplicáveis e o ponto de atenção.');
+    if(_docs.length)  _passos.push('Emitir e registrar: '+_docs.join(', ')+'.');
+    if(_sys.length)   _passos.push('Registrar no(s) sistema(s): '+_sys.join(', ')+'.');
+    if(a.outputs&&a.outputs.length) _passos.push('Encaminhar como resultado: '+a.outputs.join(', ')+'.');
+    return {
+      id:a.id, num:String(i+1), phase:sp[a.stage]||'p1', actor:lm[a.lane]||'ses',
+      title:a.name, desc:a.desc, items:a.outputs||[], alert:a.alert||null,
+      docs:_docs, btnLabel:'Concluído', _passos,
+      attachments:[], comments:[],
+      _stage:a.stage, _lane:a.lane, _btype:a.type,
+      _inputs:a.inputs||[], _systems:_sys,
+      _gw:a.gateway_after||null, _children:a.children||[], _requirements:a.requirements||[],
+    };
+  });
 }
 
 /* --- switchTab --------------------------------------- */
 function switchTab(tab) {
-  ['flow','bpmn','fb'].forEach(t=>{
+  ['flow','bpmn','fb','macro'].forEach(t=>{
     document.getElementById('tab-'+t)?.classList.toggle('active',t===tab);
     document.getElementById('pane-'+t)?.classList.toggle('active',t===tab);
   });
   // actorFilterBar is inside pane-flow — shows automatically with the pane
   if (tab==='fb') renderFBPage();
+  if (tab==='macro') initMacroPane();
   if (tab==='bpmn') { bpmnReady=false; loadBPMN(buildBPMN(steps)); }
 }
 
@@ -4096,14 +4702,14 @@ function advance(i) {
   doneSteps.add(i); currentStep=i+1; openCard=currentStep<steps.length?currentStep:-1; editCard=-1;
   _activeProc().doneSteps=[...doneSteps]; _activeProc().currentStep=currentStep; _saveProcesses();
   addHistory('Etapa concluída', i, steps[i]?.title?.substring(0,50)||'');
-  renderFlow();
+  renderFlow();applyExecutionOverlays();
   setTimeout(()=>{ const el=document.getElementById('card-'+currentStep); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); },100);
   if(currentStep>=steps.length) setTimeout(()=>document.getElementById('celebrateOverlay').classList.add('show'),600);
 }
 function resetFlow() {
   doneSteps.clear(); currentStep=0; openCard=0; editCard=-1; activeActor=null;
   _activeProc().doneSteps=[]; _activeProc().currentStep=0; _saveProcesses();
-  closeCelebrate(); renderFlow();
+  closeCelebrate(); renderFlow();applyExecutionOverlays();
   document.getElementById('flowMain').scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -4195,7 +4801,28 @@ let modeler=null;
 function getModeler(){
   if(modeler) return modeler;
   if(typeof BpmnJS==='undefined') return null;
-  modeler=new BpmnJS({container:'#bpmnCanvas'});
+  modeler=new BpmnJS({
+    container:'#bpmnCanvas',
+    additionalModules:[...(window.Minimap?[window.Minimap]:[])],
+  });
+  modeler.on('element.hover',({element})=>{
+    if(!element.businessObject||element.waypoints) return;
+    const c=modeler.get('canvas');
+    c.addMarker(element.id,'highlight');
+    (element.incoming||[]).forEach(f=>c.addMarker(f.id,'highlight-conn'));
+    (element.outgoing||[]).forEach(f=>c.addMarker(f.id,'highlight-conn'));
+    document.getElementById('bpmnCanvas').classList.add('focus-mode');
+    updateBpmnBreadcrumb(element);
+  });
+  modeler.on('element.out',({element})=>{
+    if(!element.businessObject||element.waypoints) return;
+    const c=modeler.get('canvas');
+    c.removeMarker(element.id,'highlight');
+    (element.incoming||[]).forEach(f=>c.removeMarker(f.id,'highlight-conn'));
+    (element.outgoing||[]).forEach(f=>c.removeMarker(f.id,'highlight-conn'));
+    document.getElementById('bpmnCanvas').classList.remove('focus-mode');
+    updateBpmnBreadcrumb(null);
+  });
   modeler.on('selection.changed',({newSelection})=>{
     bpmnSelected=newSelection[0]||null;
     const ppEmpty=document.getElementById('ppEmpty'),ppForm=document.getElementById('ppForm'),ppType=document.getElementById('ppType');
@@ -4210,13 +4837,18 @@ function getModeler(){
     document.getElementById('ppSave').style.display=canEdit?'block':'none';
     document.getElementById('ppLock').style.display=canEdit?'none':'block';
   });
+  const ppStatusEl=document.getElementById('ppStatus');
+  if(ppStatusEl&&bpmnSelected){
+    const mm=bpmnSelected.businessObject&&String(bpmnSelected.businessObject.id||'').match(/^T_(\d+)$/);
+    ppStatusEl.textContent=mm?(doneSteps.has(+mm[1])?'✓ Concluída':(+mm[1]===currentStep?'▶ Em andamento':'○ Pendente')):'—';
+  }
   return modeler;
 }
 async function loadBPMN(xml){
   const m=getModeler();
   if(!m) return;
   document.getElementById('syncOverlay').classList.add('show');
-  try{await m.importXML(xml);m.get('canvas').zoom('fit-viewport');bpmnReady=true;}
+  try{await m.importXML(xml);m.get('canvas').zoom('fit-viewport');bpmnReady=true;applyExecutionOverlays();}
   catch(e){console.error('BPMN:',e);}
   document.getElementById('syncOverlay').classList.remove('show');
   const pn = document.getElementById('bpmnProcName');
@@ -4493,6 +5125,7 @@ function showStepDetail(idx) {
     </div>
     <div style="padding:12px 14px;overflow-y:auto">
       ${s.desc?`<div style="font-size:12.5px;color:var(--gray-600);line-height:1.7;margin-bottom:12px">${sanitize(s.desc)}</div>`:''}
+      ${s._passos&&s._passos.length?`<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:6px">Passo a passo</div><ol style="margin:0;padding-left:16px">${s._passos.map(pp=>`<li style="font-size:12px;color:var(--gray-600);line-height:1.6;margin-bottom:2px">${sanitize(pp)}</li>`).join('')}</ol></div>`:''}
       ${itemsHtml?`<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:6px">Atividades</div>${itemsHtml}</div>`:''}
       ${inHtml?`<div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:5px">Entradas</div>${inHtml}</div>`:''}
       <div style="margin-bottom:10px"><div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--gray-400);margin-bottom:5px">Documentos</div>${docsHtml}</div>
@@ -4540,6 +5173,94 @@ function updateSbIndicator() {
     el.style.color = 'var(--green)';
   }
 }
+
+
+/* ===================================================
+   BPMN EXPERIENCE UPGRADE
+   focus mode · status de execução · busca global ·
+   minimap · legenda · breadcrumb · atalhos · dark mode
+=================================================== */
+function updateBpmnBreadcrumb(el){
+  const bc=document.getElementById('bpmnBreadcrumb'); if(!bc) return;
+  const proc=_activeProc()?.name||'Processo';
+  bc.innerHTML=sanitize(proc)+(el?` <span class="bc-sep">›</span> <span class="bc-current">${sanitize((el.businessObject?.name||el.type||'').replace(/\n/g,' '))}</span>`:'');
+}
+
+function applyExecutionOverlays(){
+  if(!modeler||!bpmnReady) return;
+  const canvas=modeler.get('canvas'),reg=modeler.get('elementRegistry');
+  reg.forEach(el=>{canvas.removeMarker(el.id,'bpmn-status-done');canvas.removeMarker(el.id,'bpmn-status-current');});
+  doneSteps.forEach(i=>{if(reg.get('T_'+i))canvas.addMarker('T_'+i,'bpmn-status-done');});
+  if(currentStep<steps.length&&reg.get('T_'+currentStep)) canvas.addMarker('T_'+currentStep,'bpmn-status-current');
+}
+
+/* ---- busca global no diagrama ---- */
+let bpmnHits=[],bpmnHitIdx=-1;
+function bpmnSearch(q){
+  q=(q||'').trim().toLowerCase();
+  const count=document.getElementById('bpmnSearchCount');
+  if(!modeler||!bpmnReady) return;
+  const canvas=modeler.get('canvas'),reg=modeler.get('elementRegistry');
+  bpmnHits.forEach(id=>canvas.removeMarker(id,'bpmn-search-hit'));
+  if(bpmnHits[bpmnHitIdx]) canvas.removeMarker(bpmnHits[bpmnHitIdx],'bpmn-search-current');
+  bpmnHits=[]; bpmnHitIdx=-1;
+  if(!q){ if(count) count.textContent=''; return; }
+  reg.forEach(el=>{
+    const nm=(el.businessObject?.name||'').toLowerCase();
+    if(nm&&nm.includes(q)&&el.type!=='label') bpmnHits.push(el.id);
+  });
+  bpmnHits.forEach(id=>canvas.addMarker(id,'bpmn-search-hit'));
+  if(count) count.textContent=bpmnHits.length?`${bpmnHits.length} encontrado(s)`:'nenhum';
+  if(bpmnHits.length) bpmnGoTo(0);
+}
+function bpmnGoTo(n){
+  if(!bpmnHits.length||!modeler) return;
+  const canvas=modeler.get('canvas');
+  if(bpmnHits[bpmnHitIdx]) canvas.removeMarker(bpmnHits[bpmnHitIdx],'bpmn-search-current');
+  bpmnHitIdx=((n%bpmnHits.length)+bpmnHits.length)%bpmnHits.length;
+  const id=bpmnHits[bpmnHitIdx];
+  canvas.addMarker(id,'bpmn-search-current');
+  const el=modeler.get('elementRegistry').get(id);
+  if(el) canvas.scrollToElement(el);
+  const count=document.getElementById('bpmnSearchCount');
+  if(count) count.textContent=`${bpmnHitIdx+1}/${bpmnHits.length}`;
+}
+function bpmnSearchNav(d){
+  if(!bpmnHits.length){ bpmnSearch(document.getElementById('bpmnSearchInput')?.value); return; }
+  bpmnGoTo(bpmnHitIdx+d);
+}
+
+/* ---- minimap & legenda ---- */
+function bToggleMinimap(){
+  if(!modeler||!bpmnReady){ toast('Abra o diagrama primeiro.','error'); return; }
+  const mm=modeler.get('minimap',false);
+  if(!mm){ toast('Minimap indisponível (biblioteca não carregada).','error'); return; }
+  mm.toggle();
+}
+function toggleBpmnLegend(){
+  const l=document.querySelector('.bpmn-legend');
+  if(l) l.classList.toggle('hidden');
+}
+
+/* ---- atalhos de teclado (aba BPMN) ---- */
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('pane-bpmn')?.classList.contains('active')) return;
+  const t=e.target;
+  if(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable)) return;
+  const m=getModeler();
+  if(e.key==='Escape'&&m&&bpmnReady){
+    m.get('selection').select(null);
+    const si=document.getElementById('bpmnSearchInput');
+    if(si){ si.value=''; bpmnSearch(''); }
+    return;
+  }
+  if(!m||!bpmnReady) return;
+  if(e.key==='+'||e.key==='='){ e.preventDefault(); bZoomIn(); }
+  else if(e.key==='-'){ e.preventDefault(); bZoomOut(); }
+  else if(e.key==='0'){ e.preventDefault(); m.get('canvas').zoom(1.0); }
+  else if(e.key==='f'||e.key==='F'){ e.preventDefault(); bFit(); }
+  else if(e.key==='m'||e.key==='M'){ e.preventDefault(); bToggleMinimap(); }
+});
 
 /* --- INIT ---------------------------------------------- */
 // Clear legacy keys
