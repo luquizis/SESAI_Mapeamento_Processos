@@ -15,6 +15,12 @@ de contratação/execução** do documento *Fluxo Detalhado DSEI — Processo Li
 | 📋 Contratação Direta | Dispensa / Inexigibilidade | Fluxo Detalhado (pág. 6) | 9 etapas |
 | 🏛️ Incorporação de Imóvel | Aquisição de imóvel existente | Fluxo Detalhado (pág. 7) | 6 etapas |
 
+> ⚠️ **Divergência conhecida:** as contagens acima (fontes/JSONs de `data/`) diferem das
+> versões internas carregadas automaticamente pelo `index.html` — Execução Indireta **46 etapas**,
+> Execução Direta **18**, Contratação Direta **10**, Incorporação **9**. A versão oficial de cada
+> processo está **pendente de validação**; ver o comparativo detalhado em
+> `comparacao-versoes-processos.md`.
+
 ### Fluxo-mestre (macro) — Gatilhos determinantes
 ```
 Início → Planejamento estratégico → Processo licitatório/contratação
@@ -63,12 +69,25 @@ Na plataforma (com login de editor): **＋ Novo processo → Importar JSON** e c
 
 Ou versione-os direto no repositório e referencie no `PROCS.list` do `index.html`.
 
-## 🔑 Credenciais (modo de edição)
+## 🔑 Acesso ao modo de edição
 
-| Usuário | Senha | Perfil |
-|---------|-------|--------|
-| `editor` | `sesai2024` | Editor de fluxo |
-| `admin` | `sesai@admin` | Administrador |
+As credenciais **não ficam mais neste repositório** — solicite-as à coordenação.
+Importante: o login da plataforma compara a senha no navegador e serve apenas para
+condicionar a exibição dos controles de edição; **não é uma barreira de segurança**.
+As senhas que estavam neste arquivo até a v5.0 devem ser consideradas expostas
+(permanecem no histórico do Git) e precisam ser trocadas. A proteção real dos
+dados depende das políticas (RLS) configuradas no Supabase.
+
+## ☁️ Persistência e sincronização
+
+- Os dados ficam no **localStorage** do navegador e, quando configurado, são
+  sincronizados com uma tabela `proc_sync` no **Supabase** (registro único).
+- A sincronização verifica o carimbo de data do registro remoto e **pergunta antes
+  de sobrescrever** dados mais recentes gravados por outra pessoa.
+- Anexos grandes (~150 KB ou mais em base64) **não sobem para a nuvem**: ficam
+  salvos apenas no navegador em que foram anexados (sinalizados como "somente local").
+- Antes de qualquer migração automática de versão de processo, um **backup** da
+  versão anterior é gravado no navegador (chave `sesai_backup_*`).
 
 ## 👥 Atores
 

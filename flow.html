@@ -212,7 +212,7 @@ footer{border-top:1px solid var(--cinza-200);padding:12px 0;font-size:11px;color
   <div class="cel-title">Fluxo concluído!</div>
   <div class="cel-sub">Todas as 15 etapas foram percorridas. Não se esqueça de registrar sua contribuição sobre o processo.</div>
   <div class="cel-actions">
-    <button class="cel-btn primary" onclick="window.parent.postMessage({type:'openFeedback',step:'geral'},'*')">💬 Registrar contribuição</button>
+    <button class="cel-btn primary" onclick="window.parent.postMessage({type:'openFeedback',step:'geral'},location.origin)">💬 Registrar contribuição</button>
     <button class="cel-btn secondary" onclick="resetAll()">↺ Reiniciar</button>
   </div>
 </div>
@@ -553,7 +553,6 @@ let STEPS_DATA = JSON.parse(localStorage.getItem('sesai_steps_v3') || 'null') ||
     "isLast": true,
     "attachments": []
   }
-]
 ];
 
 let currentStep=0, completedSteps=new Set(), openCard=-1, isEditMode=false, editingCard=-1;
@@ -605,7 +604,7 @@ function renderCards(){
         actionHtml=`<button class="btn-advance" style="background:${ph.color}" onclick="advance(${i})">${s.btnLabel}</button>`;
         if(s.optional) actionHtml+=`<button class="btn-skip" onclick="advance(${i})">${s.optLabel||'Pular'}</button>`;
       }
-      actionHtml+=`<button class="btn-comment" onclick="window.parent.postMessage({type:'openFeedback',step:'${s.num}'},'*')">💬 Comentar</button>`;
+      actionHtml+=`<button class="btn-comment" onclick="window.parent.postMessage({type:'openFeedback',step:'${s.num}'},location.origin)">💬 Comentar</button>`;
       if(isEditMode && !isDone){
         actionHtml+=`<button class="btn-edit-step" onclick="toggleEdit(${i})">✏️ Editar</button>`;
       }
@@ -699,7 +698,7 @@ function resetAll(){ currentStep=0; completedSteps.clear(); openCard=0; editingC
 
 // EDIT
 function toggleEdit(i){
-  if(!isEditMode){ window.parent.postMessage({type:'loginNeeded'},'*'); return; }
+  if(!isEditMode){ window.parent.postMessage({type:'loginNeeded'},location.origin); return; }
   editingCard=(editingCard===i)?-1:i;
   openCard=i;
   renderAll();
@@ -713,20 +712,21 @@ function saveStepEdit(i){
   if(desc)  STEPS_DATA[i].desc=desc;
   localStorage.setItem('sesai_steps_v3',JSON.stringify(STEPS_DATA));
   editingCard=-1; renderAll();
-  window.parent.postMessage({type:'toast',msg:'✅ Etapa atualizada com sucesso!'},'*');
+  window.parent.postMessage({type:'toast',msg:'✅ Etapa atualizada com sucesso!'},location.origin);
 }
 
 function renderAll(){ renderPhases(); renderCards(); renderMiniSteps(); renderPhBars(); renderProgress(); }
 
 // Listen for editMode from parent
 window.addEventListener('message',e=>{
+  if(e.origin!==location.origin) return;
   if(e.data?.type==='editMode'){
     isEditMode=e.data.value;
     renderAll();
   }
 });
 // ask parent for current edit mode on load
-window.parent.postMessage({type:'requestEditMode'},'*');
+window.parent.postMessage({type:'requestEditMode'},location.origin);
 
 openCard=0; renderAll();
 </script>

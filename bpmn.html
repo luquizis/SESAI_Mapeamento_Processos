@@ -376,7 +376,7 @@ function zoomOut()  { const c=modeler.get('canvas'); c.zoom(c.zoom()*.82); }
 function doUndo()   { if(!isEditMode){requestLogin();return;} modeler.get('commandStack').undo(); }
 function doRedo()   { if(!isEditMode){requestLogin();return;} modeler.get('commandStack').redo(); }
 
-function requestLogin(){ window.parent.postMessage({type:'loginNeeded'},'*'); }
+function requestLogin(){ window.parent.postMessage({type:'loginNeeded'},location.origin); }
 
 async function exportBPMN(){
   const{xml}=await modeler.saveXML({format:true});
@@ -430,10 +430,11 @@ function applyEditMode(val){
 
 // listen from parent
 window.addEventListener('message',e=>{
+  if(e.origin!==location.origin) return;
   if(e.data?.type==='editMode') applyEditMode(e.data.value);
-  if(e.data?.type==='requestEditMode') window.parent.postMessage({type:'requestEditMode'},'*');
+  if(e.data?.type==='requestEditMode') window.parent.postMessage({type:'requestEditMode'},location.origin);
 });
-window.parent.postMessage({type:'requestEditMode'},'*');
+window.parent.postMessage({type:'requestEditMode'},location.origin);
 </script>
 </body>
 </html>
