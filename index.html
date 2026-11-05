@@ -2971,7 +2971,7 @@ function buildBPMN(stepsData) {
   const laneExtra = {};
   const addLaneExtra = (a, id) => { (laneExtra[a] = laneExtra[a] || []).push(id); };
 
-  const flowEdge = (sfId, src, tgt, x1, y1, x2, y2, label) => {
+  const flowEdge = (sfId, src, tgt, x1, y1, x2, y2, label, lblBounds) => {
     const nameAttr = label ? ` name="${sanitizeXml(label)}"` : '';
     seqFlowDefs += `    <sequenceFlow id="${sfId}"${nameAttr} sourceRef="${src}" targetRef="${tgt}"/>`;
     let wps;
@@ -2981,7 +2981,12 @@ function buildBPMN(stepsData) {
       const midX = Math.round((x1 + x2) / 2);
       wps = `<di:waypoint x="${Math.round(x1)}" y="${Math.round(y1)}"/><di:waypoint x="${midX}" y="${Math.round(y1)}"/><di:waypoint x="${midX}" y="${Math.round(y2)}"/><di:waypoint x="${Math.round(x2)}" y="${Math.round(y2)}"/>`;
     }
-    seqFlowEdges += `      <bpmndi:BPMNEdge id="ed_${sfId}" bpmnElement="${sfId}">${wps}</bpmndi:BPMNEdge>`;
+    // Rótulos de aresta sem Bounds explícitos são posicionados pelo bpmn-js no
+    // meio da aresta — no fork isso caía em cima do gateway/das tarefas.
+    const lblXml = (label && lblBounds)
+      ? `<bpmndi:BPMNLabel><dc:Bounds x="${Math.round(lblBounds.x)}" y="${Math.round(lblBounds.y)}" width="${lblBounds.w}" height="${lblBounds.h}"/></bpmndi:BPMNLabel>`
+      : '';
+    seqFlowEdges += `      <bpmndi:BPMNEdge id="ed_${sfId}" bpmnElement="${sfId}">${wps}${lblXml}</bpmndi:BPMNEdge>`;
   };
 
   const emitTask = (i) => {
@@ -3067,7 +3072,10 @@ function buildBPMN(stepsData) {
         tr.idxs.forEach(idx => {
           const tt = emitTask(idx);
           const lbl = pId === GWF_ID ? `Trilha ${tr.name}` : undefined;
-          flowEdge(`sf_${pId}_T_${idx}`, pId, `T_${idx}`, pX, pY, tt.left, tt.cy, lbl);
+          // Rótulo da trilha como "cabeçalho da linha": borda esquerda da raia,
+          // acima da seta — faixa sempre vazia, longe do gateway e das tarefas.
+          const lblB = lbl ? { x: ELEM_X0 + 8, y: tt.cy - 27, w: 76, h: 13 } : null;
+          flowEdge(`sf_${pId}_T_${idx}`, pId, `T_${idx}`, pX, pY, tt.left, tt.cy, lbl, lblB);
           pId = tt.id; pX = tt.right; pY = tt.cy;
           if (stepsData[idx].optional) { const g = emitXor(idx, tt); pId = g.id; pX = g.right; pY = g.cy; }
         });
@@ -3089,7 +3097,12 @@ function buildBPMN(stepsData) {
       const gwX2 = prevX + 30;
       const gwY2 = prevY - GW_SIZE / 2;
       gwDefs += `    <exclusiveGateway id="${gwId2}" name="${sanitizeXml(gwm.question)}"/>`;
-      gwShapes += `      <bpmndi:BPMNShape id="sh_${gwId2}" bpmnElement="${gwId2}" isMarkerVisible="true"><dc:Bounds x="${gwX2}" y="${gwY2}" width="${GW_SIZE}" height="${GW_SIZE}"/><bpmndi:BPMNLabel><dc:Bounds x="${gwX2 - 20}" y="${gwY2 - 22}" width="96" height="14"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>`;
+      // Rótulo dimensionado pelo nº de linhas estimado (quebra em ~14 caracteres
+      // por linha a 96px) e posicionado de baixo para cima: nunca invade o gateway.
+      const _qLen = String(gwm.question || '').length;
+      const _qLines = Math.max(1, Math.ceil(_qLen / 14));
+      const _qH = _qLines * 14 + 4;
+      gwShapes += `      <bpmndi:BPMNShape id="sh_${gwId2}" bpmnElement="${gwId2}" isMarkerVisible="true"><dc:Bounds x="${gwX2}" y="${gwY2}" width="${GW_SIZE}" height="${GW_SIZE}"/><bpmndi:BPMNLabel><dc:Bounds x="${gwX2 - 26}" y="${gwY2 - 6 - _qH}" width="96" height="${_qH}"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>`;
       addLaneExtra(stepsData[i].actor || 'ses', gwId2);
       flowEdge(`sf_${prevId}_${gwId2}`, prevId, gwId2, prevX, prevY, gwX2, prevY, 'Sim');
       const loopTarget = (typeof GW_LOOP !== 'undefined') ? GW_LOOP[stepsData[i]._gw] : null;
@@ -3259,8 +3272,12 @@ async function bPrint(){
     }catch(e){ /* offline: segue com o CSS mínimo */ }
     const m=getModeler();
     const canvas=m.get('canvas'),reg=m.get('elementRegistry');
-    const gfx=canvas.getContainer().querySelector('svg');
-    if(!gfx){toast('Nada para imprimir.','error');return;}
+    // O container pode conter SVGs de overlays ANTES do diagrama (ícones de
+    // drill-down de subprocessos, lupa da busca etc.). O SVG do diagrama é o
+    // filho direto do container e tem data-element-id — os ícones não.
+    const _cont=canvas.getContainer();
+    const gfx=_cont.querySelector(':scope > svg')||_cont.querySelector('svg[data-element-id]')||_cont.querySelector('svg');
+    if(!gfx||!gfx.querySelector('.djs-element')){toast('Nada para imprimir.','error');return;}
     let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
     reg.forEach(el=>{try{const b=el.businessObject;if(!b)return;const g=reg.getGraphics(el);if(!g)return;const bb2=g.getBBox?g.getBBox():null;if(!bb2)return;minX=Math.min(minX,bb2.x);minY=Math.min(minY,bb2.y);maxX=Math.max(maxX,bb2.x+bb2.width);maxY=Math.max(maxY,bb2.y+bb2.height);}catch(e){}});
     if(!isFinite(minX)){const vb=canvas.viewbox();minX=vb.x;minY=vb.y;maxX=vb.x+vb.width;maxY=vb.y+vb.height;}
