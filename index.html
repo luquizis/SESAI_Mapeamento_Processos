@@ -72,7 +72,8 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
 .actor-filter-bar{display:flex;align-items:center;gap:6px;padding:0 20px;height:38px;background:#EEF0F4;border-bottom:1px solid var(--gray-200);flex-shrink:0;overflow-x:auto}
 .actor-filter-bar::-webkit-scrollbar{height:0}
 .actor-filter-label{font-size:10.5px;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.07em;white-space:nowrap;margin-right:2px}
-.actor-chip{display:flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;border:1px solid var(--gray-200);background:var(--white);font-size:11.5px;font-weight:500;color:var(--gray-500);cursor:pointer;transition:all var(--transition);white-space:nowrap;flex-shrink:0}
+#actorChips{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.actor-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;border:1px solid var(--gray-200);background:var(--white);font-size:11.5px;font-weight:500;color:var(--gray-500);cursor:pointer;transition:all var(--transition);white-space:nowrap;flex-shrink:0}
 .actor-chip:hover{border-color:var(--gray-300);color:var(--gray-800)}
 .actor-chip.active{color:white;border-color:transparent;font-weight:600}
 .actor-chip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
@@ -3265,10 +3266,32 @@ async function bPrint(){
     if(!isFinite(minX)){const vb=canvas.viewbox();minX=vb.x;minY=vb.y;maxX=vb.x+vb.width;maxY=vb.y+vb.height;}
     const pad=40;minX-=pad;minY-=pad;maxX+=pad;maxY+=pad;
     const w=maxX-minX,h=maxY-minY;
-    // A4 paisagem em mm: 297x210. Margens internas: 12mm laterais, 8mm sup/inf.
-    // Em px @96dpi: pagina 1122x793; area do tile: 1032 x 703 (cabecalho consome 30px no topo)
-    const TW=1032,TH=703;
-    let scale=Math.min(TW/w,1.6);scale=Math.max(scale,0.2);
+    // Dimensionamento priorizando LEGIBILIDADE:
+    // 1) se couber em 1 folha A4 com escala >= 72% -> 1 folha (amplia ate 160% se pequeno);
+    // 2) se nao couber legivel em A4, mas couber em A3 -> oferece 1 folha A3 paisagem;
+    // 3) caso contrario -> divide em varias folhas A4 mantendo escala minima de 72%.
+    // A4 paisagem: 297x210mm (1122x793px @96dpi) -> tile 1032x703 (margens 45px lat, 60/30 vert)
+    // A3 paisagem: 420x297mm (1587x1122px @96dpi) -> tile 1497x1032 (mesmas margens)
+    const PRINT_FMT={
+      A4:{tw:1032,th:703,page:'A4',sheetW:'297mm',sheetH:'209.5mm'},
+      A3:{tw:1497,th:1032,page:'A3',sheetW:'420mm',sheetH:'296.5mm'}
+    };
+    const MIN_SCALE=0.72,MAX_SCALE=1.6;
+    let fmt=PRINT_FMT.A4;
+    let TW=fmt.tw,TH=fmt.th;
+    let scale=Math.min(TW/w,TH/h,MAX_SCALE);
+    if(scale<MIN_SCALE){
+      const sA3=Math.min(PRINT_FMT.A3.tw/w,PRINT_FMT.A3.th/h,MAX_SCALE);
+      if(sA3>=MIN_SCALE){
+        if(confirm('O diagrama fica pequeno demais para ler em 1 folha A4.\n\nOK = imprimir em 1 folha A3 (paisagem)\nCancelar = dividir em várias folhas A4 legíveis')){
+          fmt=PRINT_FMT.A3;TW=fmt.tw;TH=fmt.th;scale=sA3;
+        }else scale=MIN_SCALE;
+      }else if(confirm('O diagrama é grande demais para uma única folha.\n\nOK = dividir em várias folhas A4 com letra legível (recomendado)\nCancelar = 1 folha A3 com o diagrama inteiro (visão geral, letra pequena)')){
+        scale=MIN_SCALE;
+      }else{
+        fmt=PRINT_FMT.A3;TW=fmt.tw;TH=fmt.th;scale=sA3;
+      }
+    }
     const contentW=w*scale,contentH=h*scale;
     const cols=Math.max(1,Math.ceil(contentW/TW));
     const rows=Math.max(1,Math.ceil(contentH/TH));
@@ -3304,7 +3327,7 @@ async function bPrint(){
         clone.setAttribute('height',Math.round(contentH));
         const svgStr=serializer.serializeToString(clone);
         pages+=`<div class="sheet">
-          <div class="phead"><span class="pt">${sanitize(title)}</span><span>${date} · SESAI/MS · Página ${r*cols+c+1}/${total}</span></div>
+          <div class="phead"><span class="pt">${sanitize(title)}</span><span>${date} · SESAI/MS · ${fmt.page} · escala ${Math.round(scale*100)}% · Página ${r*cols+c+1}/${total}</span></div>
           <div class="tile" style="left:${Math.round(45-c*TW)}px;top:${Math.round(60-r*TH)}px">${svgStr}</div>
         </div>`;
       }
@@ -3315,11 +3338,11 @@ async function bPrint(){
 <meta charset="UTF-8">
 <title>SESAI — ${sanitize(title)}</title>
 <style>
-  @page{size:A4 landscape;margin:0}
+  @page{size:${fmt.page} landscape;margin:0}
   ${bpmnCss}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#111}
-  .sheet{position:relative;width:297mm;height:209.5mm;overflow:hidden;page-break-after:always;break-after:page}
+  .sheet{position:relative;width:${fmt.sheetW};height:${fmt.sheetH};overflow:hidden;page-break-after:always;break-after:page}
   .sheet:last-of-type{page-break-after:auto;break-after:auto}
   .phead{position:absolute;left:12mm;top:8mm;right:12mm;display:flex;justify-content:space-between;align-items:flex-end;border-bottom:2px solid #1b4332;padding-bottom:4px;margin-bottom:4px;color:#1b4332}
   .pt{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
@@ -3379,7 +3402,7 @@ ${pages}
   </tbody>
 </table>
 </div>
-<scr'+'ipt>window.onload=()=>{window.print();}<\/script>
+<script>window.onload=()=>{window.print();}<\/script>
 </body></html>`);
     win.document.close();
   }catch(e){console.error(e);toast('Erro ao imprimir.','error');}
@@ -4765,7 +4788,7 @@ tr:nth-child(even) td{background:#f8fafc}
   <tbody>${rows}</tbody>
 </table>
 <div class="footer"><span>SESAI / Ministério da Saúde — Macroprocesso Vol. 2</span><span>Total: ${MACRO_ACTIVITIES.length} atividades</span></div>
-<scr'+'ipt>window.onload=()=>window.print()<\/script>
+<script>window.onload=()=>window.print()<\/script>
 </body></html>`);
   win.document.close();
 }
