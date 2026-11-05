@@ -106,6 +106,7 @@ button{font-family:var(--font);cursor:pointer} input,textarea,select{font-family
 
 /* STEP CARDS */
 .step-card{position:relative;background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);margin-bottom:6px;transition:border-color .2s,box-shadow .2s,opacity .2s;overflow:hidden}
+.step-card.actor-dim{opacity:.32;filter:grayscale(.55)}
 .step-card.locked{opacity:.42;pointer-events:none}
 .step-card.active{border-color:var(--gray-300);box-shadow:var(--shadow-md)}
 .step-card.done{background:var(--gray-50)}
@@ -656,6 +657,7 @@ body.theme-black .bpmn-legend{background:#1e293b;border-color:#334155;color:#cbd
 body.theme-green #bpmnCanvas .djs-container{background:#f0faf4}
 
 </style>
+<base target="_blank">
 <base target="_blank">
 <base target="_blank">
 <base target="_blank">
@@ -1374,6 +1376,7 @@ const USERS = {
   junior:  { pass:'sesai20242026',name:'Junior',         role:'Editor',        initials:'JU', canEdit:true },
   leticia: { pass:'sesai20242026',name:'Leticia',        role:'Editor',        initials:'LE', canEdit:true },
   luiz:    { pass:'sesai20242026',name:'Luiz',           role:'Editor',        initials:'LZ', canEdit:true },
+  lucas:   { pass:'sesai20242026',name:'Lucas',          role:'Editor',        initials:'LC', canEdit:true },
 };
 const PHASES = [
   { id:'p1', label:'Pré-obra',      color:'#1b4332', bg:'#f0faf4', steps:[] },
@@ -2485,6 +2488,57 @@ function buildSavePayload() {
   return toSave;
 }
 
+// Banner discreto para eventos de sincronização — não bloqueia a edição
+let _syncBanner = null;
+function _ensureSyncBanner() {
+  if (_syncBanner) return _syncBanner;
+  const d = document.createElement('div');
+  d.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:9999;'
+    + 'background:#1e293b;color:#fff;padding:10px 14px;border-radius:10px;font-size:12.5px;'
+    + 'display:none;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:92vw';
+  document.body.appendChild(d);
+  _syncBanner = d;
+  return d;
+}
+function showSyncBanner(msg, btnLabel, fn) {
+  const d = _ensureSyncBanner();
+  d.innerHTML = '<span>' + msg + '</span>'
+    + (btnLabel ? '<button id="syncBannerBtn" style="background:#22c55e;border:0;color:#052e12;font-weight:700;padding:5px 10px;border-radius:6px;cursor:pointer;white-space:nowrap">' + btnLabel + '</button>' : '')
+    + '<button id="syncBannerX" title="Dispensar" style="background:none;border:0;color:#94a3b8;cursor:pointer;font-size:14px">✕</button>';
+  d.style.display = 'flex';
+  document.getElementById('syncBannerX').onclick = () => { d.style.display = 'none'; };
+  if (fn) document.getElementById('syncBannerBtn').onclick = () => { d.style.display = 'none'; fn(); };
+}
+function hideSyncBanner() { if (_syncBanner) _syncBanner.style.display = 'none'; }
+
+// Verifica se a nuvem tem dados mais novos que a última sincronização desta aba
+async function checkRemoteNewer() {
+  if (!JBIN_CONFIGURED || !window._sbLastSync) return false;
+  try {
+    const res = await fetch(`${JBIN_URL}/rest/v1/${SB_TABLE}?id=eq.main&select=updated_at`, { headers: sbHeaders() });
+    if (!res.ok) return false;
+    const rows = await res.json();
+    const ts = rows && rows[0] && rows[0].updated_at;
+    return !!(ts && Date.parse(ts) > Date.parse(window._sbLastSync));
+  } catch(e) { return false; }
+}
+
+// Pull automático: a cada 45s e ao voltar para a aba. Só recarrega sozinho quando
+// não há edição em andamento nem alterações locais pendentes — caso contrário, avisa.
+async function pollCloudUpdates() {
+  if (!JBIN_CONFIGURED || document.hidden) return;
+  const newer = await checkRemoteNewer();
+  if (!newer) return;
+  if (editCard >= 0 || window._localDirty) {
+    showSyncBanner('☁️ Há alterações mais recentes na nuvem, feitas por outra pessoa.',
+      'Ver agora', () => { window._localDirty = false; jbinLoadAndRefresh(); });
+    return;
+  }
+  jbinLoadAndRefresh();
+}
+setInterval(pollCloudUpdates, 45000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) pollCloudUpdates(); });
+
 async function jbinLoad() {
   if (!JBIN_CONFIGURED) return null;
   try {
@@ -2542,6 +2596,12 @@ function sbIndicatorClick(){
 }
 
 async function jbinLoadAndRefresh() {
+  // Nunca sobrescreve a tela no meio de uma edição — avisa e deixa o usuário decidir
+  if (editCard >= 0) {
+    showSyncBanner('☁️ Dados novos da nuvem aguardando. Termine a edição atual antes de recarregar.',
+      'Recarregar mesmo assim', () => { editCard = -1; jbinLoadAndRefresh(); });
+    return;
+  }
   const cloud = await jbinLoad();
   if (!cloud || !cloud.list || !cloud.list.length) return;
   const indireta = PROCS.list.find(p => p.id === 'p_indireta');
@@ -2569,6 +2629,7 @@ async function jbinLoadAndRefresh() {
   feedbacks = _activeProc().feedbacks;
   localStorage.setItem('sesai_proc_v2', JSON.stringify(PROCS));
   renderProcBar(); renderFlow(); updateFBBadge();
+  window._localDirty = false; hideSyncBanner();
   const count = cloud.list.filter(p => p.id !== 'p_indireta').length;
   toast('Dados sincronizados da nuvem (' + count + ' processo' + (count !== 1 ? 's' : '') + ').', 'success');
 }
@@ -2690,8 +2751,14 @@ function _saveProcesses() {
     toast('⚠️ Falha ao gravar no armazenamento local (' + (e && e.name || 'erro') + '). '
       + 'Suas alterações podem se perder ao fechar a página — exporte um backup em JSON.', 'error');
   }
-  // 2. Save to cloud (async, non-blocking, com detecção de conflito)
-  if (JBIN_CONFIGURED) saveToCloud(buildSavePayload());
+  // 2. Save to cloud — debounce de 1,5s para agrupar edições rápidas e não
+  //    disparar uma sincronização a cada ação durante a edição
+  if (JBIN_CONFIGURED) {
+    window._localDirty = true;
+    updateSbIndicator();
+    if (_cloudSaveTimer) clearTimeout(_cloudSaveTimer);
+    _cloudSaveTimer = setTimeout(() => { _cloudSaveTimer = null; saveToCloud(buildSavePayload()); }, 1500);
+  }
 }
 
 // Envia ao Supabase com detecção simples de conflito: se o registro remoto foi
@@ -2700,7 +2767,8 @@ function saveToCloud(payload, opts) {
   const verbose = opts && opts.verbose;
   jbinSave(payload).then(r => {
     if (r.ok) {
-      window._sbLastSync = r.updatedAt; window._sbLastError = null;
+      window._sbLastSync = r.updatedAt; window._sbLastError = null; window._localDirty = false;
+      hideSyncBanner();
       if (window._attLocalOnly) toast('☁️ Sincronizado. Atenção: ' + window._attLocalOnly
         + ' anexo(s) grande(s) ficaram só neste navegador.', 'error');
       else if (verbose) toast('☁️ Dados sincronizados com a nuvem.', 'success');
@@ -2709,6 +2777,12 @@ function saveToCloud(payload, opts) {
     }
     if (r.conflict) {
       window._sbLastError = r.error; updateSbIndicator();
+      if (editCard >= 0) {
+        // Usuário no meio de uma edição — não interromper com diálogo modal
+        showSyncBanner('⚠️ Conflito: há dados mais novos na nuvem. Suas edições ainda não foram enviadas.',
+          'Resolver agora', () => saveToCloud(buildSavePayload(), { verbose:true }));
+        return;
+      }
       const when = r.remoteTs ? new Date(r.remoteTs).toLocaleString('pt-BR') : 'desconhecida';
       if (confirm('⚠️ Conflito de sincronização\n\nOs dados na nuvem foram alterados em '
         + when + ', depois da sua última sincronização — provavelmente por outra pessoa.\n\n'
@@ -2751,6 +2825,7 @@ let auth        = null;
 let bpmnReady   = false;
 let bpmnSelected= null;
 let syncTimer   = null;
+let _cloudSaveTimer = null;
 let dragSrcIdx  = null;
 let currentFileCardIdx = null;
 let confirmCallback = null;
@@ -2806,8 +2881,6 @@ function buildBPMN(stepsData) {
 
   const usedActors = [...new Set(stepsData.map(s => s.actor || 'ses'))];
   const activeLanes = LANE_ORDER.filter(a => usedActors.includes(a));
-  const laneYMap = {};
-  activeLanes.forEach((a, i) => { laneYMap[a] = Y_POOL + i * LANE_H + LANE_H / 2; });
 
   // ---- Trilhas paralelas (uma região por processo) ----
   let forkIdx = stepsData.findIndex(s => s._fork);
@@ -2829,7 +2902,32 @@ function buildBPMN(stepsData) {
       if (!tracks.length) { forkIdx = -1; joinIdx = -1; }
     } else { forkIdx = -1; }
   }
-  const spacing = (s, nxt) => ((s && s.optional) || (nxt && nxt.optional)) ? STEP_X + 60 : STEP_X;
+
+  // Raias que hospedam mais de uma trilha ganham uma linha vertical por trilha —
+  // sem isso, tarefas de trilhas diferentes do mesmo ator se sobrepunham.
+  const trackLanes = {}; // ator -> [nomes de trilha, na ordem das trilhas]
+  if (forkIdx >= 0) {
+    for (let k = forkIdx + 1; k < joinIdx; k++) {
+      const a = stepsData[k].actor || 'ses';
+      const t = stepsData[k]._track;
+      if (!t) continue;
+      (trackLanes[a] = trackLanes[a] || []);
+      if (!trackLanes[a].includes(t)) trackLanes[a].push(t);
+    }
+    Object.values(trackLanes).forEach(list =>
+      list.sort((x, y) => tracks.findIndex(tr => tr.name === x) - tracks.findIndex(tr => tr.name === y)));
+  }
+  const laneHOf = a => LANE_H * Math.max(1, (trackLanes[a] || []).length);
+
+  const laneYMap  = {}; // centro vertical da raia (tarefas fora de trilha, gateways)
+  const laneTopMap = {};
+  let _laneTopAcc = Y_POOL;
+  activeLanes.forEach(a => { laneTopMap[a] = _laneTopAcc; laneYMap[a] = _laneTopAcc + laneHOf(a) / 2; _laneTopAcc += laneHOf(a); });
+  const spacing = (s, nxt) => {
+    let d = ((s && s.optional) || (nxt && nxt.optional)) ? STEP_X + 60 : STEP_X;
+    if (s && s._gw) d += GW_SIZE + 66; // gateway de decisão após a etapa ocupa espaço próprio
+    return d;
+  };
 
   // ---- 1. Posição X de cada etapa ----
   const stepX = new Array(stepsData.length).fill(0);
@@ -2841,7 +2939,7 @@ function buildBPMN(stepsData) {
     curX += spacing(stepsData[i], stepsData[i + 1]);
     if (forkIdx >= 0 && i === forkIdx) {
       forkGX = curX + 20;
-      const baseX = forkGX + GW_SIZE + 60;
+      const baseX = forkGX + GW_SIZE + 30 + TASK_W / 2; // primeira tarefa da trilha não encosta no gateway
       let joinNeed = baseX;
       tracks.forEach(tr => {
         let x = baseX;
@@ -2853,17 +2951,18 @@ function buildBPMN(stepsData) {
         const lastIdx = tr.idxs[tr.idxs.length - 1];
         let end = stepX[lastIdx] + TASK_W / 2;
         if (stepsData[lastIdx].optional) end += 30 + GW_SIZE;
+        if (stepsData[lastIdx]._gw)      end += GW_SIZE + 66;
         if (end > joinNeed) joinNeed = end;
       });
       joinGX = joinNeed + 60;
-      curX = joinGX + GW_SIZE + 60;
+      curX = joinGX + GW_SIZE + 30 + TASK_W / 2; // próxima tarefa não encosta no gateway de junção
     }
   }
 
   const X_START_EVT = ELEM_X0 + 80;
   const X_END_EVT   = curX + 60;
   const TOTAL_W     = X_END_EVT + 80;
-  const TOTAL_H     = activeLanes.length * LANE_H;
+  const TOTAL_H     = activeLanes.reduce((sum, a) => sum + laneHOf(a), 0);
   const POOL_H      = TOTAL_H;
 
   // ---- 2. Emissores de XML ----
@@ -2890,7 +2989,13 @@ function buildBPMN(stepsData) {
     const actor = s.actor || 'ses';
     const col = BIZAGI_COLORS[actor] || BIZAGI_COLORS.ses;
     const cx = stepX[i];
-    const cy = laneYMap[actor];
+    // Tarefas de trilha ocupam uma linha própria dentro da raia do ator
+    let cy = laneYMap[actor];
+    const _trk = (forkIdx >= 0 && i > forkIdx && i < joinIdx) ? stepsData[i]._track : null;
+    if (_trk && trackLanes[actor]) {
+      const row = trackLanes[actor].indexOf(_trk);
+      cy = laneTopMap[actor] + LANE_H / 2 + row * LANE_H;
+    }
     const tx = cx - TASK_W / 2;
     const ty = cy - TASK_H / 2;
     const cleanTitle = s.title.replace(/^Trilha [A-Z] — /, '');
@@ -2910,6 +3015,11 @@ function buildBPMN(stepsData) {
     } else {
       taskDefs += `    <${taskTag} id="${tid}" name="${label}"/>`;
       taskShapes += `      <bpmndi:BPMNShape id="sh_${tid}" bpmnElement="${tid}" bioc:fill="${col.fill}" bioc:stroke="${col.stroke}" color:background-color="${col.fill}" color:border-color="${col.stroke}"><dc:Bounds x="${tx}" y="${ty}" width="${TASK_W}" height="${TASK_H}"/><bpmndi:BPMNLabel/></bpmndi:BPMNShape>`;
+    }
+    // Eventos intermediários são círculos de 36px centralizados — as arestas
+    // devem apontar para a borda do círculo, não para a caixa imaginária de tarefa
+    if (taskTag === 'intermediateCatchEvent') {
+      return { id: tid, left: cx - 18, right: cx + 18, cy: cy };
     }
     return { id: tid, left: tx, right: tx + TASK_W, cy: cy };
   };
@@ -3000,7 +3110,8 @@ function buildBPMN(stepsData) {
     }
     i++;
   }
-  flowEdge(`sf_${prevId}_Ev_End`, prevId, 'Ev_End', prevX, prevY, endX, endY);
+  // A seta final mira o centro da borda esquerda do evento de fim (não o canto superior)
+  flowEdge(`sf_${prevId}_Ev_End`, prevId, 'Ev_End', prevX, prevY, endX, endY + 18);
 
   // ---- 4. Raias ----
   const laneElements = {};
@@ -3027,7 +3138,7 @@ function buildBPMN(stepsData) {
     const lStroke = BIZAGI_COLORS[a]?.stroke || '#94a3b8';
     const childRefs = [...laneElements[a]].map(id => `      <flowNodeRef>${id}</flowNodeRef>`).join('\n');
     laneSetXml += `      <lane id="${laneId}" name="${sanitizeXml(actorLabel)}">\n${childRefs}\n      </lane>`;
-    laneShapes += `      <bpmndi:BPMNShape id="sh_${laneId}" bpmnElement="${laneId}" isHorizontal="true" bioc:fill="${lFill}" bioc:stroke="${lStroke}" color:background-color="${lFill}" color:border-color="${lStroke}"><dc:Bounds x="${POOL_LABEL_W}" y="${Y_POOL + li * LANE_H}" width="${TOTAL_W - POOL_LABEL_W}" height="${LANE_H}"/><bpmndi:BPMNLabel><dc:Bounds x="${POOL_LABEL_W + 2}" y="${Y_POOL + li * LANE_H + LANE_H/2 - 6}" width="${LANE_LABEL_W - 8}" height="12"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>`;
+    laneShapes += `      <bpmndi:BPMNShape id="sh_${laneId}" bpmnElement="${laneId}" isHorizontal="true" bioc:fill="${lFill}" bioc:stroke="${lStroke}" color:background-color="${lFill}" color:border-color="${lStroke}"><dc:Bounds x="${POOL_LABEL_W}" y="${laneTopMap[a]}" width="${TOTAL_W - POOL_LABEL_W}" height="${laneHOf(a)}"/><bpmndi:BPMNLabel><dc:Bounds x="${POOL_LABEL_W + 2}" y="${laneYMap[a] - 6}" width="${LANE_LABEL_W - 8}" height="12"/></bpmndi:BPMNLabel></bpmndi:BPMNShape>`;
   });
   laneSetXml += `    </laneSet>`;
 
@@ -3127,6 +3238,24 @@ function dlFile(content,name,type) { const a=document.createElement('a'); a.href
 async function bPrint(){
   if(!modeler||!bpmnReady){toast('Gere o diagrama primeiro.','error');return;}
   try{
+    // A janela de impressão não herda os estilos do bpmn-js — sem CSS o SVG fica
+    // invisível (caixas pretas/sem traço). Tenta o CSS oficial da CDN; se offline,
+    // usa um CSS mínimo embutido que garante contorno, texto e setas.
+    let bpmnCss = `
+      .djs-visual rect,.djs-visual circle,.djs-visual ellipse,.djs-visual polygon{fill:#fff;stroke:#1f2937;stroke-width:1.5px}
+      .djs-visual path{fill:none;stroke:#1f2937;stroke-width:1.5px}
+      .djs-connection .djs-visual polyline,.djs-connection .djs-visual path{fill:none;stroke:#1f2937;stroke-width:1.5px}
+      .djs-visual text,.djs-label,.djs-label text{fill:#111827;font-family:Arial,Helvetica,sans-serif}
+      marker path{fill:#1f2937;stroke:#1f2937}
+    `;
+    try{
+      const cssParts = await Promise.all([
+        'https://unpkg.com/bpmn-js@17/dist/assets/diagram-js.css',
+        'https://unpkg.com/bpmn-js@17/dist/assets/bpmn-js.css'
+      ].map(u => fetch(u).then(r => r.ok ? r.text() : '').catch(() => '')));
+      const joined = cssParts.join('\n');
+      if (joined.length > 1000) bpmnCss = joined.replace(/<\//g, '<\\/') + '\n' + bpmnCss;
+    }catch(e){ /* offline: segue com o CSS mínimo */ }
     const m=getModeler();
     const canvas=m.get('canvas'),reg=m.get('elementRegistry');
     const gfx=canvas.getContainer().querySelector('svg');
@@ -3153,6 +3282,22 @@ async function bPrint(){
         const clone=gfx.cloneNode(true);
         // remove o transform de pan/zoom da viewport: o viewBox passa a usar coordenadas do diagrama
         const vp=clone.querySelector('g.viewport');if(vp)vp.removeAttribute('transform');
+        // cores das tarefas e raias aplicadas inline (atributos bioc:* não são renderizados pelo navegador)
+        clone.querySelectorAll('[data-element-id]').forEach(g => {
+          const elId = g.getAttribute('data-element-id') || '';
+          const mt = elId.match(/^T_(\d+)$/);
+          if (mt) {
+            const st = steps[+mt[1]];
+            const c = st && BIZAGI_COLORS[st.actor || 'ses'];
+            const rect = g.querySelector('.djs-visual rect');
+            if (rect && c) { rect.style.fill = c.fill; rect.style.stroke = c.stroke; }
+          }
+          const ml = elId.match(/^Lane_(\w+)$/);
+          if (ml) {
+            const rect = g.querySelector('.djs-visual rect');
+            if (rect) { rect.style.fill = LANE_FILL[ml[1]] || '#f8fafc'; rect.style.stroke = (BIZAGI_COLORS[ml[1]] || {}).stroke || '#94a3b8'; }
+          }
+        });
         clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
         clone.setAttribute('viewBox',`${minX} ${minY} ${w} ${h}`);
         clone.setAttribute('width',Math.round(contentW));
@@ -3171,6 +3316,7 @@ async function bPrint(){
 <title>SESAI — ${sanitize(title)}</title>
 <style>
   @page{size:A4 landscape;margin:0}
+  ${bpmnCss}
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:Arial,Helvetica,sans-serif;background:#fff;color:#111}
   .sheet{position:relative;width:297mm;height:209.5mm;overflow:hidden;page-break-after:always;break-after:page}
@@ -3284,13 +3430,19 @@ function renderPhaseFilter() {
 function renderCards() {
   const isEditMode = !!auth;
   const q = (document.getElementById('flowSearch')?.value||'').toLowerCase();
-  const visible = steps.map((s,i)=>({s,i})).filter(({s})=> {
-    if (activeActor!==null && s.actor!==activeActor) return false;
+  // Filtro por ator NÃO remove cartões — apenas atenua os demais, mantendo o
+  // layout e a posição de todas as etapas estáveis na tela.
+  const hasActorMatch = activeActor===null || steps.some(s=>s.actor===activeActor);
+  if (!hasActorMatch) {
+    document.getElementById('stepCards').innerHTML=`<div class="no-results"><div class="no-results-icon">🔍</div><div>Nenhuma etapa para o ator selecionado.</div></div>`;
+    return;
+  }
+  const visible = steps.map((s,i)=>({s,i,dim:activeActor!==null&&s.actor!==activeActor})).filter(({s})=> {
     if (q && !s.title.toLowerCase().includes(q) && !(s.desc||'').toLowerCase().includes(q)) return false;
     return true;
   });
-  if (visible.length===0 && activeActor) {
-    document.getElementById('stepCards').innerHTML=`<div class="no-results"><div class="no-results-icon">🔍</div><div>Nenhuma etapa para o ator selecionado.</div></div>`;
+  if (visible.length===0 && q) {
+    document.getElementById('stepCards').innerHTML=`<div class="no-results"><div class="no-results-icon">🔍</div><div>Nenhuma etapa encontrada para a busca.</div></div>`;
     return;
   }
   // Apply edit-mode class to flow-main for CSS hooks
@@ -3299,13 +3451,14 @@ function renderCards() {
 
   document.getElementById('addCardBtn').classList.toggle('show', isEditMode);
 
-  document.getElementById('stepCards').innerHTML = visible.map(({s,i}) => {
+  document.getElementById('stepCards').innerHTML = visible.map(({s,i,dim}) => {
     const ph=PHASES.find(p=>p.id===s.phase)||PHASES[0];
     const ac=ACTORS[s.actor]||{label:s.actor,color:'#555',bg:'#eee'};
     const isDone=doneSteps.has(i), isActive=i===currentStep, isOpen=i===openCard, isLocked=i>currentStep&&!isEditMode, isEditing=i===editCard;
     let cls='step-card';
     if(isLocked) cls+=' locked'; else if(isDone) cls+=' done'; else if(isActive) cls+=' active';
     if(isOpen) cls+=' open';
+    if(dim) cls+=' actor-dim';
 
     // Attachments
     const atts = (s.attachments||[]);
